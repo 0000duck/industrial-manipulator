@@ -11,6 +11,7 @@
 # include <iostream>
 # include <limits>
 # include <math.h>
+# include "Vector3D.h"
 
 using std::cout;
 
@@ -45,6 +46,20 @@ public:
 		_m[2][0] = r31;
 		_m[2][1] = r32;
 		_m[2][2] = r33;
+	}
+	Rotation3D(
+			const Vector3D<T>& i,
+			const Vector3D<T>& j,
+			const Vector3D<T>& k){
+		_m[0][0] = i[0];
+		_m[0][1] = j[0];
+		_m[0][2] = k[0];
+		_m[1][0] = i[1];
+		_m[1][1] = j[1];
+		_m[1][2] = k[1];
+		_m[2][0] = i[2];
+		_m[2][1] = j[2];
+		_m[2][2] = k[2];
 	}
 	static const Rotation3D& identity()
 	{

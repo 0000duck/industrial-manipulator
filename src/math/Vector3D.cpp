@@ -5,7 +5,8 @@
  *      Author: a1994846931931
  */
 
-#include "Vector3D.h"
+# include "Rotation3D.h"
+# include "Vector3D.h"
 
 namespace robot {
 namespace math {

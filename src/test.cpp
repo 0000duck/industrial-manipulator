@@ -6,7 +6,10 @@
  */
 
 # include "math/Rotation3D.h"
+# include "math/HTransform3D.h"
+# include "kinematics/Trsf.h"
 # include <iostream>
+# include <math.h>
 # include <string>
 
 using namespace robot::math;
@@ -28,21 +31,8 @@ void println(const T& printable){
 	std::cout<<printable<<'\n';
 }
 int main(){
-	Rotation3D<double> a = Rotation3D<double>::identity();
-	println("a(1, 0) is " + patch::to_string(a(1, 0))); //（）重载测试
-	println("a is:");
-	a.print();
-	println(&a);
-	Rotation3D<double> b = Rotation3D<double>::identity();
-	println("b is:");
-	b.print();
-	println(&b);
-	println(a==b? "a equals to b":"a equals to b"); //==重载测试
-	println(a.equal(b)? "a equals to b":"a equals to b"); //equal()测试
-	Rotation3D<double> c;
-	c.multiply(a, b);
-	println("multiply(a, b) is:"); //multiply重载测试
-	c.print();
+	robot::kinematic::Trsf trsf1(0,1,0,M_PI,0,0);
+	trsf1.getTransform().print();
 	return 0;
 }
 

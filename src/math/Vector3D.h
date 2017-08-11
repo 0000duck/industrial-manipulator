@@ -9,6 +9,7 @@
 #define VECTOR3D_H_
 
 # include "Rotation3D.h"
+# include <iostream>
 
 namespace robot {
 namespace math {
