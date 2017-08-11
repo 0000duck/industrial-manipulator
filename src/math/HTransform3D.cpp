@@ -10,14 +10,6 @@
 namespace robot {
 namespace math {
 
-HTransform3D::HTransform3D() {
-	// TODO Auto-generated constructor stub
-
-}
-
-HTransform3D::~HTransform3D() {
-	// TODO Auto-generated destructor stub
-}
 
 } /* namespace math */
 } /* namespace robot */

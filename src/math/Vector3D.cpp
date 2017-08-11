@@ -10,14 +10,6 @@
 namespace robot {
 namespace math {
 
-Vector3D::Vector3D() {
-	// TODO Auto-generated constructor stub
-
-}
-
-Vector3D::~Vector3D() {
-	// TODO Auto-generated destructor stub
-}
 
 } /* namespace math */
 } /* namespace robot */
