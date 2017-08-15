@@ -9,6 +9,7 @@
 #define FRAME_H_
 
 # include <vector>
+# include "stddef.h"
 # include "../math/HTransform3D.h"
 
 using namespace robot::math;
@@ -29,6 +30,7 @@ public:
 			const double&, const double&, const double&, const double&);
 	Frame* getParent();
 	const HTransform3D<double>* getTransform() const;
+	void print();
 	virtual ~Frame();
 private:
 	static int _frameIDCounter;

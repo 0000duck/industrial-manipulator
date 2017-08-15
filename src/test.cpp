@@ -12,31 +12,13 @@
 # include <iostream>
 # include <math.h>
 # include <string>
+# include "./common/printAdvance.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
 using std::cout;
-#include <sstream>
+using namespace robot::common;
 
-namespace patch
-{
-    template < typename T > std::string to_string( const T& n )
-    {
-        std::ostringstream stm ;
-        stm << n ;
-        return stm.str() ;
-    }
-}
-
-template <typename T>
-void println(const T& printable)
-{
-	std::cout<<printable<<'\n';
-}
-void println()
-{
-	std::cout<<'\n';
-}
 int main(){
 	robot::kinematic::Trsf trsf1(0,1,0,M_PI,0,0);
 	HTransform3D<double>& transform1 = trsf1.getTransform();
@@ -49,8 +31,10 @@ int main(){
 	// update matrix using Frame::updateTransform
 	println();
 	frame1.updateTransform(1,1,1,1,2,2,2,2,3,3,3,3);
-	frame1.getTransform()->print();
-
+	frame1.print();
+	HTransform3D<double> transform2(1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0);
+	Frame frame2(&transform2);
+	frame2.print();
 	return 0;
 }
 

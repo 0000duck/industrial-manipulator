@@ -7,6 +7,10 @@
 
 # include "Frame.h"
 # include "stddef.h"
+# include <iostream>
+# include "../common/printAdvance.h"
+
+using namespace robot::common;
 
 namespace robot {
 namespace kinematic {
@@ -58,6 +62,14 @@ const HTransform3D<double>* Frame::getTransform() const
 	return _tran;
 }
 
+void Frame::print()
+{
+	std::cout << "Frame ID: " << _frameID << '\n';
+	std::cout << "Have parent? -> " << (_parent == NULL ? "no":"yes") << '\n';
+	std::cout << "Number of children -> " << common::to_string(_children.size()) << '\n';
+	std::cout << "transform: " << '\n';
+	_tran->print();
+}
 Frame::~Frame()
 {
 	// TODO Auto-generated destructor stub
