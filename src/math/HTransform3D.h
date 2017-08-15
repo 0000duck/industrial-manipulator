@@ -25,8 +25,7 @@ public:
 	HTransform3D(
 			T r11, T r12, T r13, T r14,
 			T r21, T r22, T r23, T r24,
-			T r31, T r32, T r33, T r34,
-			T r41, T r42, T r43, T r44) :
+			T r31, T r32, T r33, T r34) :
 	_vec(r14, r24, r34),
 	_rot(r11, r12, r13, r21, r22, r23, r31, r32, r33)
 	{}
@@ -48,6 +47,18 @@ public:
 			const T& r31, const T& r32, const T& r33)
 	{
 		_rot.setRotation(r11, r12, r13, r21, r22, r23, r31, r32, r33);
+	}
+	inline void setVector(const T& v1, const T& v2, const T& v3)
+	{
+		_vec.setVector(v1, v2, v3);
+	}
+	inline void update(
+			const T& r11, const T& r12, const T& r13, const T& r14,
+			const T& r21, const T& r22, const T& r23, const T& r24,
+			const T& r31, const T& r32, const T& r33, const T& r34)
+	{
+		_rot.setRotation(r11, r12, r13, r21, r22, r23, r31, r32, r33);
+		_vec.setVector(r14, r24, r34);
 	}
 	static const HTransform3D& identity(){
 		static const HTransform3D id(

@@ -45,6 +45,19 @@ void Frame::setTransform(HTransform3D<double>* transform)
 	_tran = transform;
 }
 
+void Frame::updateTransform(
+		const double& r11, const double& r12, const double& r13, const double& r14,
+		const double& r21, const double& r22, const double& r23, const double& r24,
+		const double& r31, const double& r32, const double& r33, const double& r34)
+{
+	_tran->update(r11, r12, r13, r14, r21, r22, r23, r24, r31, r32, r33, r34);
+}
+
+const HTransform3D<double>* Frame::getTransform() const
+{
+	return _tran;
+}
+
 Frame::~Frame()
 {
 	// TODO Auto-generated destructor stub

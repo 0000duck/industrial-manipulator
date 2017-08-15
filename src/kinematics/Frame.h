@@ -24,7 +24,11 @@ public:
 	void addChild(Frame* child);
 	void setParent(Frame* parent);
 	void setTransform(HTransform3D<double>*);
+	void updateTransform(const double&, const double&, const double&, const double&,
+			const double&, const double&, const double&, const double&,
+			const double&, const double&, const double&, const double&);
 	Frame* getParent();
+	const HTransform3D<double>* getTransform() const;
 	virtual ~Frame();
 private:
 	static int _frameIDCounter;
