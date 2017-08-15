@@ -30,7 +30,13 @@ public:
 		_v[1] = vSource(1);
 		_v[2] = vSource(2);
 	}
+	T getLengh(){
+		return sqrt(_v[0]*_v[0] + _v[0]*_v[0] + _v[0]*_v[0]);
+	}
 	const T operator()(int i) const{
+		return _v[i];
+	}
+	T& operator[](int i) const{
 		return _v[i];
 	}
 	void operator=(const Vector3D<T>& vSource){
@@ -47,7 +53,7 @@ public:
 		return (!this->operator ==(vSource));
 	}
 	static T dot(const Vector3D<T>& a, const Vector3D<T>& b){
-		return (a(0)*a(1)*a(2));
+		return (a(0)*b(0) + a(1)*b(1) + a(2)*b(2));
 	}
 //	static Rotation3D<T>& cross(const Vector3D<T>& a, const Vector3D<T>& b){
 //		static Rotation3D<T> result(a(0))

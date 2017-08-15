@@ -9,6 +9,9 @@
 #define FRAME_H_
 
 # include <vector>
+# include "../math/HTransform3D.h"
+
+using namespace robot::math;
 
 namespace robot {
 namespace kinematic {
@@ -16,13 +19,17 @@ namespace kinematic {
 class Frame {
 	typedef std::vector<Frame*> FrameList;
 public:
-	Frame();
-	Frame(Frame* parent);
+	Frame(HTransform3D<double>*);
+	Frame(Frame* parent, HTransform3D<double>*);
 	void addChild(Frame* child);
+	void setParent(Frame* parent);
+	void setTransform(HTransform3D<double>*);
 	Frame* getParent();
 	virtual ~Frame();
 private:
-	static int _frameID;
+	static int _frameIDCounter;
+	int _frameID;
+	HTransform3D<double>* _tran;
 	Frame* _parent;
 	FrameList _children;
 };

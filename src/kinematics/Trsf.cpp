@@ -27,7 +27,7 @@ Trsf::Trsf(double x, double y, double z, double rx, double ry, double rz):
 	_isTranformChanged = true;
 }
 
-robot::math::HTransform3D<double> Trsf::getTransform(){
+robot::math::HTransform3D<double>& Trsf::getTransform(){
 	if (_isTranformChanged)
 		this->doGetTransform();
 	return _tran;

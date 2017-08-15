@@ -6,9 +6,11 @@
  */
 
 # include "Rotation3D.h"
+# include "HTransform3D.h"
 
 namespace robot {
 namespace math {
+
 
 } /* namespace math */
 } /* namespace robot */

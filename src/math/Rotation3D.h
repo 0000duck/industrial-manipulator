@@ -61,6 +61,21 @@ public:
 		_m[2][1] = j[2];
 		_m[2][2] = k[2];
 	}
+	void setRotation(
+			T r11, T r12, T r13,
+			T r21, T r22, T r23,
+			T r31, T r32, T r33)
+	{
+		_m[0][0] = r11;
+		_m[0][1] = r12;
+		_m[0][2] = r13;
+		_m[1][0] = r21;
+		_m[1][1] = r22;
+		_m[1][2] = r23;
+		_m[2][0] = r31;
+		_m[2][1] = r32;
+		_m[2][2] = r33;
+	}
 	static const Rotation3D& identity()
 	{
 		static Rotation3D id(1,0,0,0,1,0,0,0,1);
@@ -74,6 +89,9 @@ public:
 	inline const T& operator()(int row, int column) const{
 		return _m[row][column];
 	}
+//	inline T& operator[](int row, int column) const{
+//			return _m[row][column];
+//	}
 	bool operator==(const Rotation3D<T>& RotB){
 		for (int i = 0; i<3; i++)
 			for (int j = 0; j<3; j++)
@@ -97,7 +115,7 @@ public:
 				this->_m[i][j] = a(i, 0)*b(0, j) + a(i, 1)*b(1, j) + a(i, 2)*b(2, j);
 			}
 	}
-
+//	friend HTransform3D<T>::setRotation(T, T, T, T, T, T, T, T, T);
 	virtual ~Rotation3D(){}
 private:
 	T _m[3][3];
