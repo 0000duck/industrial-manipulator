@@ -9,11 +9,14 @@
 #include <iostream>
 # include "../math/HTransform3D.h"
 # include <math.h>
+# include "../kinematics/Frame.h"
+
+using namespace robot::kinematic;
 
 namespace robot {
 namespace model {
 
-Link::Link(double theta,double d,double a,double alpha,bool sigma,double offset,double min,double max)
+Link::Link(double theta,double d,double a,double alpha,bool sigma,double min,double max)
 {
 	// TODO Auto-generated constructor stub
 	_theta=theta;
@@ -21,30 +24,70 @@ Link::Link(double theta,double d,double a,double alpha,bool sigma,double offset,
 	_a=a;
 	_alpha=alpha;
 	_sigma=sigma;
-	_offset=offset;
-	_min=min;
-	_max=max;
+	//_offset=offset;
+	_lmin=min;
+	_lmax=max;
 
-	if (_sigma==0)
+	double st=sin(_theta); double ct=cos(_theta);double sa=sin(_alpha);double ca=cos(_alpha);
+	double a11=ct;double a12=-st;double a13=0;double a14=_a;
+	double a21=st*ca;double a22=ct*ca;double a23=-sa;double a24=-_d*sa;
+	double a31=st*sa;double a32=ct*sa;double a33=ca;double a34=_d*ca;
+
+	static robot::math::Rotation3D<double> rot(
+												a11, a12, a13,
+												a21, a22, a23,
+												a31, a32, a33);
+	static robot::math::Vector3D<double> vec(a14, a24, a34);
+	static robot::math::HTransform3D<double> tran(vec, rot);
+
+	Frame frame(&tran);
+	_frame = &frame;
+}
+void Link::change(double offset)  //改变link增量
+{
+	_offset=offset;
+	if (_sigma==0)				//link为转动副
 	{
-		_theta =_theta+_offset;
-		if(_theta>_max || _theta<_min)
+		double _theta1;
+		_theta1 =_theta+_offset;
+		if(_theta1>_lmax || _theta1<_lmin)
 			std::cout<< "错误"<<std::endl;
 		else
 		{
-			double a11=cos(_theta);double a12=-sin(_theta);double a13=0;double a14=_a;
-			double a21=sin(_theta)*cos(_alpha);double a22=cos(_theta)*cos(_alpha);double a23=-sin(_alpha);double a24=-_d*sin(_alpha);
-			double a31=sin(_theta)*sin(_alpha);double a32=cos(_theta)*sin(_alpha);double a33=cos(_alpha);double a34=_d*cos(_alpha);
+			double st=sin(_theta1); double ct=cos(_theta1);double sa=sin(_alpha);double ca=cos(_alpha);
+			double a11=ct;double a12=-st;double a13=0;double a14=_a;
+			double a21=st*ca;double a22=ct*ca;double a23=-sa;double a24=-_d*sa;
+			double a31=st*sa;double a32=ct*sa;double a33=ca;double a34=_d*ca;
 
+			_frame->updateTransform(a11, a12, a13, a14, a21, a22, a23, a24, a31, a32, a33, a34);
 
-			static robot::math::Rotation3D<double> rot(
-														a11, a12, a13,
-														a21, a22, a23,
-														a31, a32, a33);
-			static robot::math::Vector3D<double> vec(a14, a24, a34);
-			static robot::math::HTransform3D<double> tran(vec, rot);
 		}
 	}
+	else if(_sigma==1)				//link为移动副
+	{
+		double _a1=_a+offset;
+		if(_a1>_lmax || _a1<_lmin)
+			std::cout<< "错误"<<std::endl;
+			else
+			{
+				//static robot::math::Vector3D<double> vec(_a1, 0, _d);
+				//static robot::math::Rotation3D<double> id(1,0,0,0,1,0,0,0,1);
+				//static robot::math::HTransform3D<double> tran(vec,id);
+				_frame->updateTransform(1,0,0,_a1,0,1,0,0,0,0,1,_d);
+
+			}
+	}
+
+}
+
+void Link::reset()  //恢复link初始状态
+{
+	double st=sin(_theta); double ct=cos(_theta);double sa=sin(_alpha);double ca=cos(_alpha);
+	double a11=ct;double a12=-st;double a13=0;double a14=_a;
+	double a21=st*ca;double a22=ct*ca;double a23=-sa;double a24=-_d*sa;
+	double a31=st*sa;double a32=ct*sa;double a33=ca;double a34=_d*ca;
+
+	_frame->updateTransform(a11, a12, a13, a14, a21, a22, a23, a24, a31, a32, a33, a34);
 }
 
 Link::~Link() {

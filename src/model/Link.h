@@ -8,12 +8,19 @@
 #ifndef LINK_H_
 #define LINK_H_
 # include "../math/HTransform3D.h"
+# include "../kinematics/Frame.h"
+
+using namespace robot::kinematic;
+
 namespace robot {
 namespace model {
 
 class Link {
 public:
-	Link(double theta,double d,double a,double alpha,bool sigma,double offset,double min,double max);
+	Link();
+	Link(double theta,double d,double a,double alpha,bool sigma,double min,double max);
+	void change(double offset);
+	void reset();
 
 	virtual ~Link();
 
@@ -23,10 +30,10 @@ private:
 	double _a;
 	double _alpha;
 	bool _sigma;
+	double _lmin;
+	double _lmax;
 	double _offset;
-	double _min;
-	double _max;
-	//Frame _x;
+	Frame* _frame;
 
 };
 
