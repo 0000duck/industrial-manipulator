@@ -16,15 +16,19 @@ using namespace robot::kinematic;
 namespace robot {
 namespace model {
 
+Frame* Link::getFrame()
+{
+	 return _frame;
+}
+
 Link::Link(double theta,double d,double a,double alpha,bool sigma,double min,double max)
 {
-	// TODO Auto-generated constructor stub
 	_theta=theta;
 	_d=d;
 	_a=a;
 	_alpha=alpha;
 	_sigma=sigma;
-	//_offset=offset;
+	_offset=0;
 	_lmin=min;
 	_lmax=max;
 
@@ -77,7 +81,7 @@ void Link::change(double offset)  //改变link增量
 
 			}
 	}
-
+	getFrame();
 }
 
 void Link::reset()  //恢复link初始状态
@@ -88,10 +92,12 @@ void Link::reset()  //恢复link初始状态
 	double a31=st*sa;double a32=ct*sa;double a33=ca;double a34=_d*ca;
 
 	_frame->updateTransform(a11, a12, a13, a14, a21, a22, a23, a24, a31, a32, a33, a34);
+
+	getFrame();
 }
 
 Link::~Link() {
-	// TODO Auto-generated destructor stub
+
 }
 
 } /* namespace model */

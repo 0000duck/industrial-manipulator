@@ -21,7 +21,7 @@ public:
 	Link(double theta,double d,double a,double alpha,bool sigma,double min,double max);
 	void change(double offset);
 	void reset();
-
+	Frame* getFrame();
 	virtual ~Link();
 
 private:
