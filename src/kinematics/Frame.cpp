@@ -41,7 +41,7 @@ Frame::Frame(Frame* parent, HTransform3D<double>* transform)
 		parent->addChild(this);
 }
 
-void Frame::setParent(Frame* parent, bool doAddChild=true)
+void Frame::setParent(Frame* parent, bool doAddChild)
 {
 	/*
 	 * 设置parent；
@@ -55,7 +55,7 @@ void Frame::setParent(Frame* parent, bool doAddChild=true)
 
 }
 
-void Frame::addChild(Frame* child, bool doSetParent=true)
+void Frame::addChild(Frame* child, bool doSetParent)
 {
 	/*
 	 * 添加一个child；
@@ -74,7 +74,7 @@ bool Frame::haveChild(Frame* child)
 	/*
 	 * 判断一个Frame的_children中有没有一个child；
 	 */
-	for (int i=0; i<_children.size(); i++)
+	for (int i=0; i<(int)_children.size(); i++)
 		if (_children[i] == child)
 			return true;
 	return false;
@@ -86,7 +86,7 @@ int Frame::getChildIndex(Frame* child)
 	 * 获取一个child在_children中的位置；
 	 * 如果没有这个child，那么返回-1；
 	 */
-	for (int i=0; i<_children.size(); i++)
+	for (int i=0; i<(int)_children.size(); i++)
 			if (_children[i] == child)
 				return i;
 	return -1;
@@ -102,7 +102,7 @@ const std::vector<Frame*>& Frame::getChildren()
 	return _children;
 }
 
-void Frame::removeParent(bool doRemoveChild=true)
+void Frame::removeParent(bool doRemoveChild)
 {
 	Frame* parent = _parent;
 	_parent = NULL;
@@ -110,7 +110,7 @@ void Frame::removeParent(bool doRemoveChild=true)
 		parent->removeChild(this, false);
 }
 
-void Frame::removeChild(Frame* child, bool doRemoveParent=true)
+void Frame::removeChild(Frame* child, bool doRemoveParent)
 {
 	int index = this->getChildIndex(child);
 	if (index == -1)

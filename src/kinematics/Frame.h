@@ -23,10 +23,10 @@ public:
 	Frame();
 	Frame(HTransform3D<double>*);
 	Frame(Frame* parent, HTransform3D<double>*);
-	void addChild(Frame* child, bool doSetParent);
-	void setParent(Frame* parent, bool doCheckParent);
-	void removeParent(bool doRemoveChild);
-	void removeChild(Frame* child, bool doRemoveParent);
+	void addChild(Frame* child, bool doSetParent=true);
+	void setParent(Frame* parent, bool doCheckParent=true);
+	void removeParent(bool doRemoveChild=true);
+	void removeChild(Frame* child, bool doRemoveParent=true);
 	const Frame* getParent();
 	const FrameList& getChildren();
 	bool haveChild(Frame* child);
