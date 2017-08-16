@@ -20,15 +20,21 @@ namespace kinematic {
 class Frame {
 	typedef std::vector<Frame*> FrameList;
 public:
+	Frame();
 	Frame(HTransform3D<double>*);
 	Frame(Frame* parent, HTransform3D<double>*);
-	void addChild(Frame* child);
-	void setParent(Frame* parent);
+	void addChild(Frame* child, bool doSetParent);
+	void setParent(Frame* parent, bool doCheckParent);
+	void removeParent(bool doRemoveChild);
+	void removeChild(Frame* child, bool doRemoveParent);
+	const Frame* getParent();
+	const FrameList& getChildren();
+	bool haveChild(Frame* child);
+	int getChildIndex(Frame* child);
 	void setTransform(HTransform3D<double>*);
 	void updateTransform(const double&, const double&, const double&, const double&,
 			const double&, const double&, const double&, const double&,
 			const double&, const double&, const double&, const double&);
-	Frame* getParent();
 	const HTransform3D<double>* getTransform() const;
 	void print();
 	virtual ~Frame();

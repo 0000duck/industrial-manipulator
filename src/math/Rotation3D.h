@@ -22,7 +22,6 @@ template<class T = double>
 class Rotation3D {
 public:
 	Rotation3D(){
-		// TODO
 		_m[0][0] = 1;
 		_m[0][1] = 0;
 		_m[0][2] = 0;

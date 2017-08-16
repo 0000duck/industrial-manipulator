@@ -34,7 +34,7 @@ robot::math::HTransform3D<double>& Trsf::getTransform(){
 }
 
 void Trsf::doGetTransform(){
-	//TODO return the homogeneous transform(HTransform) of the Trsf
+	// return the homogeneous transform(HTransform) of the Trsf
 	const double s1 = sin(_rx);	const double c1 = cos(_rx);
 	const double s2 = sin(_ry);	const double c2 = cos(_ry);
 	const double s3 = sin(_rz);	const double c3 = cos(_rz);
@@ -47,8 +47,8 @@ void Trsf::doGetTransform(){
 	_tran = tran;
 }
 
-Trsf::~Trsf() {
-	// TODO Auto-generated destructor stub
+Trsf::~Trsf()
+{
 }
 
 } /* namespace kinematic */

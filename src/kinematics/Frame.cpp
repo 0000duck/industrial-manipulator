@@ -17,15 +17,22 @@ namespace kinematic {
 
 int Frame::_frameIDCounter = 0;
 
-Frame::Frame(HTransform3D<double>* transform=NULL)
+Frame::Frame()
 {
-	// TODO Auto-generated constructor stub
+	_parent = NULL;
+	_frameID = Frame::_frameIDCounter++;
+	HTransform3D<double> worldFrame;
+	_tran = &worldFrame;
+}
+
+Frame::Frame(HTransform3D<double>* transform)
+{
 	_parent = NULL;
 	_frameID = Frame::_frameIDCounter++;
 	_tran = transform;
 }
 
-Frame::Frame(Frame* parent, HTransform3D<double>* transform=NULL)
+Frame::Frame(Frame* parent, HTransform3D<double>* transform)
 {
 	_parent = parent;
 	_frameID = Frame::_frameIDCounter++;
@@ -34,14 +41,81 @@ Frame::Frame(Frame* parent, HTransform3D<double>* transform=NULL)
 		parent->addChild(this);
 }
 
-void Frame::setParent(Frame* parent)
+void Frame::setParent(Frame* parent, bool doAddChild=true)
 {
+	/*
+	 * 设置parent；
+	 * 外部调用模式下，doAddChild=true，此时除了设置parent之外；
+	 * 还要给parent添加自身作为child；
+	 * 如此保证数据的统一性
+	 */
 	_parent = parent;
+	if (doAddChild)
+		_parent->addChild(this, false);
+
 }
 
-void Frame::addChild(Frame* child)
+void Frame::addChild(Frame* child, bool doSetParent=true)
 {
-	_children.push_back(child);
+	/*
+	 * 添加一个child；
+	 * 外部调用模式下，doSetParent=true，此时不仅要给这个Frame添加child；
+	 * 还要给它的child设置parent；
+	 * 如此保证数据的统一性；
+	 */
+	if (not this->haveChild(child))
+		_children.push_back(child);
+	if (doSetParent)
+		child->setParent(this, false);
+}
+
+bool Frame::haveChild(Frame* child)
+{
+	/*
+	 * 判断一个Frame的_children中有没有一个child；
+	 */
+	for (int i=0; i<_children.size(); i++)
+		if (_children[i] == child)
+			return true;
+	return false;
+}
+
+int Frame::getChildIndex(Frame* child)
+{
+	/*
+	 * 获取一个child在_children中的位置；
+	 * 如果没有这个child，那么返回-1；
+	 */
+	for (int i=0; i<_children.size(); i++)
+			if (_children[i] == child)
+				return i;
+	return -1;
+}
+
+const Frame* Frame::getParent()
+{
+	return _parent;
+}
+
+const std::vector<Frame*>& Frame::getChildren()
+{
+	return _children;
+}
+
+void Frame::removeParent(bool doRemoveChild=true)
+{
+	Frame* parent = _parent;
+	_parent = NULL;
+	if (doRemoveChild)
+		parent->removeChild(this, false);
+}
+
+void Frame::removeChild(Frame* child, bool doRemoveParent=true)
+{
+	int index = this->getChildIndex(child);
+	if (index == -1)
+		return;
+	_children.erase(_children.begin() + index);
 }
 
 void Frame::setTransform(HTransform3D<double>* transform)
@@ -72,7 +146,6 @@ void Frame::print()
 }
 Frame::~Frame()
 {
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace kinematic */
