@@ -11,11 +11,12 @@
 # include "Rotation3D.h"
 # include "Vector3D.h"
 # include <iostream>
+# include <assert.h>
 
 namespace robot {
 namespace math {
 
-template<typename T>
+template<typename T=double>
 class HTransform3D {
 public:
 	HTransform3D() :
@@ -41,6 +42,23 @@ public:
 	_vec(d),
 	_rot(Rotation3D<T>::identity())
 	{}
+	const HTransform3D<T> operator* (const HTransform3D<T>& tran) const
+	{
+		return HTransform3D<T>(_rot*tran._vec + _vec, _rot*tran._rot);
+	}
+	const HTransform3D<T> inverse()
+	{
+		return HTransform3D<T>(-(_rot.inverse()*_vec), _rot.inverse());
+	}
+	const T operator()(int row, int col) const
+	{
+		assert(row < 3);
+		assert(col < 4);
+		if (col < 3)
+			return _rot(row, col);
+		else
+			return _vec(row);
+	}
 	inline void setRotation(
 			const T& r11, const T& r12, const T& r13,
 			const T& r21, const T& r22, const T& r23,
@@ -52,6 +70,14 @@ public:
 	{
 		_vec.setVector(v1, v2, v3);
 	}
+	inline const Rotation3D<T>& getRotation() const
+	{
+		return _rot;
+	}
+	inline const Vector3D<T>& getPosition() const
+	{
+		return _vec;
+	}
 	inline void update(
 			const T& r11, const T& r12, const T& r13, const T& r14,
 			const T& r21, const T& r22, const T& r23, const T& r24,
@@ -60,12 +86,16 @@ public:
 		_rot.setRotation(r11, r12, r13, r21, r22, r23, r31, r32, r33);
 		_vec.setVector(r14, r24, r34);
 	}
-	static const HTransform3D& identity(){
-		static const HTransform3D id(
+	static const HTransform3D<T>& identity(){
+		static const HTransform3D<T> id(
 			Vector3D<T>(0, 0, 0),
 			Rotation3D<T>::identity());
 		return id;
 	}
+	/*
+	 * 根据DH参数(Modified DH)构造HTransform3D；
+	 */
+	static const HTransform3D<T> DH(T alpha, T a, T d, T theta);
 	void print() const{
 		for (int i = 0; i<3; i++)
 			cout<<_rot(i, 0)<<" "<<_rot(i, 1)<<" "<<_rot(i, 2)<<" "<<_vec(i)<<'\n';

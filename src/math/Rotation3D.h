@@ -18,7 +18,7 @@ using std::cout;
 namespace robot {
 namespace math {
 
-template<class T = double>
+template<class T=double>
 class Rotation3D {
 public:
 	Rotation3D(){
@@ -33,9 +33,9 @@ public:
 		_m[2][2] = 1;
 	}
 	Rotation3D(
-		T r11, T r12, T r13,
-		T r21, T r22, T r23,
-		T r31, T r32, T r33){
+		const T r11, const T r12, const T r13,
+		const T r21, const T r22, const T r23,
+		const T r31, const T r32, const T r33){
 		_m[0][0] = r11;
 		_m[0][1] = r12;
 		_m[0][2] = r13;
@@ -108,11 +108,37 @@ public:
 					return false;
 		return true;
 	}
-	void multiply(const Rotation3D<T>& a, const Rotation3D<T>& b){
-		for (int i = 0; i<3; i++)
-			for (int j = 0; j<3; j++){
-				this->_m[i][j] = a(i, 0)*b(0, j) + a(i, 1)*b(1, j) + a(i, 2)*b(2, j);
-			}
+	static Rotation3D<T> multiply(const Rotation3D<T>& a, const Rotation3D<T>& b){
+		return Rotation3D<T>(
+				a(0, 0)*b(0, 0) + a(0, 1)*b(1, 0) + a(0, 2)*b(2, 0),
+				a(0, 0)*b(0, 1) + a(0, 1)*b(1, 1) + a(0, 2)*b(2, 1),
+				a(0, 0)*b(0, 2) + a(0, 1)*b(1, 2) + a(0, 2)*b(2, 2),
+
+				a(1, 0)*b(0, 0) + a(1, 1)*b(1, 0) + a(1, 2)*b(2, 0),
+				a(1, 0)*b(0, 1) + a(1, 1)*b(1, 1) + a(1, 2)*b(2, 1),
+				a(1, 0)*b(0, 2) + a(1, 1)*b(1, 2) + a(1, 2)*b(2, 2),
+
+				a(2, 0)*b(0, 0) + a(2, 1)*b(1, 0) + a(2, 2)*b(2, 0),
+				a(2, 0)*b(0, 1) + a(2, 1)*b(1, 1) + a(2, 2)*b(2, 1),
+				a(2, 0)*b(0, 2) + a(2, 1)*b(1, 2) + a(2, 2)*b(2, 2));
+	}
+	Rotation3D<T> operator*(const Rotation3D<T> rot) const
+	{
+		return multiply(*this, rot);
+	}
+	Vector3D<T> operator*(const Vector3D<T> vec) const
+	{
+		return Vector3D<T>(
+				_m[0][0]*vec(0) + _m[0][1]*vec(1) + _m[0][2]*vec(2),
+				_m[1][0]*vec(0) + _m[1][1]*vec(1) + _m[1][2]*vec(2),
+				_m[2][0]*vec(0) + _m[2][1]*vec(1) + _m[2][2]*vec(2));
+	}
+	Rotation3D<T> inverse() const
+	{
+		return Rotation3D<T>(
+				_m[0][0], _m[1][0], _m[2][0],
+				_m[0][1], _m[1][1], _m[2][1],
+				_m[0][2], _m[1][2], _m[2][2]);
 	}
 //	friend HTransform3D<T>::setRotation(T, T, T, T, T, T, T, T, T);
 	virtual ~Rotation3D(){}

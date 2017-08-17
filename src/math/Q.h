@@ -8,13 +8,24 @@
 #ifndef Q_H_
 #define Q_H_
 
+# include <stddef.h>
+# include <vector>
+
 namespace robot {
 namespace math {
 
 class Q {
 public:
 	Q();
+//	Q(Q&);
+	int size();
+	double& operator()(int) const;
 	virtual ~Q();
+public:
+	static Q& zero(int);
+private:
+	int _size;
+	std::vector<double> _value;
 };
 
 } /* namespace math */

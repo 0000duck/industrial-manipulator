@@ -15,6 +15,8 @@ class State {
 public:
 	State();
 	virtual ~State();
+private:
+
 };
 
 } /* namespace kinematic */

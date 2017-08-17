@@ -14,7 +14,7 @@
 namespace robot {
 namespace math {
 
-template<typename T>
+template<typename T=double>
 class Vector3D {
 public:
 	Vector3D()
@@ -33,7 +33,7 @@ public:
 		_v[1] = vSource(1);
 		_v[2] = vSource(2);
 	}
-	T getLengh()
+	double getLengh() const
 	{
 		return sqrt(_v[0]*_v[0] + _v[0]*_v[0] + _v[0]*_v[0]);
 	}
@@ -60,6 +60,16 @@ public:
 	bool operator!=(const Vector3D<T>& vSource)
 	{
 		return (!this->operator ==(vSource));
+	}
+	Vector3D<T> operator-() const
+	{
+		return Vector3D<T>(
+				-_v[0], -_v[1], -_v[2]);
+	}
+	Vector3D<T> operator+(Vector3D<T> vec) const
+	{
+		return Vector3D<T>(
+				vec(0) + _v[0], vec(1) + _v[1], vec(2) + _v[2]);
 	}
 	static T dot(const Vector3D<T>& a, const Vector3D<T>& b)
 	{

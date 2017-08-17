@@ -15,6 +15,11 @@ Q::Q() {
 
 }
 
+//Q::Q(Q&)
+//{
+//
+//}
+
 Q::~Q() {
 	// TODO Auto-generated destructor stub
 }
