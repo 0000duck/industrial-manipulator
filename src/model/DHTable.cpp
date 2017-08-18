@@ -15,6 +15,27 @@ DHTable::DHTable() {
 
 }
 
+
+int DHTable::size()
+{
+	return _dHParam.size();
+}
+
+const DHParameters& DHTable::operator()(int index) const
+{
+	return _dHParam[index];
+}
+
+const DHParameters& DHTable::operator[](int index) const
+{
+	return _dHParam[index];
+}
+
+void DHTable::append(const DHParameters& dHParam)
+{
+	_dHParam.push_back(dHParam);
+}
+
 DHTable::~DHTable() {
 	// TODO Auto-generated destructor stub
 }

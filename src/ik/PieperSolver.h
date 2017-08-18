@@ -22,7 +22,7 @@ class PieperSolver {
 public:
 	PieperSolver(robot::model::SerialLink& serialRobot);
     void init();
-    std::vector<Q> PieperSolver::solve(const HTransform3D<>& Y06) const;
+    std::vector<Q> solve(const HTransform3D<>& Y06) const;
     void solveTheta456(double theta1,
                        double theta2,
                        double theta3,
@@ -57,7 +57,7 @@ public:
      * Variables used for calculating
      * Defined here to avoid allocating memory for them all the time
      */
-    mutable double a,b,c,d,e;
+//    mutable double a,b,c,d,e;
 
     mutable double alpha0, a0, calpha0, salpha0, d1;
     mutable double alpha1, a1, calpha1, salpha1, d2;

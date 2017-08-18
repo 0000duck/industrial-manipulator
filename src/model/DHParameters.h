@@ -13,7 +13,7 @@ namespace model {
 
 class DHParameters {
 public:
-	DHParameters();
+	DHParameters(double alpha, double a, double d, double theta);
 	double alpha() const;
 	double a() const;
 	double d() const;

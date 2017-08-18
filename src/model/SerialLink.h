@@ -11,6 +11,8 @@
 # include "../kinematics/Frame.h"
 # include "../math/HTransform3D.h"
 # include "Link.h"
+# include "DHTable.h"
+# include "DHParameters.h"
 
 using robot::kinematic::Frame;
 
@@ -24,6 +26,7 @@ public:
 	void append(Link*);
 	Link* pop();
 	int getDOF();
+	DHTable& getDHTable();
 //	HTransform3D<double> getEndTransform()
 	void print();
 	virtual ~SerialLink();

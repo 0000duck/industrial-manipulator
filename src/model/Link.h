@@ -9,6 +9,7 @@
 #define LINK_H_
 # include "../math/HTransform3D.h"
 # include "../kinematics/Frame.h"
+# include "DHParameters.h"
 
 using namespace robot::kinematic;
 
@@ -22,6 +23,11 @@ public:
 	void change(double offset);
 	void reset();
 	Frame* getFrame();
+	const double a() const;
+	const double d() const;
+	const double theta() const;
+	const double alpha() const;
+	const DHParameters& getDHParams() const;
 	virtual ~Link();
 
 private:
@@ -30,10 +36,11 @@ private:
 	double _a;
 	double _alpha;
 	bool _sigma;
+	double _offset;
 	double _lmin;
 	double _lmax;
-	double _offset;
 	Frame* _frame;
+	DHParameters _dHParam;
 
 };
 

@@ -20,7 +20,44 @@ double Power(double arg, int exp) {
 
 PieperSolver::PieperSolver(robot::model::SerialLink& serialRobot) {
 	// TODO Auto-generated constructor stub
+	_dHTable = serialRobot.getDHTable();
+    alpha0 = _dHTable[0].alpha();
+    a0 = _dHTable[0].a();
+    calpha0 = cos(_dHTable[0].alpha());
+    salpha0 = sin(_dHTable[0].alpha());
+    d1 = _dHTable[0].d();
 
+//    _0Tbase = (_baseTdhRef*HTransform3D<>::DH(alpha0, a0, d1, 0)).inverse();
+
+    alpha1 = _dHTable[1].alpha();
+    a1 = _dHTable[1].a();
+    calpha1 = cos(_dHTable[1].alpha());
+    salpha1 = sin(_dHTable[1].alpha());
+    d2 = _dHTable[1].d();
+
+    alpha2 = _dHTable[2].alpha();
+    a2 = _dHTable[2].a();
+    calpha2 = cos(_dHTable[2].alpha());
+    salpha2 = sin(_dHTable[2].alpha());
+    d3 = _dHTable[2].d();
+
+    alpha3 = _dHTable[3].alpha();
+    a3 = _dHTable[3].a();
+    calpha3 = cos(_dHTable[3].alpha());
+    salpha3 = sin(_dHTable[3].alpha());
+    d4 = _dHTable[3].d();
+
+    alpha4 = _dHTable[4].alpha();
+    a4 = _dHTable[4].a();
+    calpha4 = cos(_dHTable[4].alpha());
+    salpha4 = sin(_dHTable[4].alpha());
+    d5 = _dHTable[4].d();
+
+    alpha5 = _dHTable[5].alpha();
+    a5 = _dHTable[5].a();
+    calpha5 = cos(_dHTable[5].alpha());
+    salpha5 = sin(_dHTable[5].alpha());
+    d6 = _dHTable[5].d();
 }
 
 void PieperSolver::init() {
@@ -125,7 +162,7 @@ std::vector<Q> PieperSolver::solve(const HTransform3D<>& baseTend) const
     }
 
     for (std::vector<Q>::iterator it = result.begin(); it != result.end(); ++it) {
-        for (size_t i = 0; i<(*it).size(); i++)
+        for (size_t i = 0; i<(size_t)(*it).size(); i++)
             (*it)(i) -= _dHTable[i].theta();
     }
 

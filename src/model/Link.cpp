@@ -10,6 +10,7 @@
 # include "../math/HTransform3D.h"
 # include <math.h>
 # include "../kinematics/Frame.h"
+# include "DHParameters.h"
 
 using namespace robot::kinematic;
 
@@ -21,17 +22,11 @@ Frame* Link::getFrame()
 	 return _frame;
 }
 
-Link::Link(double theta,double d,double a,double alpha,bool sigma,double min,double max)
+Link::Link(double theta,double d,double a,double alpha,bool sigma,double min,double max):
+		_theta(theta),_d(d),_a(a),_alpha(alpha),
+		_sigma(sigma),_offset(0),_lmin(min),_lmax(max),
+		_dHParam(_alpha, _a, _d, _theta)
 {
-	_theta=theta;
-	_d=d;
-	_a=a;
-	_alpha=alpha;
-	_sigma=sigma;
-	_offset=0;
-	_lmin=min;
-	_lmax=max;
-
 	double st=sin(_theta); double ct=cos(_theta);double sa=sin(_alpha);double ca=cos(_alpha);
 	double a11=ct;double a12=-st;double a13=0;double a14=_a;
 	double a21=st*ca;double a22=ct*ca;double a23=-sa;double a24=-_d*sa;
@@ -94,6 +89,31 @@ void Link::reset()  //恢复link初始状态
 	_frame->updateTransform(a11, a12, a13, a14, a21, a22, a23, a24, a31, a32, a33, a34);
 
 	getFrame();
+}
+
+const double Link::a() const
+{
+	return _a;
+}
+
+const double Link::d() const
+{
+	return _d;
+}
+
+const double Link::theta() const
+{
+	return _theta;
+}
+
+const double Link::alpha() const
+{
+	return _alpha;
+}
+
+const DHParameters& Link::getDHParams() const
+{
+	return _dHParam;
 }
 
 Link::~Link() {

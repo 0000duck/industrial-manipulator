@@ -52,6 +52,17 @@ int SerialLink::getDOF()
 	return (int)_linkList.size();
 }
 
+
+DHTable& SerialLink::getDHTable()
+{
+	static DHTable dHTable;
+	for (int i=0;i<(int)_linkList.size();i++)
+	{
+		dHTable.append(_linkList[i]->getDHParams());
+	}
+	return dHTable;
+}
+
 SerialLink::~SerialLink()
 {
 }

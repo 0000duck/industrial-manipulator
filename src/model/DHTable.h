@@ -9,6 +9,7 @@
 #define DHTABLE_H_
 
 # include "DHParameters.h"
+# include <vector>
 
 namespace robot {
 namespace model {
@@ -19,7 +20,10 @@ public:
 	int size();
 	const DHParameters& operator()(int) const;
 	const DHParameters& operator[](int) const;
+	void append(const DHParameters&);
 	virtual ~DHTable();
+private:
+	std::vector<DHParameters> _dHParam;
 private:
 
 };

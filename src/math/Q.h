@@ -17,9 +17,11 @@ namespace math {
 class Q {
 public:
 	Q();
+	Q(double, double, double, double, double, double);
 //	Q(Q&);
 	int size();
-	double& operator()(int) const;
+	double& operator()(int);
+	double& operator[](int);
 	virtual ~Q();
 public:
 	static Q& zero(int);

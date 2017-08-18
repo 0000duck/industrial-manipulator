@@ -10,6 +10,5 @@
 namespace robot {
 namespace math {
 
-
 } /* namespace math */
 } /* namespace robot */
