@@ -16,7 +16,9 @@ namespace model {
 class DHTable {
 public:
 	DHTable();
+	int size();
 	const DHParameters& operator()(int) const;
+	const DHParameters& operator[](int) const;
 	virtual ~DHTable();
 private:
 
