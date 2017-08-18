@@ -21,24 +21,33 @@ Frame::Frame()
 {
 	_parent = NULL;
 	_frameID = Frame::_frameIDCounter++;
-	HTransform3D<double> worldFrame;
-	_tran = &worldFrame;
+	static HTransform3D<double> worldFrame;
+	_tran = worldFrame;
 }
 
-Frame::Frame(HTransform3D<double>* transform)
+Frame::Frame(HTransform3D<double>& transform)
 {
 	_parent = NULL;
 	_frameID = Frame::_frameIDCounter++;
 	_tran = transform;
 }
 
-Frame::Frame(Frame* parent, HTransform3D<double>* transform)
+Frame::Frame(Frame* parent, HTransform3D<double>& transform)
 {
 	_parent = parent;
 	_frameID = Frame::_frameIDCounter++;
 	_tran = transform;
 	if (parent != NULL)
 		parent->addChild(this);
+}
+
+Frame::Frame(Frame* parent)
+{
+	_parent = parent;
+	_frameID = Frame::_frameIDCounter++;
+	_tran = HTransform3D<>::identity();
+	if (parent != NULL)
+	parent->addChild(this);
 }
 
 void Frame::setParent(Frame* parent, bool doAddChild)
@@ -118,7 +127,7 @@ void Frame::removeChild(Frame* child, bool doRemoveParent)
 	_children.erase(_children.begin() + index);
 }
 
-void Frame::setTransform(HTransform3D<double>* transform)
+void Frame::setTransform(HTransform3D<double>& transform)
 {
 	_tran = transform;
 }
@@ -128,10 +137,10 @@ void Frame::updateTransform(
 		const double& r21, const double& r22, const double& r23, const double& r24,
 		const double& r31, const double& r32, const double& r33, const double& r34)
 {
-	_tran->update(r11, r12, r13, r14, r21, r22, r23, r24, r31, r32, r33, r34);
+	_tran.update(r11, r12, r13, r14, r21, r22, r23, r24, r31, r32, r33, r34);
 }
 
-const HTransform3D<double>* Frame::getTransform() const
+const HTransform3D<double>& Frame::getTransform() const
 {
 	return _tran;
 }
@@ -142,7 +151,7 @@ void Frame::print()
 	std::cout << "Have parent? -> " << (_parent == NULL ? "no":"yes") << '\n';
 	std::cout << "Number of children -> " << common::to_string(_children.size()) << '\n';
 	std::cout << "transform: " << '\n';
-	_tran->print();
+	_tran.print();
 }
 Frame::~Frame()
 {

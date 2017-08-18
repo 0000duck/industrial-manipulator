@@ -22,6 +22,7 @@ public:
 	int size();
 	double& operator()(int);
 	double& operator[](int);
+	void print();
 	virtual ~Q();
 public:
 	static Q& zero(int);

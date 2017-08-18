@@ -8,8 +8,6 @@
 #ifndef PIEPERSOLVER_H_
 #define PIEPERSOLVER_H_
 
-#define Pi M_PI
-
 # include <vector>
 # include "../math/Q.h"
 # include "../model/DHTable.h"

@@ -21,8 +21,9 @@ class Frame {
 	typedef std::vector<Frame*> FrameList;
 public:
 	Frame();
-	Frame(HTransform3D<double>*);
-	Frame(Frame* parent, HTransform3D<double>*);
+	Frame(HTransform3D<double>&);
+	Frame(Frame* parent, HTransform3D<double>&);
+	Frame(Frame* parent);
 	void addChild(Frame* child, bool doSetParent=true);
 	void setParent(Frame* parent, bool doCheckParent=true);
 	void removeParent(bool doRemoveChild=true);
@@ -31,17 +32,17 @@ public:
 	const FrameList& getChildren();
 	bool haveChild(Frame* child);
 	int getChildIndex(Frame* child);
-	void setTransform(HTransform3D<double>*);
+	void setTransform(HTransform3D<double>&);
 	void updateTransform(const double&, const double&, const double&, const double&,
 			const double&, const double&, const double&, const double&,
 			const double&, const double&, const double&, const double&);
-	const HTransform3D<double>* getTransform() const;
+	const HTransform3D<double>& getTransform() const;
 	void print();
 	virtual ~Frame();
 private:
 	static int _frameIDCounter;
 	int _frameID;
-	HTransform3D<double>* _tran;
+	HTransform3D<double> _tran;
 	Frame* _parent;
 	FrameList _children;
 };

@@ -21,18 +21,19 @@ namespace model {
 
 class SerialLink {
 public:
-	SerialLink();
-	SerialLink(std::vector<Link*>);
+	SerialLink(Frame* tool=NULL);
+	SerialLink(std::vector<Link*>, Frame* tool=NULL);
 	void append(Link*);
 	Link* pop();
 	int getDOF();
 	DHTable& getDHTable();
-//	HTransform3D<double> getEndTransform()
+	HTransform3D<double> getEndTransform() const;
 	void print();
 	virtual ~SerialLink();
 private:
 	std::vector<Link*> _linkList;
 	Frame* _worldFrame;
+	Frame* _endToTool;
 };
 
 } /* namespace model */

@@ -13,15 +13,29 @@ using robot::kinematic::Frame;
 namespace robot {
 namespace model {
 
-SerialLink::SerialLink()
+SerialLink::SerialLink(Frame* tool)
 {
 	Frame worldFrame;
 	_worldFrame = &worldFrame;
+	if (tool == NULL)
+	{
+		static Frame endTool(_worldFrame);
+		_endToTool = &endTool;
+	}
+	else
+		_endToTool = tool;
 }
 
-SerialLink::SerialLink(std::vector<Link*> linkList)
+SerialLink::SerialLink(std::vector<Link*> linkList,Frame* tool)
 {
-	Frame worldFrame;
+	static Frame worldFrame;
+	if (tool == NULL)
+		{
+			static Frame endTool(_worldFrame);
+			_endToTool = &endTool;
+		}
+		else
+			_endToTool = tool;
 	_worldFrame = &worldFrame;
 	Frame* parent = _worldFrame;
 	for (int i=0; i<(int)linkList.size(); i++)
@@ -65,6 +79,16 @@ DHTable& SerialLink::getDHTable()
 		dHTable.append(_linkList[i]->getDHParams());
 	}
 	return dHTable;
+}
+
+HTransform3D<double> SerialLink::getEndTransform() const
+{
+	static HTransform3D<> tran = _endToTool->getTransform();
+	for (int i=_linkList.size()-1;i>-1;i--)
+	{
+		tran = _linkList[i]->getFrame()->getTransform()*tran;
+	}
+	return tran;
 }
 
 SerialLink::~SerialLink()

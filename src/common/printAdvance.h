@@ -8,7 +8,10 @@
 #ifndef _PRINTADVANCE_H_
 #define _PRINTADVANCE_H_
 
-#include <sstream>
+# include <sstream>
+# include <iostream>
+
+using std::cout;
 
 namespace robot{
 namespace common{
@@ -23,7 +26,7 @@ template < typename T > std::string to_string( const T& n )
 template <typename T>
 void println(const T& printable)
 {
-	std::cout<<to_string(printable)<<'\n';
+	cout<<to_string(printable)<<'\n';
 }
 
 void println();

@@ -39,7 +39,7 @@ Link::Link(double alpha, double a, double d, double theta, double min, double ma
 	static robot::math::Vector3D<double> vec(a14, a24, a34);
 	static robot::math::HTransform3D<double> tran(vec, rot);
 
-	Frame frame(&tran);
+	static Frame frame(tran);
 	_frame = &frame;
 }
 void Link::change(double offset)  //改变link增量

@@ -6,6 +6,7 @@
  */
 
 #include "Q.h"
+# include "../common/printAdvance.h"
 
 namespace robot {
 namespace math {
@@ -50,6 +51,13 @@ Q& Q::zero(int size)
 {
 	static Q q(0, 0, 0, 0, 0, 0);
 	return q;
+}
+
+void Q::print()
+{
+	for (int i = 0; i<_size; i++)
+		cout << _value[i] << " ";
+	robot::common::println();
 }
 
 Q::~Q() {

@@ -211,7 +211,7 @@ void PieperSolver::solveTheta456(
         theta4 = 0;
         theta6 = atan2(-r12, r11);
     }
-    else if (fabs(Pi-theta5)< 1e-12) {
+    else if (fabs(M_PI-theta5)< 1e-12) {
         theta4 = 0;
         theta6 = atan2(r12,-r11);
     } else {
@@ -232,14 +232,14 @@ void PieperSolver::solveTheta456(
 
     double alt4, alt6;
     if (theta4>0)
-        alt4 = theta4-Pi;
+        alt4 = theta4-M_PI;
     else
-        alt4 = theta4+Pi;
+        alt4 = theta4+M_PI;
 
     if (theta6>0)
-        alt6 = theta6-Pi;
+        alt6 = theta6-M_PI;
     else
-        alt6 = theta6+Pi;
+        alt6 = theta6+M_PI;
 
     q(3) = alt4;
     q(4) = -theta5;
