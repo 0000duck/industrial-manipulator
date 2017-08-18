@@ -13,28 +13,34 @@
 # include <math.h>
 # include <string>
 # include "./common/printAdvance.h"
+# include "model/SerialLink.h"
+# include "model/Link.h"
+# include "test.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
 using std::cout;
 using namespace robot::common;
+using namespace robot::model;
 
 int main(){
-	robot::kinematic::Trsf trsf1(0,1,0,M_PI,0,0);
-	HTransform3D<double>& transform1 = trsf1.getTransform();
-	transform1.print();
-	// update matrix using HTransform3D::setRotation
-	println();
-	transform1.setRotation(1,2,3,4,5,6,7,8,9);
-	transform1.print();
-	Frame frame1(&transform1);
-	// update matrix using Frame::updateTransform
-	println();
-	frame1.updateTransform(1,1,1,1,2,2,2,2,3,3,3,3);
-	frame1.print();
-	HTransform3D<double> transform2(1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0);
-	Frame frame2(&transform2);
-	frame2.print();
+	cout<<"test";
+	SerialLink robot;
+//	Link(alpha, a, d, theta, min, max, sigma=0)
+	Link l1(alpha1, a1, d1, theta1, lmin1, lmax1);
+	Link l2(alpha2, a2, d2, theta2, lmin2, lmax2);
+	Link l3(alpha3, a3, d3, theta3, lmin3, lmax3);
+	Link l4(alpha4, a4, d4, theta4, lmin4, lmax4);
+	Link l5(alpha5, a5, d5, theta5, lmin5, lmax5);
+	Link l6(alpha6, a6, d6, theta6, lmin6, lmax6);
+	robot.append(&l1);
+	robot.append(&l2);
+	robot.append(&l3);
+	robot.append(&l4);
+	robot.append(&l5);
+	robot.append(&l6);
+	println("number of dof is:");
+	println(robot.getDOF());
 	return 0;
 }
 

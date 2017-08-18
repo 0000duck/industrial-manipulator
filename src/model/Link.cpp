@@ -22,7 +22,7 @@ Frame* Link::getFrame()
 	 return _frame;
 }
 
-Link::Link(double theta,double d,double a,double alpha,bool sigma,double min,double max):
+Link::Link(double alpha, double a, double d, double theta, double min, double max, bool sigma):
 		_theta(theta),_d(d),_a(a),_alpha(alpha),
 		_sigma(sigma),_offset(0),_lmin(min),_lmax(max),
 		_dHParam(_alpha, _a, _d, _theta)

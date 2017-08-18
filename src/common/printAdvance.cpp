@@ -11,13 +11,6 @@
 namespace robot{
 namespace common{
 
-
-
-template <typename T>
-void println(const T& printable)
-{
-	std::cout<<printable<<'\n';
-}
 void println()
 {
 	std::cout<<'\n';

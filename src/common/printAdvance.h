@@ -21,7 +21,11 @@ template < typename T > std::string to_string( const T& n )
 }
 
 template <typename T>
-void println(const T& printable);
+void println(const T& printable)
+{
+	std::cout<<to_string(printable)<<'\n';
+}
+
 void println();
 }
 }

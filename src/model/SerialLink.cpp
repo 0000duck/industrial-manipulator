@@ -34,7 +34,11 @@ SerialLink::SerialLink(std::vector<Link*> linkList)
 
 void SerialLink::append(Link* link)
 {
-	Frame* parent = _linkList[_linkList.size() - 1]->getFrame();
+	Frame* parent = NULL;
+	if (_linkList.size() < 1)
+		parent = _worldFrame;
+	else
+		parent = _linkList[_linkList.size() - 1]->getFrame();
 	_linkList.push_back(link);
 	parent->addChild(link->getFrame());
 }

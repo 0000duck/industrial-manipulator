@@ -18,8 +18,8 @@ namespace model {
 
 class Link {
 public:
-	Link();
-	Link(double theta,double d,double a,double alpha,bool sigma,double min,double max);
+//	Link();
+	Link(double alpha, double a, double d, double theta, double min, double max, bool sigma=0);
 	void change(double offset);
 	void reset();
 	Frame* getFrame();
