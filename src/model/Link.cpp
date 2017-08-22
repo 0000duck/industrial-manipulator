@@ -19,8 +19,19 @@ namespace model {
 
 Frame* Link::getFrame()
 {
+<<<<<<< Updated upstream
 	 return _frame;
 }
+=======
+	_theta=theta;
+	_d=d;
+	_a=a;
+	_alpha=alpha;
+	_sigma=sigma;
+	//_offset=offset;
+	_lmin=min;
+	_lmax=max;
+>>>>>>> Stashed changes
 
 Link::Link(double alpha, double a, double d, double theta, double min, double max, bool sigma):
 		_theta(theta),_d(d),_a(a),_alpha(alpha),
@@ -116,8 +127,13 @@ const DHParameters& Link::getDHParams() const
 	return _dHParam;
 }
 
+<<<<<<< Updated upstream
 Link::~Link() {
 
+=======
+Link::~Link()
+{
+>>>>>>> Stashed changes
 }
 
 } /* namespace model */
