@@ -44,7 +44,7 @@ public:
 //    std::vector<double> solveTheta3Case3(double r, double z) const;
 
 
-    double solveTheta2(double r, double z, double theta3) const;
+//    double solveTheta2(double r, double z, double theta3) const;
 
     std::vector<double> solveTheta2Case1(double z, double theta3) const;
     std::vector<double> solveTheta2Case2(double r, double theta3) const;

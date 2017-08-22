@@ -28,30 +28,59 @@ using namespace robot::ik;
 int main(){
 	cout<<"test";
 	SerialLink robot;
-	double alpha1 = M_PI/2;
-	double alpha2 = 0;
-	double alpha3 = M_PI/2;
-	double alpha4 = -M_PI/2;
+
+//	double alpha1 = M_PI/2;
+//	double alpha2 = 0;
+//	double alpha3 = M_PI/2;
+//	double alpha4 = -M_PI/2;
+//	double alpha5 = M_PI/2;
+//	double alpha6 = 0;
+//	double a1 = 40;
+//	double a2 = 315;
+//	double a3 = 70;
+//	double a4 = 0;
+//	double a5 = 0;
+//	double a6 = 0;
+//	double d1 = 330;
+//	double d2 = 0;
+//	double d3 = 310;
+//	double d4 = 0;
+//	double d5 = 0;
+////	double d6 = 70;
+//	double d6 = 0;
+//	double theta1 = 0;
+//	double theta2 = M_PI/2;
+//	double theta3 = 0;
+//	double theta4 = 0;
+//	double theta5 = -M_PI;
+//	double theta6 = M_PI/2;
+
+	// ***
+	double alpha1 = 0;
+	double alpha2 = -M_PI/2;
+	double alpha3 = 0;
+	double alpha4 = M_PI/2;
 	double alpha5 = M_PI/2;
-	double alpha6 = 0;
-	double a1 = 40;
-	double a2 = 315;
-	double a3 = 70;
+	double alpha6 = -M_PI/2;
+	double a1 = 0;
+	double a2 = 0;
+	double a3 = 0.3;
 	double a4 = 0;
 	double a5 = 0;
 	double a6 = 0;
-	double d1 = 330;
+	double d1 = 0;
 	double d2 = 0;
-	double d3 = 310;
-	double d4 = 0;
+	double d3 = 0;
+	double d4 = 0.2;
 	double d5 = 0;
-	double d6 = 70;
-	double theta1 = 0;
-	double theta2 = M_PI/2;
-	double theta3 = 0;
-	double theta4 = 0;
-	double theta5 = -M_PI;
-	double theta6 = M_PI/2;
+	double d6 = 0;
+	double theta1 = M_PI/2;
+	double theta2 = -M_PI/2;
+	double theta3 = M_PI/2;
+	double theta4 = M_PI/2;
+	double theta5 = 0;
+	double theta6 = 0;
+	// ***
 	double lmin1 = M_PI/180.0*-180;
 	double lmin2 = M_PI/180.0*-130;
 	double lmin3 = M_PI/180.0*-70;
@@ -77,15 +106,11 @@ int main(){
 	robot.append(&l4);
 	robot.append(&l5);
 	robot.append(&l6);
-	println("number of dof is:");
-	println(robot.getDOF());
-	println("True l1 tran is: ");
-	HTransform3D<> l1Tran = HTransform3D<>::DH(l1.alpha(), l1.a(), l1.d(), l1.theta());
-	l1Tran.print();
-	println("tran from l1 is: ");
-	l1.getFrame()->getTransform().print();
 	println("end tran of robot is: ");
 	robot.getEndTransform().print();
+	/*
+	 * Test of inverse kinematics
+	 */
 	PieperSolver solver(robot);
 	solver.init();
 	std::vector<robot::math::Q> solution = solver.solve(robot.getEndTransform());

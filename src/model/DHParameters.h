@@ -18,6 +18,7 @@ public:
 	double a() const;
 	double d() const;
 	double theta() const;
+	void print() const;
 	virtual ~DHParameters();
 private:
 	double _alpha;
