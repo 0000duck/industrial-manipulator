@@ -5,8 +5,8 @@
  *      Author: a1994846931931
  */
 
-#include "DHTable.h"
-
+# include "DHTable.h"
+# include <iostream>
 namespace robot {
 namespace model {
 
@@ -34,6 +34,15 @@ const DHParameters& DHTable::operator[](int index) const
 void DHTable::append(const DHParameters& dHParam)
 {
 	_dHParam.push_back(dHParam);
+}
+
+void DHTable::print() const
+{
+	std::cout << "alpha\ta\td\ttheta" << std::endl;
+	for (int i=0; i<(int)_dHParam.size(); i++)
+	{
+		_dHParam[i].print();
+	}
 }
 
 DHTable::~DHTable() {

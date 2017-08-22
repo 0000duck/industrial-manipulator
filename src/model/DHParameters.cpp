@@ -5,7 +5,8 @@
  *      Author: a1994846931931
  */
 
-#include "DHParameters.h"
+# include "DHParameters.h"
+# include <iostream>
 
 namespace robot {
 namespace model {
@@ -34,6 +35,11 @@ double DHParameters::d() const
 double DHParameters::theta() const
 {
 	return _theta;
+}
+
+void DHParameters::print() const
+{
+	std::cout << this->alpha() << "\t" << this->a() << "\t" << this->d() << "\t" << this->theta() << std::endl;
 }
 
 DHParameters::~DHParameters() {

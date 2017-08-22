@@ -21,6 +21,7 @@ public:
 	const DHParameters& operator()(int) const;
 	const DHParameters& operator[](int) const;
 	void append(const DHParameters&);
+	void print() const;
 	virtual ~DHTable();
 private:
 	std::vector<DHParameters> _dHParam;

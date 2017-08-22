@@ -110,19 +110,19 @@ public:
 	/*
 	 * 根据DH参数(Modified DH)构造HTransform3D；
 	 */
-	static const HTransform3D<T>& DH(T alpha, T a, T d, T theta)
+	static const HTransform3D<T> DH(T alpha, T a, T d, T theta)
 	{
 		double st=sin(theta); double ct=cos(theta);double sa=sin(alpha);double ca=cos(alpha);
 		double a11=ct;double a12=-st;double a13=0;double a14=a;
 		double a21=st*ca;double a22=ct*ca;double a23=-sa;double a24=-d*sa;
 		double a31=st*sa;double a32=ct*sa;double a33=ca;double a34=d*ca;
 
-		static robot::math::Rotation3D<double> rot(
+		robot::math::Rotation3D<double> rot(
 													a11, a12, a13,
 													a21, a22, a23,
 													a31, a32, a33);
-		static robot::math::Vector3D<double> vec(a14, a24, a34);
-		static robot::math::HTransform3D<double> tran(vec, rot);
+		robot::math::Vector3D<double> vec(a14, a24, a34);
+		robot::math::HTransform3D<double> tran(vec, rot);
 		return tran;
 	}
 

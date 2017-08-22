@@ -43,15 +43,14 @@ Link::Link(double alpha, double a, double d, double theta, double min, double ma
 	double a21=st*ca;double a22=ct*ca;double a23=-sa;double a24=-_d*sa;
 	double a31=st*sa;double a32=ct*sa;double a33=ca;double a34=_d*ca;
 
-	static robot::math::Rotation3D<double> rot(
+	robot::math::Rotation3D<double> rot(
 												a11, a12, a13,
 												a21, a22, a23,
 												a31, a32, a33);
-	static robot::math::Vector3D<double> vec(a14, a24, a34);
-	static robot::math::HTransform3D<double> tran(vec, rot);
+	robot::math::Vector3D<double> vec(a14, a24, a34);
+	robot::math::HTransform3D<double> tran(vec, rot);
 
-	static Frame frame(tran);
-	_frame = &frame;
+	_frame = new Frame(tran);
 }
 void Link::change(double offset)  //改变link增量
 {
@@ -129,11 +128,15 @@ const DHParameters& Link::getDHParams() const
 
 <<<<<<< Updated upstream
 Link::~Link() {
+<<<<<<< HEAD
 
 =======
 Link::~Link()
 {
 >>>>>>> Stashed changes
+=======
+	delete _frame;
+>>>>>>> pieper
 }
 
 } /* namespace model */

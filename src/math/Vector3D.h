@@ -35,7 +35,7 @@ public:
 	}
 	double getLengh() const
 	{
-		return sqrt(_v[0]*_v[0] + _v[0]*_v[0] + _v[0]*_v[0]);
+		return sqrt(_v[0]*_v[0] + _v[1]*_v[1] + _v[2]*_v[2]);
 	}
 	const T operator()(int i) const
 	{

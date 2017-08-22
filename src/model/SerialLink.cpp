@@ -83,7 +83,7 @@ DHTable& SerialLink::getDHTable()
 
 HTransform3D<double> SerialLink::getEndTransform() const
 {
-	static HTransform3D<> tran = _endToTool->getTransform();
+	HTransform3D<> tran = _endToTool->getTransform();
 	for (int i=_linkList.size()-1;i>-1;i--)
 	{
 		tran = _linkList[i]->getFrame()->getTransform()*tran;
