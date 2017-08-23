@@ -21,8 +21,8 @@ public:
 //	Q(Q&);
 	int size();
 	double& operator()(int);
-	double& operator[](int);
-	void print();
+	double operator[](int) const;
+	void print() const;
 	virtual ~Q();
 public:
 	static Q& zero(int);

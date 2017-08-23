@@ -28,6 +28,7 @@ public:
 	const double theta() const;
 	const double alpha() const;
 	const DHParameters& getDHParams() const;
+	HTransform3D<> getTransform(double q) const;
 	virtual ~Link();
 
 private:

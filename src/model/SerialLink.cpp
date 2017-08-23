@@ -71,14 +71,32 @@ int SerialLink::getDOF()
 }
 
 
-DHTable& SerialLink::getDHTable()
+DHTable SerialLink::getDHTable()
 {
-	static DHTable dHTable;
+	DHTable dHTable;
 	for (int i=0;i<(int)_linkList.size();i++)
 	{
 		dHTable.append(_linkList[i]->getDHParams());
 	}
 	return dHTable;
+}
+
+HTransform3D<double> SerialLink::getTransform(unsigned int startLink, unsigned int endLink, const robot::math::Q& q) const
+{
+	/*
+	 * 获取连个关节之间的变换矩阵；
+	 * 例如startLink = 0, endLink = 1，获得第一个关节到世界坐标系的转变；
+	 */
+	HTransform3D<double> tran = HTransform3D<double>::identity();
+	for (unsigned int i=startLink; i<endLink; i++)
+	{
+		tran *= HTransform3D<double>::DH(
+				_linkList[i]->alpha(),
+				_linkList[i]->a(),
+				_linkList[i]->d(),
+				_linkList[i]->theta() + q[i]);
+	}
+	return tran;
 }
 
 HTransform3D<double> SerialLink::getEndTransform() const
@@ -89,6 +107,12 @@ HTransform3D<double> SerialLink::getEndTransform() const
 		tran = _linkList[i]->getFrame()->getTransform()*tran;
 	}
 	return tran;
+}
+
+
+HTransform3D<double> SerialLink::getEndTransform(robot::math::Q& q) const
+{
+	return this->getTransform(0, _linkList.size(), q);
 }
 
 SerialLink::~SerialLink()

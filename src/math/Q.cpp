@@ -12,7 +12,6 @@ namespace robot {
 namespace math {
 
 Q::Q() {
-	// TODO Auto-generated constructor stub
 	_size = 0;
 }
 
@@ -42,7 +41,7 @@ double& Q::operator()(int index)
 	return _value[index];
 }
 
-double& Q::operator[](int index)
+double Q::operator[](int index) const
 {
 	return _value[index];
 }
@@ -53,15 +52,15 @@ Q& Q::zero(int size)
 	return q;
 }
 
-void Q::print()
+void Q::print() const
 {
+	cout.precision(4);
 	for (int i = 0; i<_size; i++)
-		cout << _value[i] << " ";
+		cout << _value[i] << " || ";
 	robot::common::println();
 }
 
 Q::~Q() {
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace math */

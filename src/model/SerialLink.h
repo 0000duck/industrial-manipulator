@@ -13,6 +13,7 @@
 # include "Link.h"
 # include "DHTable.h"
 # include "DHParameters.h"
+# include "../math/Q.h"
 
 using robot::kinematic::Frame;
 
@@ -26,8 +27,10 @@ public:
 	void append(Link*);
 	Link* pop();
 	int getDOF();
-	DHTable& getDHTable();
-	HTransform3D<double> getEndTransform() const;
+	DHTable getDHTable();
+	HTransform3D<double> getTransform(unsigned int startLink, unsigned int endLink,const robot::math::Q& q) const;
+	HTransform3D<double> getEndTransform(void) const;
+	HTransform3D<double> getEndTransform(robot::math::Q& q) const;
 	void print();
 	virtual ~SerialLink();
 private:

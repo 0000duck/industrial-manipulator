@@ -115,6 +115,11 @@ const DHParameters& Link::getDHParams() const
 	return _dHParam;
 }
 
+HTransform3D<> Link::getTransform(double q) const
+{
+	return HTransform3D<>::DH(_alpha, _a, _d, _theta + q);
+}
+
 Link::~Link()
 {
 	delete _frame;

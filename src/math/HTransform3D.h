@@ -13,6 +13,7 @@
 # include <iostream>
 # include <assert.h>
 # include <math.h>
+# include "../common/printAdvance.h"
 
 namespace robot {
 namespace math {
@@ -53,7 +54,26 @@ public:
 		return HTransform3D<T>(_rot*tran._vec + _vec, _rot*tran._rot);
 	}
 
-	const HTransform3D<T> inverse()
+	void operator*= (const HTransform3D<T>& tran)
+	{
+		_vec += _rot*tran.getPosition();
+		_rot *= tran.getRotation();
+	}
+
+	void operator=(const HTransform3D<T>& tran)
+	{
+		_rot = tran.getRotation();
+		_vec = tran.getPosition();
+	}
+
+	bool operator==(const HTransform3D<T>& tran) const
+	{
+		if (_rot != tran.getRotation() || _vec != tran.getPosition())
+			return false;
+		return true;
+	}
+
+	const HTransform3D<T> inverse() const
 	{
 		return HTransform3D<T>(-(_rot.inverse()*_vec), _rot.inverse());
 	}
@@ -110,26 +130,31 @@ public:
 	/*
 	 * 根据DH参数(Modified DH)构造HTransform3D；
 	 */
-	static const HTransform3D<T> DH(T alpha, T a, T d, T theta)
+	static const HTransform3D<T> DH(const T alpha, const T a, const T d, const T theta)
 	{
 		double st=sin(theta); double ct=cos(theta);double sa=sin(alpha);double ca=cos(alpha);
 		double a11=ct;double a12=-st;double a13=0;double a14=a;
 		double a21=st*ca;double a22=ct*ca;double a23=-sa;double a24=-d*sa;
 		double a31=st*sa;double a32=ct*sa;double a33=ca;double a34=d*ca;
 
-		robot::math::Rotation3D<double> rot(
-													a11, a12, a13,
-													a21, a22, a23,
-													a31, a32, a33);
-		robot::math::Vector3D<double> vec(a14, a24, a34);
-		robot::math::HTransform3D<double> tran(vec, rot);
-		return tran;
+		return robot::math::HTransform3D<double>(
+				a11, a12, a13, a14,
+				a21, a22, a23, a24,
+				a31, a32, a33, a34);
 	}
 
 	void print() const{
+		cout.precision(4);
+		cout << setfill('_') << setw(56) <<  "_" << endl;
 		for (int i = 0; i<3; i++)
-			cout<<_rot(i, 0)<<" "<<_rot(i, 1)<<" "<<_rot(i, 2)<<" "<<_vec(i)<<'\n';
-		cout<<"0 0 0 1"<<'\n';
+			cout << setfill(' ') << setw(12) << _rot(i, 0) << " |"
+			<< setfill(' ') << setw(12) << _rot(i, 1) << " |"
+			<< setfill(' ') << setw(12) << _rot(i, 2) << " |"
+			<< setfill(' ') << setw(12) << _vec(i) << '\n';
+		cout << setfill(' ') << setw(12) << "0" << " |"
+				<< setfill(' ') << setw(12) << "0" << " |"
+				<< setfill(' ') << setw(12) << "0" << " |"
+				<< setfill(' ') << setw(12) << "1" << '\n';
 	}
 	virtual ~HTransform3D(){}
 private:

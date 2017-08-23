@@ -11,12 +11,11 @@ namespace robot {
 namespace kinematic {
 
 State::State() {
-	// TODO Auto-generated constructor stub
 
 }
 
 State::~State() {
-	// TODO Auto-generated destructor stub
+
 }
 
 } /* namespace kinematic */

@@ -1,7 +1,7 @@
 /*
  * test.cpp
  *
- *  Created on: Aug 10, 2017
+ *  Created on: Aug 23, 2017
  *      Author: a1994846931931
  */
 
@@ -17,7 +17,8 @@
 # include "model/Link.h"
 # include "test.h"
 # include "ik/PieperSolver.h"
-# include "testIK.h"
+# include <stdlib.h>
+# include <time.h>
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -26,7 +27,13 @@ using namespace robot::common;
 using namespace robot::model;
 using namespace robot::ik;
 
-int main(){
+double fRand(double fMin, double fMax)
+{
+    double f = (double)rand() / RAND_MAX;
+    return fMin + f * (fMax - fMin);
+}
+
+void ikTest(){
 	println("*** test ***");
 	SerialLink robot;
 
@@ -108,24 +115,53 @@ int main(){
 	robot.append(&l5);
 	robot.append(&l6);
 
-//	PieperSolver solver(robot);
-//	std::vector<Q> result = solver.solve(robot.getEndTransform());
-//	println("results are;");
-//	int counter = 0;
-//	for (unsigned int i=0; i<result.size(); i++)
-//	{
-//		cout << " * * * " << counter++ << " * * * "<< endl;
-//		result[i].print();
-//		if (robot.getEndTransform(result[i]) == robot.getEndTransform())
-//			println("correct");
-//		else
-//			println("wrong");
-//	}
-//	robot.getTransform(0, 3, Q::zero(6)).print();
-
-	ikTest();
-
-	return 0;
+	PieperSolver solver(robot);
+	int MAXSTEP = 10000;
+	int unsolved = 0;
+	int allresult = 0;
+	int correct = 0;
+	int wrong = 0;
+	clock_t start = clock();
+	for (int i=0; i<MAXSTEP; i++)
+	{
+		robot::math::Q q(fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14));
+		HTransform3D<> endTran = robot.getEndTransform(q);
+		std::vector<Q> result = solver.solve(endTran);
+		if (result.size() == 0)
+		{
+			unsolved++;
+		}
+		else
+		{
+			allresult += result.size();
+			for (unsigned int i=0; i<result.size(); i++)
+			{
+				if (endTran == robot.getEndTransform(result[i]))
+					correct++;
+				else
+				{
+					wrong++;
+					println("计算错误:\n设定Q与计算Q");
+					q.print();
+					result[i].print();
+					println("正确变换矩阵与求得的变换矩阵");
+					endTran.print();
+					robot.getEndTransform(result[i]).print();
+				}
+			}
+		}
+	}
+	clock_t end = clock();
+	println("unsolved number: ");
+	println(unsolved);
+	println("total result: ");
+	println(allresult);
+	println("correct answer: ");
+	println(correct);
+	println("wrong answer: ");
+	println(wrong);
+	println("time: ");
+	println(end - start);
 }
 
 

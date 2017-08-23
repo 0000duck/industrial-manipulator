@@ -13,7 +13,6 @@ namespace model {
 
 DHParameters::DHParameters(double alpha, double a, double d, double theta) :
 	_alpha(alpha),_a(a),_d(d),_theta(theta){
-	// TODO Auto-generated constructor stub
 
 }
 
@@ -43,7 +42,6 @@ void DHParameters::print() const
 }
 
 DHParameters::~DHParameters() {
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace model */

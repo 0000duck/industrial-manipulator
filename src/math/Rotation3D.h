@@ -80,27 +80,62 @@ public:
 		static Rotation3D id(1,0,0,0,1,0,0,0,1);
 		return id;
 	}
-	void print(){
-		cout<<_m[0][0]<<" "<<_m[0][1]<<" "<<_m[0][2]<<'\n';
-		cout<<_m[1][0]<<" "<<_m[1][1]<<" "<<_m[1][2]<<'\n';
-		cout<<_m[2][0]<<" "<<_m[2][1]<<" "<<_m[2][2]<<'\n';
-	}
-	inline const T& operator()(int row, int column) const{
+
+	inline const T& operator()(int row, int column) const
+	{
 		return _m[row][column];
 	}
 //	inline T& operator[](int row, int column) const{
 //			return _m[row][column];
 //	}
-	bool operator==(const Rotation3D<T>& RotB){
+	bool operator==(const Rotation3D<T>& RotB) const
+	{
 		for (int i = 0; i<3; i++)
 			for (int j = 0; j<3; j++)
-				if (_m[i][j] != RotB(i, j))
+				if (fabs(_m[i][j] - RotB(i, j)) > 1e-12)
 					return false;
 		return true;
 	}
-	bool operator!=(const Rotation3D<T>& RotB){
+
+	void operator*=(const Rotation3D<T> RotB)
+	{
+		double a[3];
+		a[0] = _m[0][0]*RotB(0, 0) + _m[0][1]*RotB(1, 0) + _m[0][2]*RotB(2, 0);
+		a[1] = _m[0][0]*RotB(0, 1) + _m[0][1]*RotB(1, 1) + _m[0][2]*RotB(2, 1);
+		a[2] = _m[0][0]*RotB(0, 2) + _m[0][1]*RotB(1, 2) + _m[0][2]*RotB(2, 2);
+		_m[0][0] = a[0]; _m[0][1] = a[1]; _m[0][2] = a[2];
+
+		a[0] = _m[1][0]*RotB(0, 0) + _m[1][1]*RotB(1, 0) + _m[1][2]*RotB(2, 0);
+		a[1] = _m[1][0]*RotB(0, 1) + _m[1][1]*RotB(1, 1) + _m[1][2]*RotB(2, 1);
+		a[2] = _m[1][0]*RotB(0, 2) + _m[1][1]*RotB(1, 2) + _m[1][2]*RotB(2, 2);
+		_m[1][0] = a[0]; _m[1][1] = a[1]; _m[1][2] = a[2];
+
+		a[0] = _m[2][0]*RotB(0, 0) + _m[2][1]*RotB(1, 0) + _m[2][2]*RotB(2, 0);
+		a[1] = _m[2][0]*RotB(0, 1) + _m[2][1]*RotB(1, 1) + _m[2][2]*RotB(2, 1);
+		a[2] = _m[2][0]*RotB(0, 2) + _m[2][1]*RotB(1, 2) + _m[2][2]*RotB(2, 2);
+		_m[2][0] = a[0]; _m[2][1] = a[1]; _m[2][2] = a[2];
+	}
+
+	void operator=(const Rotation3D<T>& RotB)
+	{
+		_m[0][0] = RotB(0, 0);
+		_m[0][1] = RotB(0, 1);
+		_m[0][2] = RotB(0, 2);
+
+		_m[1][0] = RotB(1, 0);
+		_m[1][1] = RotB(1, 1);
+		_m[1][2] = RotB(1, 2);
+
+		_m[2][0] = RotB(2, 0);
+		_m[2][1] = RotB(2, 1);
+		_m[2][2] = RotB(2, 2);
+	}
+
+	bool operator!=(const Rotation3D<T>& RotB) const
+	{
 		return !(*this == RotB);
 	}
+
 	bool equal(const Rotation3D<T>& rot, const T precision = std::numeric_limits<T>::epsilon()) const {
 		for (int i = 0; i<3; i++)
 			for (int j = 0; j<3; j++)
@@ -108,6 +143,7 @@ public:
 					return false;
 		return true;
 	}
+
 	static Rotation3D<T> multiply(const Rotation3D<T>& a, const Rotation3D<T>& b){
 		return Rotation3D<T>(
 				a(0, 0)*b(0, 0) + a(0, 1)*b(1, 0) + a(0, 2)*b(2, 0),
@@ -140,7 +176,17 @@ public:
 				_m[0][1], _m[1][1], _m[2][1],
 				_m[0][2], _m[1][2], _m[2][2]);
 	}
-//	friend HTransform3D<T>::setRotation(T, T, T, T, T, T, T, T, T);
+
+	void print() const
+	{
+		cout.precision(4);
+		cout << setfill('_') << setw(42) << "_" << endl;
+		for (int i=0; i<3; i++)
+			cout << setfill(' ') << setw(12) << _m[i][0] << " |"
+			<< setfill(' ') << setw(12) << _m[i][1] << " |"
+			<< setfill(' ') << setw(12) << _m[i][2] << '\n';
+	}
+
 	virtual ~Rotation3D(){}
 private:
 	T _m[3][3];

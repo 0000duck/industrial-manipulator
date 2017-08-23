@@ -11,7 +11,6 @@ namespace robot {
 namespace model {
 
 DHTable::DHTable() {
-	// TODO Auto-generated constructor stub
 
 }
 
@@ -46,7 +45,6 @@ void DHTable::print() const
 }
 
 DHTable::~DHTable() {
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace model */

@@ -10,8 +10,12 @@
 
 # include <sstream>
 # include <iostream>
+# include <iomanip>
 
 using std::cout;
+using std::setfill;
+using std::setw;
+using std::endl;
 
 namespace robot{
 namespace common{

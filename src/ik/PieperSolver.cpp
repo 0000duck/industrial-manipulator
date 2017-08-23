@@ -19,7 +19,6 @@ double Power(double arg, int exp) {
 }
 
 PieperSolver::PieperSolver(robot::model::SerialLink& serialRobot) {
-	// TODO Auto-generated constructor stub
 	_dHTable = serialRobot.getDHTable();
     alpha0 = _dHTable[0].alpha();
     a0 = _dHTable[0].a();
@@ -58,6 +57,9 @@ PieperSolver::PieperSolver(robot::model::SerialLink& serialRobot) {
     calpha5 = cos(_dHTable[5].alpha());
     salpha5 = sin(_dHTable[5].alpha());
     d6 = _dHTable[5].d();
+
+    HTransform3D<> baseT0 = HTransform3D<>::DH(alpha0, a0, d1, 0);
+    _0Tbase = baseT0.inverse();
 }
 
 void PieperSolver::init() {
@@ -99,29 +101,32 @@ void PieperSolver::init() {
     salpha5 = sin(_dHTable[5].alpha());
     d6 = _dHTable[5].d();
 
+    HTransform3D<> baseT0 = HTransform3D<>::DH(alpha0, a0, d1, 0);
+    _0Tbase = baseT0.inverse();
+
 }
 
 std::vector<Q> PieperSolver::solve(const HTransform3D<>& baseTend) const
 {
 	HTransform3D<> T06 = _0Tbase*baseTend*_endTjoint6;
-	cout << "T06 is: " << std::endl;
-	T06.print();
+//	cout << "T06 is: " << std::endl;
+//	T06.print();
     double r = Power(T06.getPosition().getLengh(), 2);
     double x = T06.getPosition()(0);
     double y = T06.getPosition()(1);
     double z = T06.getPosition()(2);
-    cout<<"r= "<<r<<" "<<"x= "<<x<<" y= "<<y<<" z= "<<z<<std::endl;
+//    cout<<"r= "<<r<<" "<<"x= "<<x<<" y= "<<y<<" z= "<<z<<std::endl;
 
     std::vector<double> theta3;
     std::vector<Q> result;
     if (a1 == 0) {
-        std::cout<<"Case 1"<<std::endl;
+//        std::cout<<"Case 1"<<std::endl;
 
         theta3 = solveTheta3Case1(r);
 
         for (std::vector<double>::iterator it = theta3.begin(); it != theta3.end(); ++it) {
             double theta3 = *it;
-            std::cout << "solution of theta3: " << theta3 << std::endl;
+//            std::cout << "solution of theta3: " << theta3 << std::endl;
             std::vector<double> theta2sol = solveTheta2Case1(z, theta3);
             typedef std::vector<double>::iterator I;
             for (I it2 = theta2sol.begin(); it2 != theta2sol.end(); ++it2)
@@ -133,11 +138,11 @@ std::vector<Q> PieperSolver::solve(const HTransform3D<>& baseTend) const
         }
     }
     else if (fabs(salpha1) < 1e-12) {
-        std::cout<<"Case 2"<<std::endl;
+//        std::cout<<"Case 2"<<std::endl;
         theta3 = solveTheta3Case2(z);
         for (std::vector<double>::iterator it = theta3.begin(); it != theta3.end(); ++it) {
             double theta3 = *it;
-            std::cout << "solution of theta3: " << theta3 << std::endl;
+//            std::cout << "solution of theta3: " << theta3 << std::endl;
             std::vector<double> theta2sol = solveTheta2Case2(r, theta3);
             typedef std::vector<double>::iterator I;
             for (I it2 = theta2sol.begin(); it2 != theta2sol.end(); ++it2) {
@@ -152,7 +157,7 @@ std::vector<Q> PieperSolver::solve(const HTransform3D<>& baseTend) const
     	/*
     	 * case 3 暂不做处理
     	 */
-        std::cout<<"Case 3"<<std::endl;
+//        std::cout<<"Case 3"<<std::endl;
 //        theta3 = solveTheta3Case3(r, z);
 //      //  std::cout<<"theta3 = "<<theta3.size()<<std::endl;
 //        for (std::vector<double>::iterator it = theta3.begin(); it != theta3.end(); ++it) {
@@ -424,7 +429,7 @@ std::vector<double> PieperSolver::solveTheta2Case2(double r, double theta3) cons
         double s2 = 2*u/(1+u*u);
         double theta2 = atan2(s2,c2);
         (*it) = theta2;
-        std::cout << "solution of theta2: " << theta2 << std::endl;
+//        std::cout << "solution of theta2: " << theta2 << std::endl;
     }
 
     return result;
@@ -476,14 +481,13 @@ std::vector<double> PieperSolver::solveTheta2Case1(double z, double theta3) cons
         double s2 = 2*u/(1+u*u);
         double theta2 = atan2(s2,c2);
         (*it) = theta2;
-        std::cout << "solution of theta2: " << theta2 << std::endl;
+//        std::cout << "solution of theta2: " << theta2 << std::endl;
     }
 
     return result;
 }
 
 std::vector<double> PieperSolver::solveTheta3Case1(double r) const {
-	cout<< calpha0<<" "<<calpha1<<" "<<calpha2<<" "<<calpha3<<" "<<calpha4<<" "<<calpha5<<" "<<std::endl;
     double a = -Power(a1,2) - Power(a2,2) + 2*a2*a3 - Power(a3,2) - Power(d2,2) - 2*calpha2*d2*d3 - Power(d3,2) -
         2*calpha2*calpha3*d2*d4 - 2*calpha3*d3*d4 - Power(d4,2) + r - 2*d2*d4*salpha2*salpha3;
 
@@ -493,7 +497,7 @@ std::vector<double> PieperSolver::solveTheta3Case1(double r) const {
         -2*calpha2*calpha3*d2*d4 - 2*calpha3*d3*d4 - Power(d4,2) + r + 2*d2*d4*salpha2*salpha3;
 
     double d = b*b-4*a*c;
-    cout << a <<" "<< b <<" "<<c<<" "<<d<<std::endl;
+//    cout << a <<" "<< b <<" "<<c<<" "<<d<<std::endl;
     std::vector<double> result;
     if (fabs(a) < 1e-12)  //Is it only a linear equation
         result.push_back(-c/b);
@@ -549,7 +553,6 @@ std::vector<double> PieperSolver::solveTheta3Case2(double z) const {
 
 
 PieperSolver::~PieperSolver() {
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace ik */
