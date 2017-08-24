@@ -123,7 +123,9 @@ int main(){
 //	}
 //	robot.getTransform(0, 3, Q::zero(6)).print();
 
-	ikTest();
+	double alphaTest = atan2(310, 70);
+	println(alphaTest);
+	println(fabs(tan(alphaTest) - 310.0/70.0));
 
 	return 0;
 }

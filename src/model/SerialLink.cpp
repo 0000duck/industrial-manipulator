@@ -81,7 +81,8 @@ DHTable SerialLink::getDHTable()
 	return dHTable;
 }
 
-HTransform3D<double> SerialLink::getTransform(unsigned int startLink, unsigned int endLink, const robot::math::Q& q) const
+HTransform3D<double> SerialLink::getTransform(
+		unsigned int startLink, unsigned int endLink, const robot::math::Q& q) const
 {
 	/*
 	 * 获取连个关节之间的变换矩阵；
@@ -110,9 +111,21 @@ HTransform3D<double> SerialLink::getEndTransform() const
 }
 
 
-HTransform3D<double> SerialLink::getEndTransform(robot::math::Q& q) const
+HTransform3D<double> SerialLink::getEndTransform(const robot::math::Q& q) const
 {
 	return this->getTransform(0, _linkList.size(), q);
+}
+
+Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
+{
+	HTransform3D<double> T01 = this->getTransform(0, 1, q);
+	HTransform3D<double> T12 = this->getTransform(1, 2, q);
+	HTransform3D<double> T23 = this->getTransform(2, 3, q);
+	HTransform3D<double> T34 = this->getTransform(3, 4, q);
+	HTransform3D<double> T45 = this->getTransform(4, 5, q);
+	HTransform3D<double> T56 = this->getTransform(5, 6, q);
+
+
 }
 
 SerialLink::~SerialLink()

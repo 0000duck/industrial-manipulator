@@ -133,14 +133,27 @@ public:
 	static const HTransform3D<T> DH(const T alpha, const T a, const T d, const T theta)
 	{
 		double st=sin(theta); double ct=cos(theta);double sa=sin(alpha);double ca=cos(alpha);
-		double a11=ct;double a12=-st;double a13=0;double a14=a;
-		double a21=st*ca;double a22=ct*ca;double a23=-sa;double a24=-d*sa;
-		double a31=st*sa;double a32=ct*sa;double a33=ca;double a34=d*ca;
-
 		return robot::math::HTransform3D<double>(
-				a11, a12, a13, a14,
-				a21, a22, a23, a24,
-				a31, a32, a33, a34);
+				ct, -st, 0, a,
+				st*ca, ct*ca, -sa, -d*sa,
+				st*sa, ct*sa, ca, d*ca);
+	}
+
+	/*
+	 * 构造由DH参数制定的变换矩阵关于theta的求导形式；
+	 * 矩阵由一下公式给出：
+	 * | cos(theta)				| -sin(theta)			| 0				| a
+	 * | sin(theta)cos(alpha)	| cos(theta)cos(alpha)	| -sin(alpha)	| -sin(alpha)d
+	 * | sin(theta)sin(alpha)	| cos(theta)sin(alpha)	| cos(alpha)	| cos(alpha)d
+	 * | 0						| 0						| 0				| 1
+	 */
+	static const HTransform3D<T> dDH(const T alpha, const T a, const T d, const T theta)
+	{
+		double st=sin(theta); double ct=cos(theta);double sa=sin(alpha);double ca=cos(alpha);
+		return HTransform3D<double>(
+				ct, -st, 0, a,
+				st*ca, ct*ca, -sa, -sa*d,
+				st*sa, ct*sa, ca, ca*d);
 	}
 
 	void print() const{
