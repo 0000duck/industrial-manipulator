@@ -19,6 +19,7 @@
 # include "ik/PieperSolver.h"
 # include <stdlib.h>
 # include <time.h>
+# include "common/common.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -26,12 +27,6 @@ using std::cout;
 using namespace robot::common;
 using namespace robot::model;
 using namespace robot::ik;
-
-double fRand(double fMin, double fMax)
-{
-    double f = (double)rand() / RAND_MAX;
-    return fMin + f * (fMax - fMin);
-}
 
 void ikTest(){
 	println("*** test ***");

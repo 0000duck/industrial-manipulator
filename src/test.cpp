@@ -18,6 +18,8 @@
 # include "test.h"
 # include "ik/PieperSolver.h"
 # include "testIK.h"
+# include "ext/Eigen/Dense"
+# include "ext/Eigen/QR"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -25,6 +27,7 @@ using std::cout;
 using namespace robot::common;
 using namespace robot::model;
 using namespace robot::ik;
+using Eigen::MatrixXd;
 
 int main(){
 	println("*** test ***");
@@ -123,9 +126,18 @@ int main(){
 //	}
 //	robot.getTransform(0, 3, Q::zero(6)).print();
 
-	double alphaTest = atan2(310, 70);
-	println(alphaTest);
-	println(fabs(tan(alphaTest) - 310.0/70.0));
+	char key = '1';
+	while(key != '0')
+	{
+		Jacobian J = robot.getJacobian(robot::math::Q(
+				fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14),
+				fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14)));
+		J.print();
+		J.doInverse();
+		J.print();
+		std::cin >> key;
+	}
+
 
 	return 0;
 }

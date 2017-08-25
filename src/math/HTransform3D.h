@@ -54,6 +54,11 @@ public:
 		return HTransform3D<T>(_rot*tran._vec + _vec, _rot*tran._rot);
 	}
 
+	const Vector3D<T> operator* (const Vector3D<T>& vec) const
+	{
+		return _rot*vec + _vec;
+	}
+
 	void operator*= (const HTransform3D<T>& tran)
 	{
 		_vec += _rot*tran.getPosition();
@@ -151,9 +156,9 @@ public:
 	{
 		double st=sin(theta); double ct=cos(theta);double sa=sin(alpha);double ca=cos(alpha);
 		return HTransform3D<double>(
-				ct, -st, 0, a,
-				st*ca, ct*ca, -sa, -sa*d,
-				st*sa, ct*sa, ca, ca*d);
+				-st, -ct, 0, 0,
+				ct*ca, -st*ca, 0, 0,
+				ct*sa, -st*sa, 0, 0);
 	}
 
 	void print() const{

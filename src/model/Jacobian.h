@@ -8,15 +8,31 @@
 #ifndef JACOBIAN_H_
 #define JACOBIAN_H_
 
+# include "../ext/Eigen/Dense"
+
 namespace robot {
 namespace model {
 
 class Jacobian {
 public:
 	Jacobian();
+	Jacobian(double (&j)[6][6]);
+	void doInverse();
+	Jacobian inverse() const;
+	int rank() const;
+	void print() const;
 	virtual ~Jacobian();
 private:
-	double _j[6][6];
+	Jacobian(Eigen::MatrixXd matrix): _j(6, 6)
+	{
+		_j = matrix;
+	}
+	Eigen::MatrixXd getMatrix() const
+	{
+		return _j;
+	}
+private:
+	Eigen::MatrixXd _j;
 };
 
 } /* namespace model */

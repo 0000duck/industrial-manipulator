@@ -27,8 +27,8 @@ public:
 	SerialLink(std::vector<Link*>, Frame* tool=NULL);
 	void append(Link*);
 	Link* pop();
-	int getDOF();
-	DHTable getDHTable();
+	int getDOF() const;
+	DHTable getDHTable() const;
 	HTransform3D<double> getTransform(unsigned int startLink, unsigned int endLink, const robot::math::Q& q) const;
 	HTransform3D<double> getEndTransform(void) const;
 	HTransform3D<double> getEndTransform(const robot::math::Q& q) const;

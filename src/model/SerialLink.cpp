@@ -65,13 +65,13 @@ Link* SerialLink::pop()
 	return link;
 }
 
-int SerialLink::getDOF()
+int SerialLink::getDOF() const
 {
 	return (int)_linkList.size();
 }
 
 
-DHTable SerialLink::getDHTable()
+DHTable SerialLink::getDHTable() const
 {
 	DHTable dHTable;
 	for (int i=0;i<(int)_linkList.size();i++)
@@ -116,16 +116,71 @@ HTransform3D<double> SerialLink::getEndTransform(const robot::math::Q& q) const
 	return this->getTransform(0, _linkList.size(), q);
 }
 
+/*
+ * 根据关节角度获取雅克比矩阵；
+ */
 Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
 {
-	HTransform3D<double> T01 = this->getTransform(0, 1, q);
-	HTransform3D<double> T12 = this->getTransform(1, 2, q);
-	HTransform3D<double> T23 = this->getTransform(2, 3, q);
-	HTransform3D<double> T34 = this->getTransform(3, 4, q);
-	HTransform3D<double> T45 = this->getTransform(4, 5, q);
-	HTransform3D<double> T56 = this->getTransform(5, 6, q);
+	int dof = getDOF();
+	dof = 6; // 目前只处理6关节的雅克比矩阵
 
+	// 计算每个关节相对上一坐标系的变换矩阵
+	std::vector< HTransform3D<double> > Ti_1i; // i=1~n
+	for (int i=0; i<dof; i++)
+	{
+		Ti_1i.push_back(this->getTransform(i, i + 1, q));
+	}
 
+	// 计算每个关节变换矩阵的导
+	std::vector< HTransform3D<double> > dTi_1i; // i=1~n
+	for (int i=0; i<dof; i++)
+	{
+		Link* link = _linkList[i];
+		dTi_1i.push_back(HTransform3D<double>::dDH(link->alpha(), link->a(), link->d(), link->theta()));
+	}
+
+	// 计算每个关节相对于0坐标系的矩阵变换
+	std::vector< HTransform3D<double> > T0i; // i=1~n
+	T0i.push_back(Ti_1i[0]);
+	for (int i=1; i<dof; i++)
+	{
+		T0i.push_back(T0i[i-1]*Ti_1i[i]);
+	}
+
+	// 计算工具末端相对于哥哥关节坐标的坐标值
+	Vector3D<double> nPend = _endToTool->getTransform().getPosition();
+	std::vector< Vector3D<double> > iPend; // i=n~1 注意为逆向储存
+	iPend.push_back(nPend);
+	for (int i=dof; i>1; i--)
+	{
+		iPend.push_back( Ti_1i[i-1]*iPend[dof-i] );
+	}
+
+	double j[6][6]; // 只处理6X6的雅克比矩阵
+
+	// Jv速度雅克比
+	Vector3D<double> temp = dTi_1i[0]*iPend[dof-1];
+	j[0][0] = temp(0);
+	j[1][0] = temp(1);
+	j[2][0] = temp(2);
+
+	for (int i=1; i<dof; i++)
+	{
+		temp = (T0i[i-1].getRotation())*(dTi_1i[i].getRotation())*iPend[dof-i-1];
+		j[0][i] = temp(0);
+		j[1][i] = temp(1);
+		j[2][i] = temp(2);
+	}
+
+	// Jw角速度雅克比
+	for (int i=0; i<dof; i++)
+	{
+		j[3][i] = T0i[i](0, 2);
+		j[4][i] = T0i[i](1, 2);
+		j[5][i] = T0i[i](2, 2);
+	}
+
+	return Jacobian(j); // 返回6X6的雅克比矩阵
 }
 
 SerialLink::~SerialLink()
