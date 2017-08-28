@@ -63,6 +63,7 @@ public:
     mutable double alpha3, a3, calpha3, salpha3, d4;
     mutable double alpha4, a4, calpha4, salpha4, d5;
     mutable double alpha5, a5, calpha5, salpha5, d6;
+    bool isValid() const;
 	virtual ~PieperSolver();
 private:
 	robot::model::DHTable _dHTable;

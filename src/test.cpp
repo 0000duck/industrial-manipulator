@@ -59,30 +59,69 @@ int main(){
 //	double theta5 = -M_PI;
 //	double theta6 = M_PI/2;
 
-	// ***
+//	// *** My virtual robot
+//	double alpha1 = 0;
+//	double alpha2 = -M_PI/2;
+//	double alpha3 = 0;
+//	double alpha4 = M_PI/2;
+//	double alpha5 = M_PI/2;
+//	double alpha6 = -M_PI/2;
+//	double a1 = 0;
+//	double a2 = 0;
+//	double a3 = 0.3;
+//	double a4 = 0;
+//	double a5 = 0;
+//	double a6 = 0;
+//	double d1 = 0.1;
+//	double d2 = 0;
+//	double d3 = 0;
+//	double d4 = 0.2;
+//	double d5 = 0;
+//	double d6 = 0;
+//	double theta1 = M_PI/2;
+//	double theta2 = -M_PI/2;
+//	double theta3 = M_PI/2;
+//	double theta4 = M_PI/2;
+//	double theta5 = 0;
+//	double theta6 = 0;
+//	// ***
+//	double lmin1 = M_PI/180.0*-180;
+//	double lmin2 = M_PI/180.0*-130;
+//	double lmin3 = M_PI/180.0*-70;
+//	double lmin4 = M_PI/180.0*-240;
+//	double lmin5 = M_PI/180.0*-30;
+//	double lmin6 = M_PI/180.0*-360;
+//	double lmax1 = M_PI/180.0*180;
+//	double lmax2 = M_PI/180.0*80;
+//	double lmax3 = M_PI/180.0*160;
+//	double lmax4 = M_PI/180.0*240;
+//	double lmax5 = M_PI/180.0*200;
+//	double lmax6 = M_PI/180.0*360;
+
+	// *** siasun 6kg
 	double alpha1 = 0;
 	double alpha2 = -M_PI/2;
 	double alpha3 = 0;
-	double alpha4 = M_PI/2;
+	double alpha4 = -M_PI/2;
 	double alpha5 = M_PI/2;
 	double alpha6 = -M_PI/2;
 	double a1 = 0;
-	double a2 = 0;
-	double a3 = 0.3;
-	double a4 = 0;
+	double a2 = 0.16;
+	double a3 = 0.575;
+	double a4 = 0.13;
 	double a5 = 0;
 	double a6 = 0;
-	double d1 = 0.1;
+	double d1 = 0.439;
 	double d2 = 0;
 	double d3 = 0;
-	double d4 = 0.2;
+	double d4 = 0.644;
 	double d5 = 0;
-	double d6 = 0;
-	double theta1 = M_PI/2;
+	double d6 = 0.1095;
+	double theta1 = 0;
 	double theta2 = -M_PI/2;
-	double theta3 = M_PI/2;
-	double theta4 = M_PI/2;
-	double theta5 = 0;
+	double theta3 = 0;
+	double theta4 = 0;
+	double theta5 = M_PI/2;
 	double theta6 = 0;
 	// ***
 	double lmin1 = M_PI/180.0*-180;
@@ -97,6 +136,7 @@ int main(){
 	double lmax4 = M_PI/180.0*240;
 	double lmax5 = M_PI/180.0*200;
 	double lmax6 = M_PI/180.0*360;
+
 //	Link(alpha, a, d, theta, min, max, sigma=0)
 	Link l1(alpha1, a1, d1, theta1, lmin1, lmax1);
 	Link l2(alpha2, a2, d2, theta2, lmin2, lmax2);
@@ -129,14 +169,15 @@ int main(){
 	char key = '1';
 	while(key != '0')
 	{
-		Jacobian J = robot.getJacobian(robot::math::Q(
-				fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14),
-				fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14)));
+		Jacobian J = robot.getJacobian(robot::math::Q(1, 2, 3, 4, 5, 6));
 		J.print();
 		J.doInverse();
 		J.print();
 		std::cin >> key;
 	}
+
+
+//	ikTest();
 
 
 	return 0;

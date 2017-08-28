@@ -177,6 +177,18 @@ public:
 				_m[0][2], _m[1][2], _m[2][2]);
 	}
 
+	/*
+	 * 构造由DH参数制定的变换矩阵关于theta的求导形式；
+	 */
+	static const Rotation3D<T> dDH(const T alpha, const T a, const T d, const T theta)
+	{
+		double st=sin(theta); double ct=cos(theta);double sa=sin(alpha);double ca=cos(alpha);
+		return Rotation3D<double>(
+				-st, -ct, 0,
+				ct*ca, -st*ca, 0,
+				ct*sa, -st*sa, 0);
+	}
+
 	void print() const
 	{
 		cout.precision(4);

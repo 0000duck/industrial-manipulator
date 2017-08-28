@@ -16,11 +16,14 @@ namespace model {
 class Jacobian {
 public:
 	Jacobian();
-	Jacobian(double (&j)[6][6]);
+	Jacobian(const double (&j)[6][6]);
 	void doInverse();
 	Jacobian inverse() const;
 	int rank() const;
 	void print() const;
+	void update(const double (&j)[6][6]);
+	double operator()(int, int) const;
+	void operator=(const Jacobian&);
 	virtual ~Jacobian();
 private:
 	Jacobian(Eigen::MatrixXd matrix): _j(6, 6)

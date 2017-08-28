@@ -550,7 +550,12 @@ std::vector<double> PieperSolver::solveTheta3Case2(double z) const {
 
 }
 
-
+bool PieperSolver::isValid() const
+{
+	if (a4==0&&a5==0&&d4==0&&(a1==0||fabs(sin(alpha1))<1e-12))
+		return true;
+	return false;
+}
 
 PieperSolver::~PieperSolver() {
 }

@@ -117,11 +117,15 @@ void ikTest(){
 	int correct = 0;
 	int wrong = 0;
 	clock_t start = clock();
+
+	HTransform3D<> endTran;
+	std::vector<Q> result;
+	Jacobian J;
 	for (int i=0; i<MAXSTEP; i++)
 	{
 		robot::math::Q q(fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14));
-		HTransform3D<> endTran = robot.getEndTransform(q);
-		std::vector<Q> result = solver.solve(endTran);
+		endTran = robot.getEndTransform(q);
+		result = solver.solve(endTran);
 		if (result.size() == 0)
 		{
 			unsolved++;
@@ -132,7 +136,9 @@ void ikTest(){
 			for (unsigned int i=0; i<result.size(); i++)
 			{
 				if (endTran == robot.getEndTransform(result[i]))
+				{
 					correct++;
+				}
 				else
 				{
 					wrong++;
@@ -144,6 +150,8 @@ void ikTest(){
 					robot.getEndTransform(result[i]).print();
 				}
 			}
+			J = robot.getJacobian(result[0]);
+			J.doInverse();
 		}
 	}
 	clock_t end = clock();

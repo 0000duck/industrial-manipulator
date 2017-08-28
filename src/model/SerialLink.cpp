@@ -7,6 +7,7 @@
 
 # include "SerialLink.h"
 # include "../kinematics/Frame.h"
+# include "../common/printAdvance.h"
 
 using robot::kinematic::Frame;
 
@@ -119,10 +120,11 @@ HTransform3D<double> SerialLink::getEndTransform(const robot::math::Q& q) const
 /*
  * 根据关节角度获取雅克比矩阵；
  */
-Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
+const Jacobian SerialLink::getJacobian(const robot::math::Q& q)
 {
 	int dof = getDOF();
 	dof = 6; // 目前只处理6关节的雅克比矩阵
+	double j[6][6]; // 只处理6X6的雅克比矩阵
 
 	// 计算每个关节相对上一坐标系的变换矩阵
 	std::vector< HTransform3D<double> > Ti_1i; // i=1~n
@@ -132,19 +134,19 @@ Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
 	}
 
 	// 计算每个关节变换矩阵的导
-	std::vector< HTransform3D<double> > dTi_1i; // i=1~n
+	std::vector< Rotation3D<double> > dTi_1i; // i=1~n
 	for (int i=0; i<dof; i++)
 	{
 		Link* link = _linkList[i];
-		dTi_1i.push_back(HTransform3D<double>::dDH(link->alpha(), link->a(), link->d(), link->theta()));
+		dTi_1i.push_back(Rotation3D<double>::dDH(link->alpha(), link->a(), link->d(), link->theta() + q[i]));
 	}
 
 	// 计算每个关节相对于0坐标系的矩阵变换
-	std::vector< HTransform3D<double> > T0i; // i=1~n
-	T0i.push_back(Ti_1i[0]);
+	std::vector< Rotation3D<double> > R0i; // i=1~n
+	R0i.push_back(Ti_1i[0].getRotation());
 	for (int i=1; i<dof; i++)
 	{
-		T0i.push_back(T0i[i-1]*Ti_1i[i]);
+		R0i.push_back(R0i[i-1]*(Ti_1i[i].getRotation()));
 	}
 
 	// 计算工具末端相对于哥哥关节坐标的坐标值
@@ -156,8 +158,6 @@ Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
 		iPend.push_back( Ti_1i[i-1]*iPend[dof-i] );
 	}
 
-	double j[6][6]; // 只处理6X6的雅克比矩阵
-
 	// Jv速度雅克比
 	Vector3D<double> temp = dTi_1i[0]*iPend[dof-1];
 	j[0][0] = temp(0);
@@ -166,7 +166,7 @@ Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
 
 	for (int i=1; i<dof; i++)
 	{
-		temp = (T0i[i-1].getRotation())*(dTi_1i[i].getRotation())*iPend[dof-i-1];
+		temp = R0i[i-1]*dTi_1i[i]*iPend[dof-i-1];
 		j[0][i] = temp(0);
 		j[1][i] = temp(1);
 		j[2][i] = temp(2);
@@ -175,9 +175,9 @@ Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
 	// Jw角速度雅克比
 	for (int i=0; i<dof; i++)
 	{
-		j[3][i] = T0i[i](0, 2);
-		j[4][i] = T0i[i](1, 2);
-		j[5][i] = T0i[i](2, 2);
+		j[3][i] = R0i[i](0, 2);
+		j[4][i] = R0i[i](1, 2);
+		j[5][i] = R0i[i](2, 2);
 	}
 
 	return Jacobian(j); // 返回6X6的雅克比矩阵
