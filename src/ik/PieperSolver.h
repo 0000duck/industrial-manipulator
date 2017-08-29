@@ -20,7 +20,7 @@ class PieperSolver {
 public:
 	PieperSolver(robot::model::SerialLink& serialRobot);
     void init();
-    std::vector<Q> solve(const HTransform3D<>& Y06) const;
+    std::vector<Q> solve(const HTransform3D<>& baseTend) const;
     void solveTheta456(double theta1,
                        double theta2,
                        double theta3,

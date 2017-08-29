@@ -193,7 +193,7 @@ void PieperSolver::solveTheta456(
     q(1) = theta2;
     q(2) = theta3;
 
-    HTransform3D<> T01 = HTransform3D<>::DH(alpha0, a0, d1, theta1);
+    HTransform3D<> T01 = HTransform3D<>::DH(alpha0, a0, d1, theta1); // TODO DH(0, 0, 0, theta1) ?
     HTransform3D<> T12 = HTransform3D<>::DH(alpha1, a1, d2, theta2);
     HTransform3D<> T23 = HTransform3D<>::DH(alpha2, a2, d3, theta3);
     HTransform3D<> T34 = HTransform3D<>::DH(alpha3, a3, d4, 0);

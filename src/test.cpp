@@ -20,6 +20,7 @@
 # include "testIK.h"
 # include "ext/Eigen/Dense"
 # include "ext/Eigen/QR"
+# include "testIK2.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -166,19 +167,20 @@ int main(){
 //	}
 //	robot.getTransform(0, 3, Q::zero(6)).print();
 
-	char key = '1';
-	while(key != '0')
-	{
-		Jacobian J = robot.getJacobian(robot::math::Q(1, 2, 3, 4, 5, 6));
-		J.print();
-		J.doInverse();
-		J.print();
-		std::cin >> key;
-	}
+//	char key = '1';
+//	while(key != '0')
+//	{
+//		Jacobian J = robot.getJacobian(robot::math::Q(1, 2, 3, 4, 5, 6));
+//		J.print();
+//		J.doInverse();
+//		J.print();
+//		std::cin >> key;
+//	}
 
 
 //	ikTest();
 
+	ik2Test();
 
 	return 0;
 }
