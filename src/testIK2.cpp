@@ -97,20 +97,27 @@ void ik2Test()
 	HTransform3D<> endTran;
 	std::vector<Q> result;
 	Jacobian J;
-	robot::model::Config dafaultConfig;
-	robot::model::Config freeConfig(-1, -1, -1);
-	robot::model::Config posConfig(2, 2, 2);
+//	robot::model::Config dafaultConfig;
+//	robot::model::Config freeConfig(-1, -1, -1);
+//	robot::model::Config posConfig(2, 2, 2);
 	for (int i=0; i<MAXSTEP; i++)
 	{
 		robot::math::Q q(fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14));
 		endTran = robot.getEndTransform(q);
-		result = solver.solve(endTran, freeConfig);
+		result = solver.solve(endTran, solver.getConfig(q));
+//		result = solver.solve(endTran, freeConfig);
 		if (result.size() == 0)
 		{
 			unsolved++;
 		}
 		else
 		{
+//			if (result.size() > 1)
+//			{
+//				cout << "result size is: " << result.size() << std::endl;
+//
+//				break;
+//			}
 			allresult += result.size();
 			for (unsigned int i=0; i<result.size(); i++)
 			{

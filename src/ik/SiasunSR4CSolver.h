@@ -35,6 +35,7 @@ public:
 	bool isElbowValid(const double j3, const model::Config&) const;
 	bool isWristValid(const robot::math::Q&, const model::Config&) const;
 	bool isWristValid(const double j5, const model::Config&) const;
+	robot::model::Config getConfig(const robot::math::Q&) const;
 	virtual ~SiasunSR4CSolver();
 private:
     double _alpha1, _a1, _calpha1, _salpha1, _d1;

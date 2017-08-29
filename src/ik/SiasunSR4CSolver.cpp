@@ -74,7 +74,9 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend, const mod
     {
     	double sgn = *it;
     	if (!isShoulderValid(sgn, config))
-    		continue;
+    	{
+    	    continue;
+    	}
     	// theta1
     	double theta1 = atan2(sgn*y, sgn*x);
     	double R = (pow((sgn*r -_a2), 2) + pow(z, 2) - pow(_a3, 2) - pow(_a4, 2) - pow(_d4, 2))/(2.0*_a3);
@@ -84,7 +86,9 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend, const mod
     	double d = b*b - 4*a*c;
     	// theta3
     	std::vector<double> theta3s;
-    	if (fabs(d) < 1e-16)
+    	if (fabs(a) < 1e-12)
+    		theta3s.push_back(atan((_a4 - R)/(2*a))*2);
+    	else if (fabs(d) < 1e-12)
     		theta3s.push_back(atan(-b/(2*a))*2);
     	else if (d > 0)
     	{
@@ -100,7 +104,9 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend, const mod
     	{
     		double theta3 = *it2;
     		if (!isElbowValid(theta3, config))
-    			continue;
+    		{
+				continue;
+			}
     		double c3 = cos(theta3);
     		double s3 = sin(theta3);
 
@@ -250,14 +256,20 @@ bool SiasunSR4CSolver::isElbowValid(const robot::math::Q& q, const model::Config
 
 bool SiasunSR4CSolver::isElbowValid(const double j3, const model::Config& config) const
 {
+	double fixedJ3 = j3 + atan(_d4/_a4);
+	if (fixedJ3 > M_PI)
+		fixedJ3 -= 2*M_PI;
+	double configJ = (_serialLink->getQ())[2] + atan(_d4/_a4);
+	if (configJ > M_PI)
+		configJ -= 2*M_PI;
 	switch (config.getElbow())
 	{
 	case Config::epositive:
-		return (j3 >= 0);
+		return (fixedJ3 >= 0);
 	case Config::enegative:
-		return (j3 < 0);
+		return (fixedJ3 < 0);
 	case Config::esame:
-		return ((j3 >= 0) == ((_serialLink->getQ())[2] >= 0));
+		return ((fixedJ3 >= 0) == (configJ >= 0));
 	case Config::efree:
 		return true;
 	default:
@@ -285,6 +297,18 @@ bool SiasunSR4CSolver::isWristValid(const double j5, const model::Config& config
 	default:
 		return true;
 	}
+}
+
+Config SiasunSR4CSolver::getConfig(const robot::math::Q& q) const
+{
+	double j2 = q[1] + _dHTable[1].theta();
+	double j3 = q[2] + _dHTable[2].theta();
+	double j5 = q[4] + _dHTable[4].theta();
+	double config_r = _a2 + _a3*cos(j2) + _a4*cos(j2 + j3) - _d4*sin(j2 + j3);
+	double wrist = (j5 >= 0)? Config::wpositive:Config::wnegative;
+	double elbow = (j3 >= 0)? Config::epositive:Config::enegative;
+	double shoulder =(config_r < 0)? Config::righty:Config::lefty;
+	return Config(shoulder, elbow, wrist);
 }
 
 SiasunSR4CSolver::~SiasunSR4CSolver() {
