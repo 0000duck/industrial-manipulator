@@ -34,12 +34,15 @@ public:
 	HTransform3D<double> getEndTransform(void) const;
 	HTransform3D<double> getEndTransform(const robot::math::Q& q) const;
 	const Jacobian getJacobian(const robot::math::Q& q);
-	void print();
+	const robot::math::Q getQ() const;
+	void setQ(robot::math::Q);
+	void print(); // TODO
 	virtual ~SerialLink();
 private:
 	std::vector<Link*> _linkList;
 	Frame* _worldFrame;
 	Frame* _endToTool;
+
 };
 
 } /* namespace model */

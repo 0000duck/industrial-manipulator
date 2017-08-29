@@ -12,6 +12,7 @@
 # include "../math/Q.h"
 # include "../model/DHTable.h"
 # include "../model/SerialLink.h"
+# include "../model/Config.h"
 
 namespace robot {
 namespace ik {
@@ -19,13 +20,21 @@ namespace ik {
 class SiasunSR4CSolver {
 public:
 	SiasunSR4CSolver(robot::model::SerialLink& serialRobot);
-    std::vector<Q> solve(const HTransform3D<>& baseTend) const;
+    std::vector<Q> solve(const HTransform3D<>& baseTend, const model::Config&) const;
     void solveTheta456(double theta1,
                        double theta2,
                        double theta3,
                        robot::math::HTransform3D<>& T06,
-                       std::vector<robot::math::Q>& result) const;
-    bool isValid() const;
+                       std::vector<robot::math::Q>& result,
+                       const model::Config&) const;
+    bool isValid() const; // TODO
+
+	bool isShoulderValid(const robot::math::Q&, const model::Config&) const;
+	bool isShoulderValid(const double r, const model::Config&) const;
+	bool isElbowValid(const robot::math::Q&, const model::Config&) const;
+	bool isElbowValid(const double j3, const model::Config&) const;
+	bool isWristValid(const robot::math::Q&, const model::Config&) const;
+	bool isWristValid(const double j5, const model::Config&) const;
 	virtual ~SiasunSR4CSolver();
 private:
     double _alpha1, _a1, _calpha1, _salpha1, _d1;
@@ -38,6 +47,7 @@ private:
 	robot::model::DHTable _dHTable;
     robot::math::HTransform3D<> _0Tbase;
     robot::math::HTransform3D<> _endTjoint6;
+    robot::model::SerialLink* _serialLink;
 };
 
 } /* namespace ik */

@@ -20,6 +20,7 @@
 # include <stdlib.h>
 # include <time.h>
 # include "common/common.h"
+# include "model/Config.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -96,11 +97,14 @@ void ik2Test()
 	HTransform3D<> endTran;
 	std::vector<Q> result;
 	Jacobian J;
+	robot::model::Config dafaultConfig;
+	robot::model::Config freeConfig(-1, -1, -1);
+	robot::model::Config posConfig(2, 2, 2);
 	for (int i=0; i<MAXSTEP; i++)
 	{
 		robot::math::Q q(fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14));
 		endTran = robot.getEndTransform(q);
-		result = solver.solve(endTran);
+		result = solver.solve(endTran, freeConfig);
 		if (result.size() == 0)
 		{
 			unsolved++;
@@ -123,8 +127,6 @@ void ik2Test()
 					println("正确变换矩阵与求得的变换矩阵");
 					endTran.print();
 					robot.getEndTransform(result[i]).print();
-					println("矩阵之差");
-					(robot.getEndTransform(result[i]) - endTran).print();
 				}
 			}
 			J = robot.getJacobian(result[0]);

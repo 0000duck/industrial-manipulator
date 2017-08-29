@@ -7,10 +7,13 @@
 
 #include "SiasunSR4CSolver.h"
 
+using namespace robot::model;
+
 namespace robot {
 namespace ik {
 
 SiasunSR4CSolver::SiasunSR4CSolver(robot::model::SerialLink& serialRobot) {
+	_serialLink = &serialRobot;
 	_dHTable = serialRobot.getDHTable();
     _alpha1 = _dHTable[0].alpha();
     _a1 = _dHTable[0].a();
@@ -53,7 +56,7 @@ SiasunSR4CSolver::SiasunSR4CSolver(robot::model::SerialLink& serialRobot) {
 }
 
 
-std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend) const
+std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend, const model::Config& config) const
 {
 	HTransform3D<> T06 = _0Tbase*baseTend*_endTjoint6;
     double x = T06.getPosition()(0);
@@ -70,6 +73,8 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend) const
     for (std::vector<double>::iterator it=sgns.begin(); it<sgns.end(); it++)
     {
     	double sgn = *it;
+    	if (!isShoulderValid(sgn, config))
+    		continue;
     	// theta1
     	double theta1 = atan2(sgn*y, sgn*x);
     	double R = (pow((sgn*r -_a2), 2) + pow(z, 2) - pow(_a3, 2) - pow(_a4, 2) - pow(_d4, 2))/(2.0*_a3);
@@ -79,7 +84,7 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend) const
     	double d = b*b - 4*a*c;
     	// theta3
     	std::vector<double> theta3s;
-    	if (fabs(d) < 1e-12)
+    	if (fabs(d) < 1e-16)
     		theta3s.push_back(atan(-b/(2*a))*2);
     	else if (d > 0)
     	{
@@ -94,6 +99,8 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend) const
     	for (std::vector<double>::iterator it2=theta3s.begin(); it2<theta3s.end(); it2++)
     	{
     		double theta3 = *it2;
+    		if (!isElbowValid(theta3, config))
+    			continue;
     		double c3 = cos(theta3);
     		double s3 = sin(theta3);
 
@@ -108,7 +115,7 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend) const
     		double ac2 = (x3*x5 - x2*x6)/(x1*x5 - x2*x4);
     		double theta2 = atan2(as2, ac2);
 
-    		solveTheta456(theta1, theta2, theta3, T06, result);
+    		solveTheta456(theta1, theta2, theta3, T06, result, config);
     	}
     }
     for (std::vector<Q>::iterator it = result.begin(); it != result.end(); ++it) {
@@ -123,7 +130,8 @@ void SiasunSR4CSolver::solveTheta456(
     double theta2,
     double theta3,
     HTransform3D<>& T06,
-    std::vector<Q>& result) const
+    std::vector<Q>& result,
+    const model::Config& config) const
 {
 	// 当前推导仅适用于末端旋转=等同于欧拉角Z（-Y）Z的情况， 其它情况可以利用欧拉角表格重新推导
     Q q(Q::zero(6));
@@ -164,41 +172,119 @@ void SiasunSR4CSolver::solveTheta456(
         theta6 = atan2(r12,-r11);
     } else {
         double s5 = sin(theta5);
-        if (_alpha6 < 0) { //Case for Z(-Y)Z rotation
+        //if (_alpha6 < 0)
+        { //Case for Z(-Y)Z rotation
             theta4 = atan2(-r23/s5, -r13/s5);
             theta6 = atan2(-r32/s5, r31/s5);
-        } else { //Case for Z(-Y)Z rotation
-            theta4 = atan2(r23/s5, r13/s5);
-            theta6 = atan2(r32/s5, -r31/s5);
         }
     }
 
-    q(3) = theta4;
-    q(4) = theta5;
-    q(5) = theta6;
-    result.push_back(q);
-
-    double alt4, alt6;
-    if (theta4>0)
-        alt4 = theta4-M_PI;
+    if (isWristValid(theta5, config))
+    {
+        q(3) = theta4;
+        q(4) = theta5;
+        q(5) = theta6;
+    	result.push_back(q);
+    }
     else
-        alt4 = theta4+M_PI;
+    {
+		double alt4, alt6;
+		if (theta4>0)
+			alt4 = theta4-M_PI;
+		else
+			alt4 = theta4+M_PI;
 
-    if (theta6>0)
-        alt6 = theta6-M_PI;
-    else
-        alt6 = theta6+M_PI;
+		if (theta6>0)
+			alt6 = theta6-M_PI;
+		else
+			alt6 = theta6+M_PI;
 
-    q(3) = alt4;
-    q(4) = -theta5;
-    q(5) = alt6;
-    result.push_back(q);
+		q(3) = alt4;
+		q(4) = -theta5;
+		q(5) = alt6;
+		result.push_back(q);
+    }
 }
 
 bool SiasunSR4CSolver::isValid() const
 {
 	// TODO
 	return true;
+}
+
+bool SiasunSR4CSolver::isShoulderValid(const robot::math::Q& q, const model::Config& config) const
+{
+	double j2 = q[1];
+	double j3 = q[2];
+	double r = _a2 + _a3*cos(j2) + _a4*cos(j2 + j3) - _d4*sin(j2 + j3);
+	return isShoulderValid(r, config);
+}
+
+bool SiasunSR4CSolver::isShoulderValid(const double r, const model::Config& config) const
+{
+	switch (config.getShoulder())
+	{
+	case Config::righty:
+		return (r < 0);
+	case Config::lefty:
+		return (r >= 0);
+	case Config::ssame:
+	{
+		robot::math::Q q = _serialLink->getQ();
+		double j2 = q[1];
+		double j3 = q[2];
+		double config_r = _a2 + _a3*cos(j2) + _a4*cos(j2 + j3) - _d4*sin(j2 + j3);
+		return ((r > 0) == (config_r > 0));
+	}
+	case Config::sfree:
+		return true;
+	default:
+		return true;
+	}
+}
+
+bool SiasunSR4CSolver::isElbowValid(const robot::math::Q& q, const model::Config& config) const
+{
+	return isElbowValid(q[2], config);
+}
+
+bool SiasunSR4CSolver::isElbowValid(const double j3, const model::Config& config) const
+{
+	switch (config.getElbow())
+	{
+	case Config::epositive:
+		return (j3 >= 0);
+	case Config::enegative:
+		return (j3 < 0);
+	case Config::esame:
+		return ((j3 >= 0) == ((_serialLink->getQ())[2] >= 0));
+	case Config::efree:
+		return true;
+	default:
+		return true;
+	}
+}
+
+bool SiasunSR4CSolver::isWristValid(const robot::math::Q& q, const model::Config& config) const
+{
+	return isWristValid(q[4], config);
+}
+
+bool SiasunSR4CSolver::isWristValid(const double j5, const model::Config& config) const
+{
+	switch (config.getWrist())
+	{
+	case Config::wpositive:
+		return (j5 >= 0);
+	case Config::wnegative:
+		return (j5 < 0);
+	case Config::wsame:
+		return ((j5 >= 0) == ((_serialLink->getQ())[4] >= 0));
+	case Config::wfree:
+		return true;
+	default:
+		return true;
+	}
 }
 
 SiasunSR4CSolver::~SiasunSR4CSolver() {

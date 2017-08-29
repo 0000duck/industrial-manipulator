@@ -183,6 +183,24 @@ const Jacobian SerialLink::getJacobian(const robot::math::Q& q)
 	return Jacobian(j); // 返回6X6的雅克比矩阵
 }
 
+
+const robot::math::Q SerialLink::getQ() const
+{
+	robot::math::Q q = robot::math::Q::zero(getDOF());
+	for (int i=0; i<getDOF(); i++)
+	{
+		q(i) = _linkList[i]->getQ();
+	}
+	return q;
+}
+
+void SerialLink::setQ(robot::math::Q q)
+{
+	int i=0;
+	for (std::vector<Link*>::iterator it=_linkList.begin(); it<_linkList.end(); it++)
+		(*it)->change(q[i++]);
+}
+
 SerialLink::~SerialLink()
 {
 }
