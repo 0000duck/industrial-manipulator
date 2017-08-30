@@ -8,7 +8,6 @@
 #ifndef TESTIK_H_
 #define TESTIK_H_
 
-double fRand(double fMin, double fMax);
 void ikTest();
 
 

@@ -12,12 +12,12 @@
 namespace robot {
 namespace model {
 
-Jacobian::Jacobian() {
-	// TODO Auto-generated constructor stub
+Jacobian::Jacobian():_j(6, 6)
+{
 
 }
 
-Jacobian::Jacobian(double (&j)[6][6]):_j(6, 6)
+Jacobian::Jacobian(const double (&j)[6][6]):_j(6, 6)
 {
 	for (int i=0; i<6; i++)
 	{
@@ -57,6 +57,33 @@ void Jacobian::print() const
 			cout << setfill(' ') << setw(12) << _j(i, j) << " |";
 		}
 		cout << endl;
+	}
+}
+
+void Jacobian::update(const double (&j)[6][6])
+{
+	for (int i=0; i<6; i++)
+	{
+		for (int k=0; k<6; k++)
+		{
+			_j(i, k) = j[i][k];
+		}
+	}
+}
+
+double Jacobian::operator()(int a, int b) const
+{
+	return _j(a, b);
+}
+
+void Jacobian::operator=(const Jacobian& jaco)
+{
+	for (int i=0; i<6; i++)
+	{
+		for (int k=0; k<6; k++)
+		{
+			_j(i, k) = jaco(i, k);
+		}
 	}
 }
 

@@ -29,6 +29,7 @@ public:
 	const double alpha() const;
 	const DHParameters& getDHParams() const;
 	HTransform3D<> getTransform(double q) const;
+	inline double getQ(){return _offset;}
 	virtual ~Link();
 
 private:

@@ -20,7 +20,7 @@ class PieperSolver {
 public:
 	PieperSolver(robot::model::SerialLink& serialRobot);
     void init();
-    std::vector<Q> solve(const HTransform3D<>& Y06) const;
+    std::vector<Q> solve(const HTransform3D<>& baseTend) const;
     void solveTheta456(double theta1,
                        double theta2,
                        double theta3,
@@ -63,6 +63,7 @@ public:
     mutable double alpha3, a3, calpha3, salpha3, d4;
     mutable double alpha4, a4, calpha4, salpha4, d5;
     mutable double alpha5, a5, calpha5, salpha5, d6;
+    bool isValid() const;
 	virtual ~PieperSolver();
 private:
 	robot::model::DHTable _dHTable;

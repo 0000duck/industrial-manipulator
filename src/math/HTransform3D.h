@@ -146,11 +146,6 @@ public:
 
 	/*
 	 * 构造由DH参数制定的变换矩阵关于theta的求导形式；
-	 * 矩阵由一下公式给出：
-	 * | cos(theta)				| -sin(theta)			| 0				| a
-	 * | sin(theta)cos(alpha)	| cos(theta)cos(alpha)	| -sin(alpha)	| -sin(alpha)d
-	 * | sin(theta)sin(alpha)	| cos(theta)sin(alpha)	| cos(alpha)	| cos(alpha)d
-	 * | 0						| 0						| 0				| 1
 	 */
 	static const HTransform3D<T> dDH(const T alpha, const T a, const T d, const T theta)
 	{
