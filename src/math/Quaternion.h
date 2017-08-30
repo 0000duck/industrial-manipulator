@@ -17,6 +17,7 @@ namespace math {
 class Quaternion {
 public:
 	Quaternion();
+
 	Quaternion(double, double, double, double);
 	Quaternion(const Quaternion&);
 	Quaternion operator+(const Quaternion&) const;
@@ -33,10 +34,11 @@ public:
 	double j() const;
 	double k() const;
 	Quaternion conjugate() const;
-	double norm() const;
+	Quaternion norm() const;
 	robot::math::Rotation3D<double> toRotation3D() const;
 	robot::math::HTransform3D<double> toHTransform3D() const;
 	void print();
+
 	virtual ~Quaternion();
 private:
 	double _r, _i, _j, _k;
