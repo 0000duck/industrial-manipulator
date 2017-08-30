@@ -9,6 +9,8 @@
 #define JACOBIAN_H_
 
 # include "../ext/Eigen/Dense"
+# include "../math/Q.h"
+# include <vector>
 
 namespace robot {
 namespace model {
@@ -16,7 +18,7 @@ namespace model {
 class Jacobian {
 public:
 	Jacobian();
-	Jacobian(const double (&j)[6][6]);
+	Jacobian(std::vector< std::vector<double> >);
 	void doInverse();
 	Jacobian inverse() const;
 	int rank() const;
@@ -24,6 +26,8 @@ public:
 	void update(const double (&j)[6][6]);
 	double operator()(int, int) const;
 	void operator=(const Jacobian&);
+	robot::math::Q operator*(const robot::math::Q& jointVelocity) const;
+	int size() const;
 	virtual ~Jacobian();
 private:
 	Jacobian(Eigen::MatrixXd matrix): _j(6, 6)
@@ -35,6 +39,7 @@ private:
 		return _j;
 	}
 private:
+	int _size;
 	Eigen::MatrixXd _j;
 };
 

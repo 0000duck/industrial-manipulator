@@ -19,13 +19,14 @@ public:
 	Q();
 	Q(double, double, double, double, double, double);
 //	Q(Q&);
-	int size();
+	int size() const;
 	double& operator()(int);
 	double operator[](int) const;
+	void pushBack(double);
 	void print() const;
 	virtual ~Q();
 public:
-	static Q& zero(int);
+	static Q zero(int size);
 private:
 	int _size;
 	std::vector<double> _value;

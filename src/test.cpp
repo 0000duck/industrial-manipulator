@@ -17,10 +17,13 @@
 # include "model/Link.h"
 # include "test.h"
 # include "ik/PieperSolver.h"
+# include "ik/SiasunSR4CSolver.h"
 # include "testIK.h"
 # include "ext/Eigen/Dense"
 # include "ext/Eigen/QR"
 # include "testIK2.h"
+# include "model/Config.h"
+# include "kinematics/State.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -152,20 +155,20 @@ int main(){
 	robot.append(&l5);
 	robot.append(&l6);
 
-//	PieperSolver solver(robot);
-//	std::vector<Q> result = solver.solve(robot.getEndTransform());
-//	println("results are;");
-//	int counter = 0;
-//	for (unsigned int i=0; i<result.size(); i++)
-//	{
-//		cout << " * * * " << counter++ << " * * * "<< endl;
-//		result[i].print();
-//		if (robot.getEndTransform(result[i]) == robot.getEndTransform())
-//			println("correct");
-//		else
-//			println("wrong");
-//	}
-//	robot.getTransform(0, 3, Q::zero(6)).print();
+	SiasunSR4CSolver solver(robot);
+	std::vector<Q> result = solver.solve(robot.getEndTransform(), Config(Config::ssame, Config::esame, Config::wsame));
+	println("results are;");
+	int counter = 0;
+	for (unsigned int i=0; i<result.size(); i++)
+	{
+		cout << " * * * " << counter++ << " * * * "<< endl;
+		result[i].print();
+		if (robot.getEndTransform(result[i]) == robot.getEndTransform())
+			println("correct");
+		else
+			println("wrong");
+	}
+
 
 //	char key = '1';
 //	while(key != '0')
@@ -180,7 +183,7 @@ int main(){
 
 //	ikTest();
 
-	ik2Test();
+//	ik2Test();
 
 	return 0;
 }

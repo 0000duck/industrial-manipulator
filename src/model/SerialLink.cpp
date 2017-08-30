@@ -8,8 +8,10 @@
 # include "SerialLink.h"
 # include "../kinematics/Frame.h"
 # include "../common/printAdvance.h"
+# include "Jacobian.h"
 
 using robot::kinematic::Frame;
+using std::vector;
 
 namespace robot {
 namespace model {
@@ -120,11 +122,16 @@ HTransform3D<double> SerialLink::getEndTransform(const robot::math::Q& q) const
 /*
  * 根据关节角度获取雅克比矩阵；
  */
-const Jacobian SerialLink::getJacobian(const robot::math::Q& q)
+Jacobian SerialLink::getJacobian() const
+{
+	return getJacobian(getQ());
+}
+
+Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
 {
 	int dof = getDOF();
 	dof = 6; // 目前只处理6关节的雅克比矩阵
-	double j[6][6]; // 只处理6X6的雅克比矩阵
+	vector< vector<double> > j(6, vector<double>(dof)); // 只处理6X6的雅克比矩阵 // TODO static?
 
 	// 计算每个关节相对上一坐标系的变换矩阵
 	std::vector< HTransform3D<double> > Ti_1i; // i=1~n
@@ -199,6 +206,29 @@ void SerialLink::setQ(robot::math::Q q)
 	int i=0;
 	for (std::vector<Link*>::iterator it=_linkList.begin(); it<_linkList.end(); it++)
 		(*it)->change(q[i++]);
+}
+
+Config SerialLink::getConfig(const robot::math::Q& q) const
+{
+	DHTable dHTable = getDHTable();
+	double j2 = q[1] + dHTable[1].theta();
+	double j3 = q[2] + dHTable[2].theta();
+	double j5 = q[4] + dHTable[4].theta();
+	double a2 = dHTable[1].a();
+	double a3 = dHTable[2].a();
+	double a4 = dHTable[3].a();
+	double d4 = dHTable[3].d();
+	double config_r = a2 + a3*cos(j2) + a4*cos(j2 + j3) - d4*sin(j2 + j3);
+	double wrist = (j5 >= 0)? Config::wpositive:Config::wnegative;
+	double elbow = (j3 >= 0)? Config::epositive:Config::enegative;
+	double shoulder =(config_r < 0)? Config::righty:Config::lefty;
+	return Config(shoulder, elbow, wrist);
+}
+
+const robot::math::Q SerialLink::getEndVelocity(const robot::kinematic::State& state) const
+{
+	Jacobian jacob = getJacobian(state.getAngle());
+	return jacob*(state.getVelocity());
 }
 
 SerialLink::~SerialLink()

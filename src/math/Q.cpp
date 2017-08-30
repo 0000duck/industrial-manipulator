@@ -32,7 +32,8 @@ Q::Q(double q1, double q2, double q3, double q4, double q5, double q6)
 //}
 
 
-int Q::size(){
+int Q::size() const
+{
 	return _size;
 }
 
@@ -46,10 +47,18 @@ double Q::operator[](int index) const
 	return _value[index];
 }
 
-Q& Q::zero(int size)
+Q Q::zero(int size)
 {
-	static Q q(0, 0, 0, 0, 0, 0);
+	Q q;
+	for (int i=0; i<size; i++)
+		q.pushBack(0);
 	return q;
+}
+
+void Q::pushBack(double newValue)
+{
+	_size++;
+	_value.push_back(newValue);
 }
 
 void Q::print() const

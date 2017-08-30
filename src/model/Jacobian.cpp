@@ -12,30 +12,36 @@
 namespace robot {
 namespace model {
 
-Jacobian::Jacobian():_j(6, 6)
+Jacobian::Jacobian():_j(6, 6) // 默认关节数为6
 {
-
+	_size = 6;
 }
 
-Jacobian::Jacobian(const double (&j)[6][6]):_j(6, 6)
+Jacobian::Jacobian(std::vector< std::vector<double> > j):_j(6, j[0].size())
 {
+	_size = j[0].size();
 	for (int i=0; i<6; i++)
 	{
-		for (int k=0; k<6; k++)
+		for (int k=0; k<_size; k++)
 		{
 			_j(i, k) = j[i][k];
 		}
 	}
 }
 
+
 void Jacobian::doInverse()
 {
+	if (_size != 6)
+		throw("Jacobian is not inversible because the #joint is not 6! ");
 	_j = _j.inverse();
 }
 
 Jacobian Jacobian::inverse() const
 {
-	Jacobian jcob;
+	if (_size != 6)
+		throw("Jacobian is not inversible because the #joint is not 6! ");
+	Jacobian jcob = *this;
 	jcob.getMatrix().inverse();
 	return jcob;
 }
@@ -87,8 +93,28 @@ void Jacobian::operator=(const Jacobian& jaco)
 	}
 }
 
-Jacobian::~Jacobian() {
-	// TODO Auto-generated destructor stub
+robot::math::Q Jacobian::operator*(const robot::math::Q& jointVelocity) const
+{
+	if (jointVelocity.size() != _size)
+		throw("Jacobian doesn't match joint velocity size");
+	robot::math::Q endVelocity = robot::math::Q::zero(6);
+	for (int i=0; i<6; i++)
+	{
+		for (int j=0; j<_size; j++)
+		{
+			endVelocity(i) += _j(i, j)*jointVelocity[j];
+		}
+	}
+	return endVelocity;
+}
+
+int Jacobian::size() const
+{
+	return _size;
+}
+
+Jacobian::~Jacobian()
+{
 }
 
 

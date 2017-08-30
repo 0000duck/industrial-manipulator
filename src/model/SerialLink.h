@@ -16,6 +16,8 @@
 # include "../math/Q.h"
 # include "../model/Jacobian.h"
 # include "Jacobian.h"
+# include "Config.h"
+# include "../kinematics/State.h"
 
 using robot::kinematic::Frame;
 
@@ -33,9 +35,12 @@ public:
 	HTransform3D<double> getTransform(unsigned int startLink, unsigned int endLink, const robot::math::Q& q) const;
 	HTransform3D<double> getEndTransform(void) const;
 	HTransform3D<double> getEndTransform(const robot::math::Q& q) const;
-	const Jacobian getJacobian(const robot::math::Q& q);
+	Jacobian getJacobian() const;
+	Jacobian getJacobian(const robot::math::Q& q) const;
 	const robot::math::Q getQ() const;
 	void setQ(robot::math::Q);
+	Config getConfig(const Q&) const;
+	const robot::math::Q getEndVelocity(const robot::kinematic::State& state) const;
 	void print(); // TODO
 	virtual ~SerialLink();
 private:

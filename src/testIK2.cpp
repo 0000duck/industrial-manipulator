@@ -137,7 +137,7 @@ void ik2Test()
 				}
 			}
 			J = robot.getJacobian(result[0]);
-			J.doInverse();
+			J.inverse();
 		}
 	}
 	clock_t end = clock();
