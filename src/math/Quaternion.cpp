@@ -5,13 +5,14 @@
  *      Author: a1994846931931
  */
 
-#include "Quaternion.h"
-#include <math.h>
+# include "Quaternion.h"
+# include <math.h>
+# include "../common/printAdvance.h"
 
 namespace robot {
 namespace math {
 
-Quaternion::Quaternion():_r(0),_i(0),_j(0),_k(0)
+Quaternion::Quaternion():_r(1),_i(0),_j(0),_k(0)
 {
 	// TODO Auto-generated constructor stub
 }
@@ -60,10 +61,14 @@ void Quaternion::operator-=(const Quaternion& QuatA)
 }
 void Quaternion::operator*=(const Quaternion& QuatA)
 {
-	_r*=QuatA._r;
-	_i*=QuatA._i;
-	_j*=QuatA._j;
-	_k*=QuatA._k;
+	double r = _r*QuatA._r-_i*QuatA._i-_j*QuatA._j-_k*QuatA._k;
+	double i = _r*QuatA._i+_i*QuatA._r+_j*QuatA._k-_k*QuatA._j;
+	double j = _r*QuatA._j+_j*QuatA._r+_k*QuatA._i-_i*QuatA._k;
+	double k = _r*QuatA._k+_k*QuatA._r+_i*QuatA._j-_j*QuatA._i;
+	_r = r;
+	_i = i;
+	_j = j;
+	_k = k;
 }
 void Quaternion::operator=(const Quaternion& QuatA)
 {
@@ -100,10 +105,17 @@ Quaternion Quaternion::conjugate() const
 {
 	return Quaternion(_r,-_i,-_j,-_k);
 }
-Quaternion Quaternion::norm() const
+double Quaternion::norm() const
 {
-	double q=sqrt(_r*_r+_i*_i+_j*_j+_k*_k);
-	return Quaternion(_r/q,_i/q,_j/q,_k/q);
+	return sqrt(_r*_r+_i*_i+_j*_j+_k*_k);
+}
+void Quaternion::normalize()
+{
+	double q=norm();
+	_r = _r/q;
+	_i = _i/q;
+	_j = _j/q;
+	_k = _k/q;
 }
 robot::math::Rotation3D<double> Quaternion::toRotation3D() const
 {
@@ -117,6 +129,21 @@ robot::math::HTransform3D<double> Quaternion::toHTransform3D() const
 				                 2*_i*_j-2*_r*_k,     1-2*_i*_i-2*_k*_k,  2*_j*_k+2*_r*_i,  0,
 				                 2*_i*_k+2*_r*_j,     2*_j*_k-2*_r*_i,    1-2*_i*_i-2*_j*_j,0);
 }
+
+Quaternion Quaternion::DH(double alpha, double theta)
+{
+	double ca = cos(alpha/2);
+	double sa = sin(alpha/2);
+	double ct = cos(theta/2);
+	double st = sin(theta/2);
+	return Quaternion(ca*ct, sa*ct, -sa*st, ca*st);
+}
+
+void Quaternion::print() const
+{
+	cout << _r << " + " << _i << "i + " << _j << "j + " << _k << "k" << endl;
+}
+
 Quaternion::~Quaternion() {
 	// TODO Auto-generated destructor stub
 }

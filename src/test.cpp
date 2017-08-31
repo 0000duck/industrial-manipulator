@@ -24,6 +24,7 @@
 # include "testIK2.h"
 # include "model/Config.h"
 # include "kinematics/State.h"
+# include "math/Quaternion.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -156,18 +157,22 @@ int main(){
 	robot.append(&l6);
 
 	SiasunSR4CSolver solver(robot);
-	std::vector<Q> result = solver.solve(robot.getEndTransform(), Config(Config::ssame, Config::esame, Config::wsame));
-	println("results are;");
-	int counter = 0;
-	for (unsigned int i=0; i<result.size(); i++)
-	{
-		cout << " * * * " << counter++ << " * * * "<< endl;
-		result[i].print();
-		if (robot.getEndTransform(result[i]) == robot.getEndTransform())
-			println("correct");
-		else
-			println("wrong");
-	}
+//	std::vector<Q> result = solver.solve(robot.getEndTransform(), Config(Config::ssame, Config::esame, Config::wsame));
+//	println("results are;");
+//	int counter = 0;
+//	for (unsigned int i=0; i<result.size(); i++)
+//	{
+//		cout << " * * * " << counter++ << " * * * "<< endl;
+//		result[i].print();
+//		if (robot.getEndTransform(result[i]) == robot.getEndTransform())
+//			println("correct");
+//		else
+//			println("wrong");
+//	}
+	Quaternion endQuat = robot.getEndQuaternion();
+	endQuat.print();
+
+	cout << ((robot.getEndTransform().getRotation() == endQuat.toRotation3D())? "same":"different");
 
 
 //	char key = '1';

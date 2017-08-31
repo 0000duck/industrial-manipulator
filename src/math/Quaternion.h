@@ -34,11 +34,13 @@ public:
 	double j() const;
 	double k() const;
 	Quaternion conjugate() const;
-	Quaternion norm() const;
+	double norm() const;
+	void normalize();
 	robot::math::Rotation3D<double> toRotation3D() const;
 	robot::math::HTransform3D<double> toHTransform3D() const;
-	void print();
-
+	void print() const;
+public:
+	static Quaternion DH(double alpha, double theta);
 	virtual ~Quaternion();
 private:
 	double _r, _i, _j, _k;

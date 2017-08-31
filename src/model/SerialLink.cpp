@@ -105,18 +105,33 @@ HTransform3D<double> SerialLink::getTransform(
 
 HTransform3D<double> SerialLink::getEndTransform() const
 {
-	HTransform3D<> tran = _endToTool->getTransform();
-	for (int i=_linkList.size()-1;i>-1;i--)
-	{
-		tran = _linkList[i]->getFrame()->getTransform()*tran;
-	}
-	return tran;
+	return this->getTransform(0, _linkList.size(), Q::zero(getDOF()));
 }
 
 
 HTransform3D<double> SerialLink::getEndTransform(const robot::math::Q& q) const
 {
 	return this->getTransform(0, _linkList.size(), q);
+}
+
+Quaternion SerialLink::getQuaternion(unsigned int startLink, unsigned int endLink, const robot::math::Q& q) const
+{
+	Quaternion quat(1, 0, 0, 0);
+	for (unsigned int i=startLink; i<endLink; i++)
+	{
+		quat *= Quaternion::DH(_linkList[i]->alpha(), _linkList[i]->theta() + q[i]);
+	}
+	return quat;
+}
+
+Quaternion SerialLink::getEndQuaternion(void) const
+{
+	return SerialLink::getEndQuaternion(Q::zero(getDOF()));
+}
+
+Quaternion SerialLink::getEndQuaternion(const Q& q) const
+{
+	return getQuaternion(0, getDOF(), q);
 }
 
 /*
