@@ -14,6 +14,7 @@
 #include <vector>
 using std::vector;
 namespace robot {
+namespace trajectory{
 
 int n;//插补点数
 double L,l,a,diffx,diffy,diffz,diffrx,diffry,diffrz;//直线段长度L，插补线段长度l
@@ -95,4 +96,5 @@ MoveL::~MoveL()
 	{
 
 	}
+}
 }

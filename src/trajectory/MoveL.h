@@ -8,6 +8,7 @@
 #ifndef MOVEL_H_
 #define MOVEL_H_
 namespace robot{
+namespace trajectory{
 class MoveL {
 public:
 	MoveL();
@@ -24,6 +25,7 @@ private:
 
 	int _v;
 };
+}
 }
 
 #endif /* MOVEL_H_ */
