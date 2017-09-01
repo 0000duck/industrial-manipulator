@@ -26,9 +26,11 @@ Q::Q(double q1, double q2, double q3, double q4, double q5, double q6)
 	_value.push_back(q6);
 }
 
-//Q::Q(Q&)
+//Q::Q(Q& q)
 //{
-//
+//	_size = q.size();
+//	for (int i=0; i<_size; i++)
+//		_value.push_back(q[i]);
 //}
 
 
@@ -45,6 +47,43 @@ double& Q::operator()(int index)
 double Q::operator[](int index) const
 {
 	return _value[index];
+}
+
+Q Q::operator+(const Q& q1) const
+{
+	if (this->size() < q1.size())
+		throw("This Q size is smaller then the right handed Q!");
+	Q q(*this);
+	for (int i=0; i<(int)_size; i++)
+		q(i) += q1[i];
+	return q;
+}
+
+Q Q::operator-(const Q& q1) const
+{
+	if (this->size() < q1.size())
+		throw("This Q size is smaller then the right handed Q!");
+	Q q(*this);
+	for (int i=0; i<(int)_size; i++)
+		q(i) -= q1[i];
+	return q;
+}
+
+Q Q::operator*(double num) const
+{
+	Q q(*this);
+	for (int i=0; i<this->size(); i++)
+		q(i) *= num;
+	return q;
+}
+
+Q Q::operator/(double num) const
+{
+	double factor = 1.0/num;
+	Q q(*this);
+	for (int i=0; i<this->size(); i++)
+		q(i) *= factor;
+	return q;
 }
 
 Q Q::zero(int size)

@@ -14,7 +14,7 @@ namespace math {
 
 Quaternion::Quaternion():_r(1),_i(0),_j(0),_k(0)
 {
-	// TODO Auto-generated constructor stub
+
 }
 
 Quaternion::Quaternion(double r,double i,double j,double k):_r(r),_i(i),_j(j),_k(k)
@@ -29,6 +29,34 @@ Quaternion::Quaternion(const Quaternion& QuatA)
 	_j=QuatA._j;
 	_k=QuatA._k;
 }
+
+Quaternion::Quaternion(const Rotation3D<double>& rot)
+{
+	_r = 0.5*sqrt(1 + rot(0, 0) + rot(1, 1) + rot(2, 2));
+	double _r4 = _r*4;
+	_i = (rot(2, 1) - rot(1, 2))/_r4;
+	_j = (rot(0, 2) - rot(2, 0))/_r4;
+	_k = (rot(1, 0) - rot(0, 1))/_r4;
+}
+
+Quaternion::Quaternion(const HTransform3D<double>& tran)
+{
+	_r = 0.5*sqrt(1 + tran(0, 0) + tran(1, 1) + tran(2, 2));
+	double _r4 = _r*4;
+	_i = (tran(2, 1) - tran(1, 2))/_r4;
+	_j = (tran(0, 2) - tran(2, 0))/_r4;
+	_k = (tran(1, 0) - tran(0, 1))/_r4;
+}
+
+Quaternion::Quaternion(double theta, const Vector3D<double>& n)
+{
+	double st = sin(theta/2.0);
+	_r = cos(theta/2.0);
+	_i = n(0)*st;
+	_j = n(1)*st;
+	_k = n(2)*st;
+}
+
 Quaternion Quaternion::operator+(const Quaternion& QuatA) const
 {
 	return Quaternion(_r+QuatA._r,_i+QuatA._i,_j+QuatA._j,_k+QuatA._k);
@@ -137,6 +165,16 @@ Quaternion Quaternion::DH(double alpha, double theta)
 	double ct = cos(theta/2);
 	double st = sin(theta/2);
 	return Quaternion(ca*ct, sa*ct, -sa*st, ca*st);
+}
+
+Quaternion::rotVar Quaternion::getRotationVariables() const
+{
+	double theta = acos(_r)*2;
+	double st = sin(theta/2);
+	Quaternion::rotVar var;
+	var.theta = theta;
+	var.n = Vector3D<double>(_i/st, _j/st, _k/st);
+	return var;
 }
 
 void Quaternion::print() const

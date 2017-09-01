@@ -8,6 +8,7 @@
 #ifndef QUATERNION_H_
 #define QUATERNION_H_
 
+//# include "Vector3D.h"
 # include "Rotation3D.h"
 # include "HTransform3D.h"
 
@@ -15,11 +16,17 @@ namespace robot {
 namespace math {
 
 class Quaternion {
+	typedef struct{
+		double theta;
+		Vector3D<double> n;
+	} rotVar;
 public:
 	Quaternion();
-
 	Quaternion(double, double, double, double);
 	Quaternion(const Quaternion&);
+	Quaternion(const Rotation3D<double>&);
+	Quaternion(const HTransform3D<double>&);
+	Quaternion(double theta, const Vector3D<double>& n);
 	Quaternion operator+(const Quaternion&) const;
 	Quaternion operator-(const Quaternion&) const;
 	Quaternion operator*(const Quaternion&) const;
@@ -38,6 +45,7 @@ public:
 	void normalize();
 	robot::math::Rotation3D<double> toRotation3D() const;
 	robot::math::HTransform3D<double> toHTransform3D() const;
+	rotVar getRotationVariables() const;
 	void print() const;
 public:
 	static Quaternion DH(double alpha, double theta);

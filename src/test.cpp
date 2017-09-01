@@ -25,6 +25,8 @@
 # include "model/Config.h"
 # include "kinematics/State.h"
 # include "math/Quaternion.h"
+# include <vector>
+# include "trajectory/LinearInterpolator.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -32,7 +34,24 @@ using std::cout;
 using namespace robot::common;
 using namespace robot::model;
 using namespace robot::ik;
+using namespace robot::trajectory;
 using Eigen::MatrixXd;
+
+class base{
+public:
+	base(){}
+	virtual void print(){}
+	virtual ~base(){}
+};
+class class1:public base{
+public:
+	class1(){}
+	virtual void print()
+	{
+		cout << "class1 method" << endl;
+	}
+	virtual ~class1(){}
+};
 
 int main(){
 	println("*** test ***");
@@ -169,10 +188,6 @@ int main(){
 //		else
 //			println("wrong");
 //	}
-	Quaternion endQuat = robot.getEndQuaternion();
-	endQuat.print();
-
-	cout << ((robot.getEndTransform().getRotation() == endQuat.toRotation3D())? "same":"different");
 
 
 //	char key = '1';
@@ -189,6 +204,10 @@ int main(){
 //	ikTest();
 
 //	ik2Test();
+
+	LinearInterpolator<Q> line(Q(0, 0, 0, 0, 0, 0), Q(1, 2, 3, 4, 5, 6), 10);
+	cout << "at t = 1 is: ";
+	line.x(2.2).print();
 
 	return 0;
 }

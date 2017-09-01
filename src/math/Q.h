@@ -22,6 +22,10 @@ public:
 	int size() const;
 	double& operator()(int);
 	double operator[](int) const;
+	Q operator+(const Q&) const;
+	Q operator-(const Q&) const;
+	Q operator*(double) const;
+	Q operator/(double) const;
 	void pushBack(double);
 	void print() const;
 	virtual ~Q();
