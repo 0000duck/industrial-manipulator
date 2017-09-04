@@ -10,14 +10,6 @@
 namespace robot {
 namespace trajectory {
 
-CircularInterpolator::CircularInterpolator() {
-	// TODO Auto-generated constructor stub
-
-}
-
-CircularInterpolator::~CircularInterpolator() {
-	// TODO Auto-generated destructor stub
-}
 
 } /* namespace trajectory */
 } /* namespace robot */

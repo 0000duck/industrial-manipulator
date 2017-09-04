@@ -10,14 +10,6 @@
 namespace robot {
 namespace trajectory {
 
-PolynomialInterpolator::PolynomialInterpolator() {
-	// TODO Auto-generated constructor stub
-
-}
-
-PolynomialInterpolator::~PolynomialInterpolator() {
-	// TODO Auto-generated destructor stub
-}
 
 } /* namespace trajectory */
 } /* namespace robot */

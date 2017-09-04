@@ -1,25 +1,26 @@
 /*
- * test.cpp
+ * testIK2.cpp
  *
- *  Created on: Aug 23, 2017
+ *  Created on: Aug 29, 2017
  *      Author: a1994846931931
  */
 
-# include "math/Rotation3D.h"
-# include "math/HTransform3D.h"
-# include "kinematics/Trsf.h"
-# include "kinematics/Frame.h"
+# include "../math/Rotation3D.h"
+# include "../math/HTransform3D.h"
+# include "../kinematics/Trsf.h"
+# include "../kinematics/Frame.h"
 # include <iostream>
 # include <math.h>
 # include <string>
-# include "./common/printAdvance.h"
-//# include "model/SerialLink.h"
-# include "model/Link.h"
+# include "../common/printAdvance.h"
+# include "../model/SerialLink.h"
+# include "../model/Link.h"
 # include "test.h"
-# include "ik/PieperSolver.h"
+# include "../ik/SiasunSR4CSolver.h"
 # include <stdlib.h>
 # include <time.h>
-# include "common/common.h"
+# include "../common/common.h"
+# include "../model/Config.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -28,60 +29,34 @@ using namespace robot::common;
 using namespace robot::model;
 using namespace robot::ik;
 
-void ikTest(){
-	println("*** test ***");
+void ik2Test()
+{
+	println("*** test IK for siasun ***");
 	SerialLink robot;
-
-//	double alpha1 = M_PI/2;
-//	double alpha2 = 0;
-//	double alpha3 = M_PI/2;
-//	double alpha4 = -M_PI/2;
-//	double alpha5 = M_PI/2;
-//	double alpha6 = 0;
-//	double a1 = 40;
-//	double a2 = 315;
-//	double a3 = 70;
-//	double a4 = 0;
-//	double a5 = 0;
-//	double a6 = 0;
-//	double d1 = 330;
-//	double d2 = 0;
-//	double d3 = 310;
-//	double d4 = 0;
-//	double d5 = 0;
-////	double d6 = 70;
-//	double d6 = 0;
-//	double theta1 = 0;
-//	double theta2 = M_PI/2;
-//	double theta3 = 0;
-//	double theta4 = 0;
-//	double theta5 = -M_PI;
-//	double theta6 = M_PI/2;
-
-	// ***
+	// *** siasun 6kg
 	double alpha1 = 0;
 	double alpha2 = -M_PI/2;
 	double alpha3 = 0;
-	double alpha4 = M_PI/2;
+	double alpha4 = -M_PI/2;
 	double alpha5 = M_PI/2;
 	double alpha6 = -M_PI/2;
 	double a1 = 0;
-	double a2 = 0;
-	double a3 = 0.3;
-	double a4 = 0;
+	double a2 = 0.16;
+	double a3 = 0.575;
+	double a4 = 0.13;
 	double a5 = 0;
 	double a6 = 0;
-	double d1 = 0.1;
+	double d1 = 0.439;
 	double d2 = 0;
 	double d3 = 0;
-	double d4 = 0.2;
+	double d4 = 0.644;
 	double d5 = 0;
-	double d6 = 0;
-	double theta1 = M_PI/2;
+	double d6 = 0.1095;
+	double theta1 = 0;
 	double theta2 = -M_PI/2;
-	double theta3 = M_PI/2;
-	double theta4 = M_PI/2;
-	double theta5 = 0;
+	double theta3 = 0;
+	double theta4 = 0;
+	double theta5 = M_PI/2;
 	double theta6 = 0;
 	// ***
 	double lmin1 = M_PI/180.0*-180;
@@ -96,6 +71,7 @@ void ikTest(){
 	double lmax4 = M_PI/180.0*240;
 	double lmax5 = M_PI/180.0*200;
 	double lmax6 = M_PI/180.0*360;
+
 //	Link(alpha, a, d, theta, min, max, sigma=0)
 	Link l1(alpha1, a1, d1, theta1, lmin1, lmax1);
 	Link l2(alpha2, a2, d2, theta2, lmin2, lmax2);
@@ -110,7 +86,7 @@ void ikTest(){
 	robot.append(&l5);
 	robot.append(&l6);
 
-	PieperSolver solver(robot);
+	SiasunSR4CSolver solver(robot);
 	int MAXSTEP = 10000;
 	int unsolved = 0;
 	int allresult = 0;
@@ -121,17 +97,27 @@ void ikTest(){
 	HTransform3D<> endTran;
 	std::vector<Q> result;
 	Jacobian J;
+//	robot::model::Config dafaultConfig;
+//	robot::model::Config freeConfig(-1, -1, -1);
+//	robot::model::Config posConfig(2, 2, 2);
 	for (int i=0; i<MAXSTEP; i++)
 	{
 		robot::math::Q q(fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14), fRand(-3.14, 3.14));
 		endTran = robot.getEndTransform(q);
-		result = solver.solve(endTran);
+		result = solver.solve(endTran, solver.getConfig(q));
+//		result = solver.solve(endTran, freeConfig);
 		if (result.size() == 0)
 		{
 			unsolved++;
 		}
 		else
 		{
+//			if (result.size() > 1)
+//			{
+//				cout << "result size is: " << result.size() << std::endl;
+//
+//				break;
+//			}
 			allresult += result.size();
 			for (unsigned int i=0; i<result.size(); i++)
 			{
@@ -151,7 +137,7 @@ void ikTest(){
 				}
 			}
 			J = robot.getJacobian(result[0]);
-			J.doInverse();
+			J.inverse();
 		}
 	}
 	clock_t end = clock();
@@ -166,6 +152,3 @@ void ikTest(){
 	println("time: ");
 	println(end - start);
 }
-
-
-

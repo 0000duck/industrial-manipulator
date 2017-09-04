@@ -48,7 +48,7 @@ public:
 		return _v[i];
 	}
 
-	T& operator[](int i) const
+	T& operator[](int i)
 	{
 		return _v[i];
 	}
@@ -89,6 +89,12 @@ public:
 	{
 		return Vector3D<T>(
 				vec(0) + _v[0], vec(1) + _v[1], vec(2) + _v[2]);
+	}
+
+	Vector3D<T> operator-(Vector3D<T> vec) const
+	{
+		return Vector3D<T>(
+				_v[0] - vec(0), _v[1] - vec(1), _v[2] - vec(2));
 	}
 
 	static T dot(const Vector3D<T>& a, const Vector3D<T>& b)

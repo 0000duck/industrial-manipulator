@@ -13,7 +13,8 @@
 namespace robot {
 namespace trajectory {
 
-class PolynomialInterpolator: public Interpolator {
+template <class T>
+class PolynomialInterpolator: public Interpolator<T> {
 public:
 	PolynomialInterpolator();
 	virtual ~PolynomialInterpolator();

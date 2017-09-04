@@ -5,28 +5,28 @@
  *      Author: a1994846931931
  */
 
-# include "math/Rotation3D.h"
-# include "math/HTransform3D.h"
-# include "kinematics/Trsf.h"
-# include "kinematics/Frame.h"
+# include "../math/Rotation3D.h"
+# include "../math/HTransform3D.h"
+# include "../kinematics/Trsf.h"
+# include "../kinematics/Frame.h"
 # include <iostream>
 # include <math.h>
 # include <string>
-# include "./common/printAdvance.h"
+# include "../common/printAdvance.h"
 //# include "model/SerialLink.h"
-# include "model/Link.h"
+# include "../model/Link.h"
 # include "test.h"
-# include "ik/PieperSolver.h"
-# include "ik/SiasunSR4CSolver.h"
+# include "../ik/PieperSolver.h"
+# include "../ik/SiasunSR4CSolver.h"
 # include "testIK.h"
-# include "ext/Eigen/Dense"
-# include "ext/Eigen/QR"
+# include "../ext/Eigen/Dense"
+# include "../ext/Eigen/QR"
 # include "testIK2.h"
-# include "model/Config.h"
-# include "kinematics/State.h"
-# include "math/Quaternion.h"
+# include "../model/Config.h"
+# include "../kinematics/State.h"
+# include "../math/Quaternion.h"
 # include <vector>
-# include "trajectory/LinearInterpolator.h"
+# include "../trajectory/LinearInterpolator.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
