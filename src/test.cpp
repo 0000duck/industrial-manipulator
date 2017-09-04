@@ -205,10 +205,14 @@ int main(){
 
 //	ik2Test();
 
-	LinearInterpolator<Q> line(Q(0, 0, 0, 0, 0, 0), Q(1, 2, 3, 4, 5, 6), 10);
-	cout << "at t = 1 is: ";
-	line.x(2.2).print();
+//	LinearInterpolator<Q> line(Q(0, 0, 0, 0, 0, 0), Q(1, 2, 3, 4, 5, 6), 10);
+//	cout << "at t = 1 is: ";
+//	line.x(2.2).print();
 
+	std::vector<base*> a;
+	class1 b;
+	a.push_back(&b);
+	a[0]->print();
 	return 0;
 }
 

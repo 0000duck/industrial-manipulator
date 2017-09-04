@@ -22,7 +22,7 @@ namespace robot {
 namespace trajectory {
 
 /*
- * 用于例如常亮（例如double...)的差值；
+ * 用于例如常亮（例如double, Q...)的插值；
  */
 template <class T>
 class LinearInterpolator: public Interpolator<T> {
@@ -116,21 +116,6 @@ private:
 	Rotation3D<T> _vel;
 	Rotation3D<T> _acc;
 };
-
-//class LinearInterpolator<Q>: public Interpolator<Q>{
-//public:
-//	LinearInterpolator(const Q& start, const Q& end, double duration)
-//	{
-//		if (start.size() != end.size())
-//			throw("Start Q size and end Q size don't math!");
-//		for (int i=0; i<)
-//	}
-//
-//	virtual ~LinearInterpolator(){}
-//private:
-//	std::vector<LinearInterpolator<double> > _qLinearInterpolators;
-//
-//}
 
 } /* namespace trajectory */
 } /* namespace robot */
