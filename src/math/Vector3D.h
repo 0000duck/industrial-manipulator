@@ -102,9 +102,19 @@ public:
 		_v[1] = v2;
 		_v[2] = v3;
 	}
-//	static Rotation3D<T>& cross(const Vector3D<T>& a, const Vector3D<T>& b){
-//		static Rotation3D<T> result(a(0))
-//	}
+
+	static Vector3D<T> cross(const Vector3D<T>& a, const Vector3D<T>& b)
+	{
+		return Vector3D<T>(a(1)*b(2) - a(2)*b(1),
+				a(2)*b(0) - a(0)*b(2),
+				a(0)*b(1) - a(1)*b(0));
+	}
+
+	static Vector3D<T> normalize(const Vector3D<T>& a)
+	{
+		T len = a.getLengh();
+		return Vector3D<T>(a(0)/len, a(1)/len, a(2)/len);
+	}
 
 	void print() const
 	{
