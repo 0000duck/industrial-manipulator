@@ -66,12 +66,6 @@ void Frame::setParent(Frame* parent, bool doAddChild)
 
 void Frame::addChild(Frame* child, bool doSetParent)
 {
-	/*
-	 * 添加一个child；
-	 * 外部调用模式下，doSetParent=true，此时不仅要给这个Frame添加child；
-	 * 还要给它的child设置parent；
-	 * 如此保证数据的统一性；
-	 */
 	if (not this->haveChild(child))
 		_children.push_back(child);
 	if (doSetParent)
@@ -80,9 +74,6 @@ void Frame::addChild(Frame* child, bool doSetParent)
 
 bool Frame::haveChild(Frame* child)
 {
-	/*
-	 * 判断一个Frame的_children中有没有一个child；
-	 */
 	for (int i=0; i<(int)_children.size(); i++)
 		if (_children[i] == child)
 			return true;
@@ -91,10 +82,6 @@ bool Frame::haveChild(Frame* child)
 
 int Frame::getChildIndex(Frame* child)
 {
-	/*
-	 * 获取一个child在_children中的位置；
-	 * 如果没有这个child，那么返回-1；
-	 */
 	for (int i=0; i<(int)_children.size(); i++)
 			if (_children[i] == child)
 				return i;

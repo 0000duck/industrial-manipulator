@@ -1,8 +1,7 @@
-/*
- * Jacobian.h
- *
- *  Created on: Aug 24, 2017
- *      Author: a1994846931931
+/**
+ * @brief Jacobian类
+ * @date Aug 24, 2017
+ * @author a1994846931931
  */
 
 #ifndef JACOBIAN_H_
@@ -15,6 +14,9 @@
 namespace robot {
 namespace model {
 
+/** @addtogroup model
+ * @{
+ */
 class Jacobian {
 public:
 	Jacobian();
@@ -43,6 +45,7 @@ private:
 	Eigen::MatrixXd _j;
 };
 
+/** @} */
 } /* namespace model */
 } /* namespace robot */
 

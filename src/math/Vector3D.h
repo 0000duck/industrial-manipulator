@@ -1,8 +1,7 @@
-/*
- * Vector3D.h
- *
- *  Created on: Aug 10, 2017
- *      Author: a1994846931931
+/**
+ * @brief 齐次三维向量类Vector3D
+ * @date Aug 10, 2017
+ * @author a1994846931931
  */
 
 #ifndef VECTOR3D_H_
@@ -16,6 +15,9 @@
 namespace robot {
 namespace math {
 
+/** @addtogroup math
+ * @{
+ */
 template<typename T=double>
 class Vector3D {
 public:
@@ -133,6 +135,7 @@ private:
 	T _v[3];
 };
 
+/** @} */
 } /* namespace math */
 } /* namespace robot */
 

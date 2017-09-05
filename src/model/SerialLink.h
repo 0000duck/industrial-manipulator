@@ -1,8 +1,7 @@
-/*
- * SerialLink.h
- *
- *  Created on: Aug 15, 2017
- *      Author: a1994846931931
+/**
+ * @brief SerialLink类
+ * @date Aug 15, 2017
+ * @author a1994846931931
  */
 
 #ifndef SERIALLINK_H_
@@ -25,6 +24,10 @@ using robot::kinematic::Frame;
 namespace robot {
 namespace model {
 
+/** @addtogroup model
+ * @brief 机器人模型的表达, DH参数, 雅克比矩阵等.
+ * @{
+ */
 class SerialLink {
 public:
 	SerialLink(Frame* tool=NULL);
@@ -54,6 +57,7 @@ private:
 
 };
 
+/** @} */
 } /* namespace model */
 } /* namespace robot */
 

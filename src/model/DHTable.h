@@ -1,8 +1,7 @@
-/*
- * DHTable.h
- *
- *  Created on: Aug 17, 2017
- *      Author: a1994846931931
+/**
+ * @brief DHTable类
+ * @date Aug 17, 2017
+ * @author a1994846931931
  */
 
 #ifndef DHTABLE_H_
@@ -14,6 +13,9 @@
 namespace robot {
 namespace model {
 
+/** @addtogroup model
+ * @{
+ */
 class DHTable {
 public:
 	DHTable();
@@ -29,6 +31,7 @@ private:
 
 };
 
+/** @} */
 } /* namespace model */
 } /* namespace robot */
 

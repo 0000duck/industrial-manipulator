@@ -1,8 +1,7 @@
-/*
- * Q.h
- *
- *  Created on: Aug 17, 2017
- *      Author: a1994846931931
+/**h
+ * @brief 数组Q类
+ * @date Aug 17, 2017
+ * @author a1994846931931
  */
 
 #ifndef Q_H_
@@ -14,6 +13,9 @@
 namespace robot {
 namespace math {
 
+/** @addtogroup math
+ * @{
+ */
 class Q {
 public:
 	Q();
@@ -36,6 +38,7 @@ private:
 	std::vector<double> _value;
 };
 
+/** @} */
 } /* namespace math */
 } /* namespace robot */
 

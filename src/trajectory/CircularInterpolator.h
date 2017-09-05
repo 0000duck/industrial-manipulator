@@ -1,8 +1,7 @@
-/*
- * CircularInterpolator.h
- *
- *  Created on: Sep 4, 2017
- *      Author: a1994846931931
+/**
+ * @brief 圆弧插补器
+ * @date Sep 4, 2017
+ * @author a1994846931931
  */
 
 #ifndef CIRCULARINTERPOLATOR_H_
@@ -16,12 +15,25 @@ using namespace robot::math;
 namespace robot {
 namespace trajectory {
 
+/** @addtogroup trajectory
+ * @{
+ */
+
+/**
+ * @brief 圆弧插补器模板类
+ *
+ * 可以由三个点构造一个圆弧插补器, 根据时间参数给出当前的位置, 速度和加速度.
+ */
 template <class T>
 class CircularInterpolator: public Interpolator<T> {
 public:
 	virtual ~CircularInterpolator(){}
 };
 
+/**
+ * @brief Vector3D<T>类的圆弧插补器.
+ *
+ */
 template <class T>
 class CircularInterpolator<Vector3D<T> >: public Interpolator<Vector3D<T> > {
 public:
@@ -111,6 +123,7 @@ private:
 	double _tend;
 };
 
+/** @} */
 } /* namespace trajectory */
 } /* namespace robot */
 

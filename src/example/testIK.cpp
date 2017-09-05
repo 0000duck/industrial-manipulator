@@ -28,7 +28,8 @@ using namespace robot::common;
 using namespace robot::model;
 using namespace robot::ik;
 
-void ikTest(){
+void ikTest()
+{
 	println("*** test ***");
 	SerialLink robot;
 

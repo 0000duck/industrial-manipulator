@@ -1,8 +1,7 @@
-/*
- * PolynomialInterpolator.h
- *
- *  Created on: Sep 4, 2017
- *      Author: a1994846931931
+/**
+ * @brief PolynomialInterpolator类
+ * @date Sep 4, 2017
+ * @author a1994846931931
  */
 
 #ifndef POLYNOMIALINTERPOLATOR_H_
@@ -13,6 +12,9 @@
 namespace robot {
 namespace trajectory {
 
+/** @addtogroup trajectory
+ * @{
+ */
 template <class T>
 class PolynomialInterpolator: public Interpolator<T> {
 public:
@@ -20,6 +22,7 @@ public:
 	virtual ~PolynomialInterpolator();
 };
 
+/** @} */
 } /* namespace trajectory */
 } /* namespace robot */
 

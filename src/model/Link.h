@@ -1,8 +1,7 @@
-/*
- * Link.h
- *
- *  Created on: Aug 14, 2017
- *      Author: zrf
+/**
+ * @brief Link类
+ * @date Aug 14, 2017
+ * @author zrf
  */
 
 #ifndef LINK_H_
@@ -16,6 +15,9 @@ using namespace robot::kinematic;
 namespace robot {
 namespace model {
 
+/** @addtogroup model
+ * @{
+ */
 class Link {
 public:
 //	Link();
@@ -46,6 +48,7 @@ private:
 
 };
 
+/** @} */
 } /* namespace model */
 } /* namespace robot */
 

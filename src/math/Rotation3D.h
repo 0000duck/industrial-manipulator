@@ -1,8 +1,7 @@
-/*
- * Rotation3D.h
- *
- *  Created on: Aug 10, 2017
- *      Author: a1994846931931
+/**
+ * @brief 旋转矩阵模板类Rotation3D<>
+ * @date Aug 10, 2017
+ * @author a1994846931931
  */
 
 #ifndef ROTATION3D_H_
@@ -18,6 +17,9 @@ using std::cout;
 namespace robot {
 namespace math {
 
+/** @addtogroup math
+ * @{
+ */
 template<class T=double>
 class Rotation3D {
 public:
@@ -204,6 +206,7 @@ private:
 	T _m[3][3];
 };
 
+/** @} */
 } /* namespace math */
 } /* namespace robot */
 

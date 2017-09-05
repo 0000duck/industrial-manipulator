@@ -1,8 +1,7 @@
-/*
- * LinearInterpolator.h
- *
- *  Created on: Sep 1, 2017
- *      Author: a1994846931931
+/**
+ * @brief LinearInterpolater类
+ * @date Sep 1, 2017
+ * @author a1994846931931
  */
 
 #ifndef LINEARINTERPOLATOR_H_
@@ -21,12 +20,29 @@ using namespace robot::math;
 namespace robot {
 namespace trajectory {
 
-/*
- * 用于例如常亮（例如double, Q...)的插值；
+/** @addtogroup trajectory
+ * @{
+ */
+
+/**
+ * @brief 线性插值器模板类
+ *
+ * 用于常量（例如double, Q...)的插值. <br>
+ * 给定起始点 \f$\mathbf{s}\f$, 终点位置 \f$\mathbf{e}\f$ 以及插补时长 \f$ d\f$
+ * 线性插补器的值由 \f$\mathbf{x}(t)=\mathbf{s} +
+ * (\mathbf{e}-\mathbf{s})*t/d\f$给出. <br>
+ *
+ * 旋转矩阵的差值用到四元数的概念, 具体实现参照LinearInterpolator<Rotation3D<T> >的内容
  */
 template <class T>
 class LinearInterpolator: public Interpolator<T> {
 public:
+	/**
+	 * @brief 构造线性插补器
+	 * @param start [in] 开始位置
+	 * @param end [in] 终点位置
+	 * @param duration [in] 插补时长
+	 */
 	LinearInterpolator(const T& start, const T& end, double duration):
 		_a(start),
 		_b((end - start)/duration),
@@ -117,6 +133,7 @@ private:
 	Rotation3D<T> _acc;
 };
 
+/** @} */
 } /* namespace trajectory */
 } /* namespace robot */
 

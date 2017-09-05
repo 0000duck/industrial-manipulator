@@ -1,8 +1,7 @@
-/*
- * DHParameters.h
- *
- *  Created on: Aug 17, 2017
- *      Author: a1994846931931
+/**
+ * @brief DH参数类
+ * @date Aug 17, 2017
+ * @author a1994846931931
  */
 
 #ifndef DHPARAMETERS_H_
@@ -11,6 +10,9 @@
 namespace robot {
 namespace model {
 
+/** @addtogroup model
+ * @{
+ */
 class DHParameters {
 public:
 	DHParameters(double alpha, double a, double d, double theta);
@@ -27,6 +29,7 @@ private:
 	double _theta;
 };
 
+/** @} */
 } /* namespace model */
 } /* namespace robot */
 

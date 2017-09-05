@@ -1,8 +1,7 @@
-/*
- * Quaternion.h
- *
- *  Created on: Aug 24, 2017
- *      Author: a1994846931931
+/**
+ * @brief 单位四元数类Quaternion
+ * @date Aug 24, 2017
+ * @author a1994846931931
  */
 
 #ifndef QUATERNION_H_
@@ -15,6 +14,9 @@
 namespace robot {
 namespace math {
 
+/** @addtogroup math
+ * @{
+ */
 class Quaternion {
 	typedef struct{
 		double theta;
@@ -54,6 +56,7 @@ private:
 	double _r, _i, _j, _k;
 };
 
+/** @} */
 } /* namespace math */
 } /* namespace robot */
 

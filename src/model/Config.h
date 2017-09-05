@@ -1,8 +1,7 @@
-/*
- * Config.h
- *
- *  Created on: Aug 29, 2017
- *      Author: a1994846931931
+/**
+ * @brief Config类
+ * @date Aug 29, 2017
+ * @author a1994846931931
  */
 
 #ifndef CONFIG_H_
@@ -13,8 +12,9 @@
 namespace robot {
 namespace model {
 
-
-
+/** @addtogroup model
+ * @{
+ */
 class Config {
 public:
 	static const int righty=2, lefty=1, ssame=0, sfree=-1;
@@ -36,6 +36,7 @@ private:
 	int _wrist;
 };
 
+/** @} */
 } /* namespace model */
 } /* namespace robot */
 
