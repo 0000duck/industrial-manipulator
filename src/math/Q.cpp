@@ -51,8 +51,8 @@ double Q::operator[](int index) const
 
 Q Q::operator+(const Q& q1) const
 {
-	if (this->size() < q1.size())
-		throw("This Q size is smaller then the right handed Q!");
+	if (this->size() != q1.size())
+		throw("错误: 尝试将不同大小的数组相加!");
 	Q q(*this);
 	for (int i=0; i<(int)_size; i++)
 		q(i) += q1[i];
@@ -61,8 +61,8 @@ Q Q::operator+(const Q& q1) const
 
 Q Q::operator-(const Q& q1) const
 {
-	if (this->size() < q1.size())
-		throw("This Q size is smaller then the right handed Q!");
+	if (this->size() != q1.size())
+		throw("错误: 尝试将不同大小的数组相减!!");
 	Q q(*this);
 	for (int i=0; i<(int)_size; i++)
 		q(i) -= q1[i];

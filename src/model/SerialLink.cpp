@@ -18,29 +18,16 @@ namespace model {
 
 SerialLink::SerialLink(Frame* tool)
 {
-	Frame worldFrame;
-	_worldFrame = &worldFrame;
-	if (tool == NULL)
-	{
-		static Frame endTool(_worldFrame);
-		_endToTool = &endTool;
-	}
-	else
+	if (tool != NULL)
 		_endToTool = tool;
 }
 
 SerialLink::SerialLink(std::vector<Link*> linkList,Frame* tool)
 {
 	static Frame worldFrame;
-	if (tool == NULL)
-		{
-			static Frame endTool(_worldFrame);
-			_endToTool = &endTool;
-		}
-		else
+	if (tool != NULL)
 			_endToTool = tool;
-	_worldFrame = &worldFrame;
-	Frame* parent = _worldFrame;
+	Frame* parent = &_worldFrame;
 	for (int i=0; i<(int)linkList.size(); i++)
 	{
 		_linkList.push_back(linkList[i]);
@@ -53,7 +40,7 @@ void SerialLink::append(Link* link)
 {
 	Frame* parent = NULL;
 	if (_linkList.size() < 1)
-		parent = _worldFrame;
+		parent = &_worldFrame;
 	else
 		parent = _linkList[_linkList.size() - 1]->getFrame();
 	_linkList.push_back(link);
@@ -172,7 +159,7 @@ Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
 	}
 
 	// 计算工具末端相对于哥哥关节坐标的坐标值
-	Vector3D<double> nPend = _endToTool->getTransform().getPosition();
+	Vector3D<double> nPend = _endToTool.getTransform().getPosition();
 	std::vector< Vector3D<double> > iPend; // i=n~1 注意为逆向储存
 	iPend.push_back(nPend);
 	for (int i=dof; i>1; i--)
