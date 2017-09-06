@@ -19,6 +19,8 @@ Jacobian::Jacobian():_j(6, 6) // 默认关节数为6
 
 Jacobian::Jacobian(std::vector< std::vector<double> > j):_j(6, j[0].size())
 {
+	if (j.size() != 6)
+		throw("错误: 用于雅克比矩阵初始化的数组大小必须为6! ");
 	_size = j[0].size();
 	for (int i=0; i<6; i++)
 	{
@@ -66,11 +68,13 @@ void Jacobian::print() const
 	}
 }
 
-void Jacobian::update(const double (&j)[6][6])
+void Jacobian::update(std::vector< std::vector<double> > j)
 {
+	if (j.size() != _size)
+		throw("错误: 赋值的数组大小与被赋值的雅克比矩阵大小不同! ");
 	for (int i=0; i<6; i++)
 	{
-		for (int k=0; k<6; k++)
+		for (int k=0; k<_size; k++)
 		{
 			_j(i, k) = j[i][k];
 		}
