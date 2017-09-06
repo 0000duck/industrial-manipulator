@@ -14,7 +14,6 @@ namespace math {
 
 Quaternion::Quaternion():_r(1),_i(0),_j(0),_k(0)
 {
-
 }
 
 Quaternion::Quaternion(double r,double i,double j,double k):_r(r),_i(i),_j(j),_k(k)
@@ -158,15 +157,6 @@ robot::math::HTransform3D<double> Quaternion::toHTransform3D() const
 				                 2*_i*_k+2*_r*_j,     2*_j*_k-2*_r*_i,    1-2*_i*_i-2*_j*_j,0);
 }
 
-Quaternion Quaternion::DH(double alpha, double theta)
-{
-	double ca = cos(alpha/2);
-	double sa = sin(alpha/2);
-	double ct = cos(theta/2);
-	double st = sin(theta/2);
-	return Quaternion(ca*ct, sa*ct, -sa*st, ca*st);
-}
-
 Quaternion::rotVar Quaternion::getRotationVariables() const
 {
 	double theta = acos(_r)*2;
@@ -181,6 +171,15 @@ void Quaternion::print() const
 {
 	cout << _r << " + " << _i << "i + " << _j << "j + " << _k << "k" << endl;
 }
+Quaternion Quaternion::DH(double alpha, double theta)
+{
+	double ca = cos(alpha/2);
+	double sa = sin(alpha/2);
+	double ct = cos(theta/2);
+	double st = sin(theta/2);
+	return Quaternion(ca*ct, sa*ct, -sa*st, ca*st);
+}
+
 
 Quaternion::~Quaternion() {
 	// TODO Auto-generated destructor stub
