@@ -75,19 +75,6 @@ public:
 
     double solveTheta1(double x, double y, double theta2, double theta3) const;
 
-    /*
-     * Variables used for calculating
-     * Defined here to avoid allocating memory for them all the time
-     */
-//    mutable double a,b,c,d,e;
-
-    mutable double alpha0, a0, calpha0, salpha0, d1;
-    mutable double alpha1, a1, calpha1, salpha1, d2;
-    mutable double alpha2, a2, calpha2, salpha2, d3;
-    mutable double alpha3, a3, calpha3, salpha3, d4;
-    mutable double alpha4, a4, calpha4, salpha4, d5;
-    mutable double alpha5, a5, calpha5, salpha5, d6;
-
     /**
      * @brief 判断可否通过该逆解器求解
      *
@@ -118,6 +105,17 @@ private:
      * @brief 从末端执行器到6关节的变换矩阵
      */
     robot::math::HTransform3D<> _endTjoint6;
+    /*
+     * Variables used for calculating
+     * Defined here to avoid allocating memory for them all the time
+     */
+//    mutable double a,b,c,d,e;
+    mutable double alpha0, a0, calpha0, salpha0, d1;
+    mutable double alpha1, a1, calpha1, salpha1, d2;
+    mutable double alpha2, a2, calpha2, salpha2, d3;
+    mutable double alpha3, a3, calpha3, salpha3, d4;
+    mutable double alpha4, a4, calpha4, salpha4, d5;
+    mutable double alpha5, a5, calpha5, salpha5, d6;
 };
 
 /** @} */
