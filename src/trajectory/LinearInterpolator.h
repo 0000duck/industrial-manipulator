@@ -83,6 +83,12 @@ private:
 template <class T>
 class LinearInterpolator<Rotation3D<T> >: public Interpolator<Rotation3D<T> >{
 public:
+	/**
+	 * @brief 构造函数
+	 * @param start [in] 开始位置
+	 * @param end [in] 结束位置
+	 * @param duration [in] 插补时长
+	 */
 	LinearInterpolator(const Rotation3D<T>& start,
 			const Rotation3D<T>& end,
 			double duration):

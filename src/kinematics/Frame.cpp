@@ -21,8 +21,6 @@ Frame::Frame()
 {
 	_parent = NULL;
 	_frameID = Frame::_frameIDCounter++;
-	static HTransform3D<double> worldFrame;
-	_tran = worldFrame;
 }
 
 Frame::Frame(HTransform3D<double>& transform)

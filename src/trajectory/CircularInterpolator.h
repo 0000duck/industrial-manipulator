@@ -33,10 +33,18 @@ public:
 /**
  * @brief Vector3D<T>类的圆弧插补器.
  *
+ * 三维向量可以定义一个空间点, 三个不共线的空间点可以描述一个空间圆弧.
  */
 template <class T>
 class CircularInterpolator<Vector3D<T> >: public Interpolator<Vector3D<T> > {
 public:
+	/**
+	 * @brief 构造函数
+	 * @param p1 [in] 开始点
+	 * @param p2 [in] 中间点
+	 * @param p3 [in] 结束点
+	 * @param duration [in] 插补时间
+	 */
 	CircularInterpolator(
 			const Vector3D<T>& p1,
 			const Vector3D<T>& p2,
@@ -111,15 +119,34 @@ public:
 
 	virtual ~CircularInterpolator(){}
 private:
+	/** @brief 开始点 */
 	Vector3D<T> _p1;
+
+	/** @brief 中间点 */
 	Vector3D<T> _p2;
+
+	/** @brief 结束点 */
 	Vector3D<T> _p3;
+
+	/** @brief 插补时长 */
 	double _duration;
+
+	/**  * @brief 映射坐标系到原坐标系的变换矩阵 */
 	HTransform3D<T> _T;
+
+	/** @brief 圆心x坐标 */
 	double _cx;
+
+	/** @brief 圆心y坐标 */
 	double _cy;
+
+	/** @brief 半径 */
 	double _r;
+
+	/** @brief 映射坐标系下的开始角度 */
 	double _tstart;
+
+	/** @brief 映射坐标系下的结束角度 */
 	double _tend;
 };
 
