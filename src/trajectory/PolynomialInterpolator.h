@@ -14,6 +14,7 @@
 # include "../math/HTransform3D.h"
 # include "../math/Quaternion.h"
 # include "../math/Q.h"
+# include "../ext/Eigen/Dense"
 namespace robot {
 namespace trajectory {
 
@@ -43,6 +44,10 @@ public:
 		return _c;
 	}
 
+	double duration() const
+	{
+		return _duration;
+	}
 private:
 	T _a;
 	T _b;
@@ -55,25 +60,43 @@ private:
 
 template <class T>
 class PolynomialInterpolator3: public Interpolator<T> {
-
 public:
 	PolynomialInterpolator3(const T& a,const T& b,const T& c,const T&d,double duration):
 		_a(a),_b(b),_c(c),_d(d),_vel(b+c*duration),_acc(c),_duration(duration)
-{
-}
+	{
+	}
 
 	virtual ~PolynomialInterpolator3(){}
 	T x(double t) const
 	{
 		return _a+(_b+(_c+_d*t)*t)*t;
 	}
+
 	T dx(double t)const
 	{
 		return _b+(_c+_d*t)*t;
 	}
+
 	T ddx(double t)const
 	{
-		return _c+d*t;
+		return _c+_d*t;
+	}
+	double duration() const
+	{
+		return _duration;
+	}
+	static PolynomialInterpolator3 make(double x1,double x2,double x3,double y1,double y2,double y3)
+	{
+		Eigen::MatrixXd j=(3,3);
+		j(0,0)=1;j(0,1)=x1;j(0,2)=x1*x1;
+		j(1,0)=1;j(1,1)=x2;j(1,2)=x2*x2;
+		j(2,0)=1;j(2,1)=x3;j(2,2)=x3*x3;
+		j.inverse();
+		Eigen::MatrixXd v=(3,1);
+		v<<y1,y2,y3;
+		Eigen::MatrixXd z=(3,1);
+		z=j*v;
+		return 0;
 	}
 
 private:

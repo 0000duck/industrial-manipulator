@@ -30,20 +30,20 @@ public:
 //	Link();
 /**
  * @brief 连杆构造函数定义，生成初始DH变换阵
- * @parame alpha [in]
- * @parame a [in]
- * @parame d [in]
- * @parame theta [in]
- * @parame min [in]
- * @parame max [in]
- * @parame sigma [in]
+ * @param alpha [in]
+ * @param a [in]
+ * @param d [in]
+ * @param theta [in]
+ * @param min [in]
+ * @param max [in]
+ * @param sigma [in]
  * @warning sigma为连杆类型，当sigma为0：转动副；sigma为1：移动副
  * min、max 为转动最小最大角度或伸缩长度
  */
 	Link(double alpha, double a, double d, double theta, double min, double max, bool sigma=0);
 /**
 * @brief 连杆增量变化阵
-* @parame offset [in] 增加的角度或者长度
+* @param offset [in] 增加的角度或者长度
 */
 	void change(double offset);
 /**
