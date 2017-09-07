@@ -28,7 +28,7 @@ template <class T>
 class SequenceInterpolator: public Interpolator<T> {
 public:
 	/** @brief 默认构造函数 */
-	SequenceInterpolator();
+	SequenceInterpolator(){}
 	/**
 	 * @brief 增添插补器
 	 * @param interpolator [in] 增添的插补器
@@ -85,7 +85,7 @@ public:
 		return *(_timeSequence.end());
 	}
 
-	virtual ~SequenceInterpolator();
+	virtual ~SequenceInterpolator(){}
 private:
 	/** @brief 插补器序列 */
 	std::vector<Interpolator<T>*> _interpolatorSequence;
