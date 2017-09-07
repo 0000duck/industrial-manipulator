@@ -1,0 +1,86 @@
+/*
+ * SmoothMotionPlanner.h
+ *
+ *  Created on: Sep 7, 2017
+ *      Author: a1994846931931
+ */
+
+#ifndef SMOOTHMOTIONPLANNER_H_
+#define SMOOTHMOTIONPLANNER_H_
+
+# include "../trajectory/Interpolator.h"
+# include <vector>
+
+namespace robot {
+namespace pathplanner {
+
+/** @addtogroup pathplanner
+ * @brief 路径规划器
+ * @{
+ */
+
+/**
+ * @brief 平滑路径规划器
+ *
+ * 指定给定的运动距离, 加加速度@f$ h @f$, 最大加速度@f$ a_{max} @f$ 和最大速度@f$ v_{max} @f$,
+ * 自动规划出平滑的路径(指加速度和速度均以0开始和结束). 实际可能出现四种规划情况:
+ *
+ * 加速度 | 速度 | 规划方法
+ * ------ | ------- | -----
+ * 不能达到@f$ a_{max} @f$ | 也不能达到@f$ v_{max} @f$ | 四段式S型速度规划
+ * 不能达到@f$ a_{max} @f$ | 但是可以达到@f$ v_{max} @f$ | 五段式S型速度规划
+ * 能达到@f$ a_{max} @f$ | 但不能达到@f$ v_{max} @f$ | 六段式S型速度规划
+ * 能达到@f$ a_{max} @f$ | 也可以达到@f$ v_{max} @f$ | 七段式S型速度规划
+ *
+ */
+class SmoothMotionPlanner {
+public:
+	SmoothMotionPlanner(){}
+	/**
+	 * @brief 生成插补器
+	 * @param s [in] 到达的距离@f$ s @f$
+	 * @param h [in] 加加速度@f$ h @f$
+	 * @param aMax [in] 最大加速度@f$ a_{max} @f$
+	 * @param vMax [in] 最大速度@f$ v_{max} @f$
+	 * @return 规划好的插补器. 插补器的生命周期和这个规划器对象的周期相同.
+	 */
+	robot::trajectory::Interpolator<double>* query(double s, double h, double aMax, double vMax);
+	robot::trajectory::Interpolator<double>* fourLineMotion(double s, double h, double aMax, double vMax);
+	robot::trajectory::Interpolator<double>* fiveLineMotion(double s, double h, double aMax, double vMax);
+	robot::trajectory::Interpolator<double>* sixLineMotion(double s, double h, double aMax, double vMax);
+	robot::trajectory::Interpolator<double>* sevenLineMotion(double s, double h, double aMax, double vMax);
+
+	/**
+	 * @brief 析构函数
+	 *
+	 * 释放规划出插补器对象占用的内存
+	 */
+	virtual ~SmoothMotionPlanner();
+private:
+	/**
+	 * @brief @f$ s_1 @f$ 长度
+	 *
+	 * 加速度以加加速@f$ h @f$ 从0到@f$ a_{max} @f$ , 匀加速一段时间, 加速度再以加加速@f$ h @f$ 从@f$ a_{max} @f$
+	 * 到0(此时认为达到@f$ v_{max} @f$ ), 所经过的总路径长度(前提是匀加速时间段大于等于0). <br>
+	 *  - @f$ s_1 = \frac{h v_{max}^2 + v_{max} a_{max}^2}{2 h a+_{max}} @f$
+	 */
+	double s1(double h, double vMax, double aMax);
+
+	/**
+	 * @brief @f$ s_2 @f$ 长度
+	 *
+	 * 加速度以加加速@f$ h @f$ 从0到@f$ a_{max} @f$ , 加速度再以加加速@f$ h @f$ 直接从@f$ a_{max} @f$ 到0,
+	 * 所经过的总路径长度. <br>
+	 *  - @f$ s_2 = \frac{a_{max}^3}{h^2} @f$
+	 */
+	double s2(double h, double aMax);
+private:
+	/** @brief 规划出的插补器 */
+	std::vector<robot::trajectory::Interpolator<double>*> _interpolatorList;
+};
+
+/** @} */
+} /* namespace pathplanner */
+} /* namespace robot */
+
+#endif /* SMOOTHMOTIONPLANNER_H_ */

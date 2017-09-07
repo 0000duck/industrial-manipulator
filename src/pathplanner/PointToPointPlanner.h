@@ -11,7 +11,6 @@ namespace robot {
 namespace pathplanner {
 
 /** @addtogroup pathplanner
- * @brief 路径规划器.
  * @{
  */
 class PointToPointPlanner {

@@ -21,7 +21,7 @@ namespace trajectory {
 /**
  * @brief 转换类型的插补器模板类
  *
- * 可以将一个特定输出类型的插补器构造成另一个输出类型的插补器
+ * 可以将一个特定输出类型B的插补器构造成输出类型为T的插补器
  */
 template <class T, class B>
 class ConvertedInterpolator: public Interpolator<T> {
@@ -37,24 +37,29 @@ public:
 		_OriginalInterpolator = origin;
 	}
 
-	T x(double t)
+	T x(double t) const
 	{
 		return T(_OriginalInterpolator->x(t));
 	}
 
-	T dx(double t)
+	T dx(double t) const
 	{
 		return T(_OriginalInterpolator->dx(t));
 	}
 
-	T ddx(double t)
+	T ddx(double t) const
 	{
 		return T(_OriginalInterpolator->ddx(t));
 	}
-	virtual ~ConvertedInterpolator();
+
+	double duration() const
+	{
+		return _OriginalInterpolator->duration();
+	}
+	virtual ~ConvertedInterpolator(){}
 private:
 	/** @brief 源插补器 */
-	Interpolator<T>* _OriginalInterpolator;
+	Interpolator<B>* _OriginalInterpolator;
 };
 
 

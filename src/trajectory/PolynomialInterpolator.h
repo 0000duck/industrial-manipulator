@@ -73,7 +73,7 @@ public:
 	}
 	T ddx(double t)const
 	{
-		return _c+d*t;
+		return _c+_d*t;
 	}
 
 private:

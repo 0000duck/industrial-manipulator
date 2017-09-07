@@ -27,6 +27,7 @@
 # include "../math/Quaternion.h"
 # include <vector>
 # include "../trajectory/LinearInterpolator.h"
+# include "../trajectory/ConvertedInterpolator.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -205,14 +206,15 @@ int main(){
 
 //	ik2Test();
 
-//	LinearInterpolator<Q> line(Q(0, 0, 0, 0, 0, 0), Q(1, 2, 3, 4, 5, 6), 10);
-//	cout << "at t = 1 is: ";
-//	line.x(2.2).print();
+	LinearInterpolator<double> line(0, 3, 10);
+	cout << "at t = 5 is: ";
+	ConvertedInterpolator<int, double> doubleLine(&line);
+	println(doubleLine.x(5));
 
-	std::vector<base*> a;
-	class1 b;
-	a.push_back(&b);
-	a[0]->print();
+//	std::vector<base*> a;
+//	class1 b;
+//	a.push_back(&b);
+//	a[0]->print();
 	return 0;
 }
 
