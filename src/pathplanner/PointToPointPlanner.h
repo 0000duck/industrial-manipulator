@@ -7,6 +7,12 @@
 #ifndef POINTTOPOINTPLANNER_H_
 #define POINTTOPOINTPLANNER_H_
 
+# include "../trajectory/Interpolator.h"
+# include "../math/Q.h"
+
+using robot::math::Q;
+using namespace robot::trajectory;
+
 namespace robot {
 namespace pathplanner {
 
@@ -16,6 +22,8 @@ namespace pathplanner {
 class PointToPointPlanner {
 public:
 	PointToPointPlanner();
+	Interpolator<Q>* querry(Q qStart, Q qDistance);
+
 	virtual ~PointToPointPlanner();
 };
 

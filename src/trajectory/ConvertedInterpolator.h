@@ -1,8 +1,7 @@
-/*
- * ConvertedInterpolator.h
- *
- *  Created on: Sep 7, 2017
- *      Author: a1994846931931
+/**
+ * @brief ConvertedInterpolator类
+ * @date: Sep 7, 2017
+ * @author a1994846931931
  */
 
 #ifndef CONVERTEDINTERPOLATOR_H_

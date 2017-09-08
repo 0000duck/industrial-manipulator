@@ -208,7 +208,36 @@ int main(){
 
 //	ik2Test();
 
-	smoothPlannerSampler();
+//	smoothPlannerSampler();
+
+	SmoothMotionPlanner planner;
+	double h = 100;
+	double aMax = 15;
+	double vMax = 2;
+	double s = 2;
+	Interpolator<double>* smoothLinearInterpolator1 = planner.query(-s, h, aMax, vMax);
+	Interpolator<double>* smoothLinearInterpolator2 = planner.query(s, h, aMax, vMax);
+	std::vector<Interpolator<double>* > interpolatorList;
+	interpolatorList.push_back(smoothLinearInterpolator1);
+	interpolatorList.push_back(smoothLinearInterpolator2);
+	ConvertedInterpolator<std::vector<Interpolator<double>* >, Q> QInterpolator(interpolatorList);
+	int step = 100;
+	double T = QInterpolator.duration();
+	double dt = T/(step - 1);
+	std::vector<Q> x;
+	std::vector<Q> dx;
+	std::vector<Q> ddx;
+	for (double t=0; t<T; t+=dt)
+	{
+		x.push_back(QInterpolator.x(t));
+		dx.push_back(QInterpolator.dx(t));
+		ddx.push_back(QInterpolator.ddx(t));
+	}
+	for (int i=0; i<(int)x.size(); i++)
+	{
+		x[i].print();
+	}
+
 
 //	std::vector<base*> a;
 //	class1 b;
