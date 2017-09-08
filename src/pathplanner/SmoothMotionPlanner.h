@@ -1,8 +1,7 @@
-/*
- * SmoothMotionPlanner.h
- *
- *  Created on: Sep 7, 2017
- *      Author: a1994846931931
+/**
+ * @brief SmoothMotionPlanner类
+ * @date Sep 7, 2017
+ * @author a1994846931931
  */
 
 #ifndef SMOOTHMOTIONPLANNER_H_
@@ -90,7 +89,7 @@ private:
 	 */
 	double s2(double h, double aMax);
 private:
-	/** @brief 规划出的插补器 */
+	/** @brief 规划出的插补器, 记录下来用于空间释放 */
 	std::vector<robot::trajectory::Interpolator<double>*> _interpolatorList;
 };
 
