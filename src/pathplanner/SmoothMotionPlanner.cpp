@@ -105,9 +105,9 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fiveLineMotion(dou
 
 	PolynomialInterpolator3<double>* interpolator1 = new PolynomialInterpolator3<double>(0, 0, 0, h/6, t1);
 	PolynomialInterpolator3<double>* interpolator2 = new PolynomialInterpolator3<double>(
-			d2, vMax - h*pow(t3, 2)/2, h*pow(t3, 2)/2, -h/6.0, t3);
+			d2, vMax - h*pow(t3, 2)/2, h*t3/2, -h/6.0, t3);
 	PolynomialInterpolator3<double>* interpolator3 = new PolynomialInterpolator3<double>(d3, vMax, 0, 0, t4);
-	PolynomialInterpolator3<double>* interpolator4 = new PolynomialInterpolator3<double>(d4, vMax, 0, h/6.0, t5);
+	PolynomialInterpolator3<double>* interpolator4 = new PolynomialInterpolator3<double>(d4, vMax, 0, -h/6.0, t5);
 	PolynomialInterpolator3<double>* interpolator5 = new PolynomialInterpolator3<double>(
 			-pow(t7, 3)*h/6.0 + s, pow(t7, 2)*h/2.0, -h*t7/2.0, h/6.0, t7);
 
@@ -149,7 +149,7 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::sixLineMotion(doub
 	PolynomialInterpolator3<double>* interpolator3 = new PolynomialInterpolator3<double>(
 			d2, (vMax - h*t3*t3/2.0), h*t3/2.0, -h/6.0, t3);
 	PolynomialInterpolator3<double>* interpolator4 = new PolynomialInterpolator3<double>(d4, vMax, 0, -h/6.0, t5);
-	PolynomialInterpolator3<double>* interpolator5 = new PolynomialInterpolator3<double>(d5, vMax - h*t5*t5/2, aMax/6, 0, t6);
+	PolynomialInterpolator3<double>* interpolator5 = new PolynomialInterpolator3<double>(d5, vMax - h*t5*t5/2, -aMax/2, 0, t6);
 	PolynomialInterpolator3<double>* interpolator6 = new PolynomialInterpolator3<double>(s - h*pow(t7, 3)/6.0, h*t7*t7/2.0, -h*t7/2.0, h/6.0, t7);
 
 	SequenceInterpolator<double>* interpolator = new SequenceInterpolator<double>();
@@ -194,7 +194,7 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::sevenLineMotion(do
 			d2, (vMax - h*t3*t3/2.0), h*t3/2.0, -h/6.0, t3);
 	PolynomialInterpolator3<double>* interpolator4 = new PolynomialInterpolator3<double>(d3, vMax, 0, 0, t4);
 	PolynomialInterpolator3<double>* interpolator5 = new PolynomialInterpolator3<double>(d4, vMax, 0, -h/6.0, t5);
-	PolynomialInterpolator3<double>* interpolator6 = new PolynomialInterpolator3<double>(d5, vMax - h*t5*t5/2, aMax/6, 0, t6);
+	PolynomialInterpolator3<double>* interpolator6 = new PolynomialInterpolator3<double>(d5, vMax - h*t5*t5/2, -aMax/2, 0, t6);
 	PolynomialInterpolator3<double>* interpolator7 = new PolynomialInterpolator3<double>(s - h*pow(t7, 3)/6.0, h*t7*t7/2.0, -h*t7/2.0, h/6.0, t7);
 
 	SequenceInterpolator<double>* interpolator = new SequenceInterpolator<double>();

@@ -37,11 +37,11 @@ public:
 	}
 	T dx(double t)const
 	{
-		return _b+_c*t;
+		return _b+2*_c*t;
 	}
 	T ddx()const
 	{
-		return _c;
+		return 2*_c;
 	}
 
 	double duration() const
@@ -74,12 +74,12 @@ public:
 
 	T dx(double t)const
 	{
-		return _b+(_c+_d*t)*t;
+		return _b+(2*_c+3*_d*t)*t;
 	}
 
 	T ddx(double t)const
 	{
-		return _c+_d*t;
+		return 2*_c+6*_d*t;
 	}
 	double duration() const
 	{
