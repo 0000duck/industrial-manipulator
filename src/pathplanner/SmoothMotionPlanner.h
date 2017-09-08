@@ -56,12 +56,53 @@ public:
 	 * @param aMax [in] 最大加速度@f$ a_{max} @f$
 	 * @param vMax [in] 最大速度@f$ v_{max} @f$
 	 * @param start [in] 开始位置@f$ x_0 @f$
-	 * @return 规划好的插补器. 插补器的生命周期和这个规划器对象的周期相同.
+	 * @return 规划好的插补器
+	 * @warning 插补器的生命周期和这个规划器对象的周期相同.
 	 */
 	robot::trajectory::Interpolator<double>* query(double s, double h, double aMax, double vMax, double start=0);
+
+	/**
+	 * @brief 四段规划方法生成插补器
+	 * @param s [in] 到达的距离@f$ s @f$
+	 * @param h [in] 加加速度@f$ h @f$
+	 * @param aMax [in] 最大加速度@f$ a_{max} @f$
+	 * @param vMax [in] 最大速度@f$ v_{max} @f$
+	 * @param start [in] 开始位置@f$ x_0 @f$
+	 * @return 规划好的插补器
+	 */
 	robot::trajectory::Interpolator<double>* fourLineMotion(double s, double h, double aMax, double vMax, double start=0);
+
+	/**
+	 * @brief 五段规划方法生成插补器
+	 * @param s [in] 到达的距离@f$ s @f$
+	 * @param h [in] 加加速度@f$ h @f$
+	 * @param aMax [in] 最大加速度@f$ a_{max} @f$
+	 * @param vMax [in] 最大速度@f$ v_{max} @f$
+	 * @param start [in] 开始位置@f$ x_0 @f$
+	 * @return 规划好的插补器
+	 */
 	robot::trajectory::Interpolator<double>* fiveLineMotion(double s, double h, double aMax, double vMax, double start=0);
+
+	/**
+	 * @brief 六段规划方法生成插补器
+	 * @param s [in] 到达的距离@f$ s @f$
+	 * @param h [in] 加加速度@f$ h @f$
+	 * @param aMax [in] 最大加速度@f$ a_{max} @f$
+	 * @param vMax [in] 最大速度@f$ v_{max} @f$
+	 * @param start [in] 开始位置@f$ x_0 @f$
+	 * @return 规划好的插补器
+	 */
 	robot::trajectory::Interpolator<double>* sixLineMotion(double s, double h, double aMax, double vMax, double start=0);
+
+	/**
+	 * @brief 七段规划方法生成插补器
+	 * @param s [in] 到达的距离@f$ s @f$
+	 * @param h [in] 加加速度@f$ h @f$
+	 * @param aMax [in] 最大加速度@f$ a_{max} @f$
+	 * @param vMax [in] 最大速度@f$ v_{max} @f$
+	 * @param start [in] 开始位置@f$ x_0 @f$
+	 * @return 规划好的插补器
+	 */
 	robot::trajectory::Interpolator<double>* sevenLineMotion(double s, double h, double aMax, double vMax, double start=0);
 
 	/**

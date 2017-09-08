@@ -15,6 +15,16 @@
 namespace robot {
 namespace trajectory {
 
+/** @addtogroup trajectory
+ * @{
+ */
+
+/**
+ * @brief 复合插补器
+ *
+ * 用于一个主插补器和一个double类型的映射插补器的复合.
+ *
+ */
 template <class T>
 class CompositeInterpolator: public Interpolator<T> {
 public:
@@ -33,12 +43,12 @@ public:
 
 	T dx(double t) const
 	{
-		return _interpolator->dx(_mapper->x(t));
+		return (_interpolator->dx(_mapper->x(t)))*(_mapper->dx(t));
 	}
 
 	T ddx(double t) const
 	{
-		return _interpolator->ddx(_mapper->x(t));
+		return (_interpolator->ddx(_mapper->x(t)))*pow((_mapper->dx(t)), 2) + (_interpolator->dx(_mapper->x(t)))*(_mapper->ddx(t));
 	}
 
 	double duration() const
@@ -68,12 +78,12 @@ public:
 
 	T dx(double t) const
 	{
-		return _interpolator->dx(_factor*t);
+		return _factor*(_interpolator->dx(_factor*t));
 	}
 
 	T ddx(double t) const
 	{
-		return _interpolator->ddx(_factor*t);
+		return _factor*_factor*(_interpolator->ddx(_factor*t));
 	}
 
 	double duration() const
