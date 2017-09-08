@@ -20,6 +20,11 @@ namespace trajectory {
  * 4. PolynomialInterpolator: 多项式插补器
  * 5. SequenceInterpolator: 将多个同输出类型的插补器组合成新的插补器
  * 6. ConvertedInterpolator: 转变插补器的输出类型
+ *
+ * 可以通过组合, 生成复杂的路径插补器. 例如, 对于抛物线路径规划的插补器, 可以用PolynomialInterpolator3生成
+ * 加速段和减速段的三次路径, 用LinearInterpolator生匀速段的路径, 再用SequenceInterpolator合并成一个
+ * 插补器. 这只是简单的例子, 实际中还要考虑三维空间坐标的转换, 角度的规划, 以及把位姿通过逆运动学求解成Q,
+ * 最后组合成输出为关节角Q的插补器.
  * @{
  */
 
