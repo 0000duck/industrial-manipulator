@@ -11,7 +11,15 @@ namespace robot {
 namespace trajectory {
 
 /** @addtogroup trajectory
- * @brief 插补器.
+ * @brief 插补器, 生成平滑的插补函数, 提供x(t), dx(t), ddx(t)和duration()函数接口
+ *
+ * 包括的类有:
+ * 1. Interpolator: 插补器基类
+ * 2. LinearInterpolator: 线性插补器
+ * 3. CircularInterpolator: 圆弧插补器
+ * 4. PolynomialInterpolator: 多项式插补器
+ * 5. SequenceInterpolator: 将多个同输出类型的插补器组合成新的插补器
+ * 6. ConvertedInterpolator: 转变插补器的输出类型
  * @{
  */
 

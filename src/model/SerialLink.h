@@ -26,6 +26,14 @@ namespace model {
 
 /** @addtogroup model
  * @brief 机器人模型的表达, DH参数, 雅克比矩阵等.
+ *
+ * 包括的类有:
+ * 1. Config: 机器人姿态配置文件
+ * 2. DHParameters: DH参数
+ * 3. DHTable: DH参数表
+ * 4. Jacobian: 雅克比矩阵
+ * 5. Link: 机器人关节模型
+ * 6. SerialLink: 串行机器人模型
  * @{
  */
 

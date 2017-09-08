@@ -18,6 +18,11 @@ namespace kinematic {
 
 /** @addtogroup kinematics
  * @brief 机器人运动学模型.
+ *
+ * 包括的类有:
+ * 1. Frame: 用以描述一个坐标系
+ * 2. State: 描述机器人的状态(关节角度, 速度, 加速度等)
+ * 3. Trsf: 实现XYZ固定角坐标系和xyz位置描述位姿的方法
  * @{
  */
 

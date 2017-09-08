@@ -15,6 +15,11 @@ namespace common{
 /**
  * @addtogroup common
  * @brief 包含常用的函数, 如取随机数, 打印文字等.
+ *
+ * 包含的主要函数有:
+ * 1. fRand: 随机浮点数
+ * 2. to_string: 转换成字符串
+ * 3. println: 打印一行
  * @{
  */
 

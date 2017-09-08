@@ -18,6 +18,10 @@ namespace ik {
 
 /** @addtogroup ik
  * @brief 用于机器人逆运动学求解.
+ *
+ * 包括的类有:
+ * 1. PieperSolver: 可用于符合Pieper准则及其它一些条件的特定机器人的逆运动学求解器
+ * 2. SiasunSR4CSolver: 用于新松SR4C机器人, 以及其它相似构造机器人(如新松6kg机器人)的逆运动学求解器
  * @{
  */
 

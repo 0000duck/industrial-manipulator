@@ -16,6 +16,10 @@ namespace pathplanner {
 
 /** @addtogroup pathplanner
  * @brief 路径规划器
+ *
+ * 包括的类有(当前关键研发部分):
+ * 1. PointToPointPlanner: 点对点路径规划
+ * 2. SmoothMotionPlanner: 平滑路径规划器
  * @{
  */
 

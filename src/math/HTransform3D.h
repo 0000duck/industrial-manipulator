@@ -19,6 +19,13 @@ namespace math {
 
 /** @addtogroup math
  * @brief 包括变换矩阵, 四元数, 数组等.
+ *
+ * 包括的类有:
+ * 1. HTransform3D: 齐次变换矩阵
+ * 2. Rotation3D: 旋转矩阵
+ * 3. Vector3D: 三维向量
+ * 4. Q: 一位数组
+ * 5. Quaternion: 单位四元数
  * @{
  */
 
