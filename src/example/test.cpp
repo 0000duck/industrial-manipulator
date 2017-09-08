@@ -28,6 +28,7 @@
 # include <vector>
 # include "../trajectory/LinearInterpolator.h"
 # include "../trajectory/ConvertedInterpolator.h"
+# include "smoothplanner/smoothPlannerSampler.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -36,6 +37,7 @@ using namespace robot::common;
 using namespace robot::model;
 using namespace robot::ik;
 using namespace robot::trajectory;
+using namespace robot::pathplanner;
 using Eigen::MatrixXd;
 
 class base{
@@ -206,10 +208,7 @@ int main(){
 
 //	ik2Test();
 
-	LinearInterpolator<double> line(0, 3, 10);
-	cout << "at t = 5 is: ";
-	ConvertedInterpolator<int, double> doubleLine(&line);
-	println(doubleLine.x(5));
+	smoothPlannerSampler();
 
 //	std::vector<base*> a;
 //	class1 b;

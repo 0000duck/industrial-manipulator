@@ -9,6 +9,9 @@
 # include "math.h"
 # include "../trajectory/PolynomialInterpolator.h"
 # include "../trajectory/SequenceInterpolator.h"
+# include "../common/printAdvance.h"
+
+using namespace robot::common;
 
 namespace robot {
 namespace pathplanner {
@@ -55,6 +58,7 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::query(double s, do
 
 robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fourLineMotion(double s, double h, double aMax, double vMax)
 {
+	println("四段规划器");
 	double t1 = aMax/h;
 	double t3 = t1;
 	double t5 = t3;
@@ -88,6 +92,7 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fourLineMotion(dou
 
 robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fiveLineMotion(double s, double h, double aMax, double vMax)
 {
+	println("五段规划器");
 	double t1 = aMax/h;
 	double t3 = t1;
 	double t4 = s/vMax - 2*sqrt(vMax/h);
@@ -125,6 +130,7 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fiveLineMotion(dou
 
 robot::trajectory::Interpolator<double>* SmoothMotionPlanner::sixLineMotion(double s, double h, double aMax, double vMax)
 {
+	println("六段规划器");
 	double s1 = this->s1(h, vMax, aMax);
 	double t1 = aMax/h;
 	double t2 = vMax/aMax - aMax/h;
@@ -167,6 +173,7 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::sixLineMotion(doub
 
 robot::trajectory::Interpolator<double>* SmoothMotionPlanner::sevenLineMotion(double s, double h, double aMax, double vMax)
 {
+	println("七段规划器");
 	double s1 = this->s1(h, vMax, aMax);
 	double t1 = aMax/h;
 	double t2 = vMax/aMax - aMax/h;

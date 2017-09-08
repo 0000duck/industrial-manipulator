@@ -9,8 +9,10 @@
 
 # include "Interpolator.h"
 # include <vector>
+# include "../common/printAdvance.h"
 
 using namespace robot::trajectory;
+using namespace robot::common;
 
 namespace robot {
 namespace trajectory {
@@ -41,7 +43,9 @@ public:
 		if (_timeSequence.size() == 0)
 			_timeSequence.push_back(interpolator->duration());
 		else
-			_timeSequence.push_back(interpolator->duration() + *(_timeSequence.end()));
+		{
+			_timeSequence.push_back(interpolator->duration() + *(_timeSequence.end() - 1));
+		}
 	}
 
 	T x(double t) const
@@ -82,7 +86,7 @@ public:
 
 	double duration() const
 	{
-		return *(_timeSequence.end());
+		return *(_timeSequence.end() - 1);
 	}
 
 	virtual ~SequenceInterpolator(){}
