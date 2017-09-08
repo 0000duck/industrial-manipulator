@@ -29,13 +29,23 @@ namespace pathplanner {
  * 指定给定的运动距离, 加加速度@f$ h @f$, 最大加速度@f$ a_{max} @f$ 和最大速度@f$ v_{max} @f$,
  * 自动规划出平滑的路径(指加速度和速度均以0开始和结束). 实际可能出现四种规划情况:
  *
+ * <center>
  * 加速度 | 速度 | 规划方法
  * ------ | ------- | -----
  * 不能达到@f$ a_{max} @f$ | 也不能达到@f$ v_{max} @f$ | 四段式S型速度规划
  * 不能达到@f$ a_{max} @f$ | 但是可以达到@f$ v_{max} @f$ | 五段式S型速度规划
  * 能达到@f$ a_{max} @f$ | 但不能达到@f$ v_{max} @f$ | 六段式S型速度规划
  * 能达到@f$ a_{max} @f$ | 也可以达到@f$ v_{max} @f$ | 七段式S型速度规划
- *
+ * </center>
+ * 参考如下:
+ * @image html "./plot/smoothMotionInterpolator/4.png" "四段规划"
+ * @image html "./plot/smoothMotionInterpolator/5.png" "五段规划"
+ * @image html "./plot/smoothMotionInterpolator/6.png" "六段规划"
+ * @image html "./plot/smoothMotionInterpolator/7.png" "七段规划"
+ * @image latex "./plot/smoothMotionInterpolator/4.png" "四段规划" width=15cm
+ * @image latex "./plot/smoothMotionInterpolator/5.png" "五段规划" width=15cm
+ * @image latex "./plot/smoothMotionInterpolator/6.png" "六段规划" width=15cm
+ * @image latex "./plot/smoothMotionInterpolator/7.png" "七段规划" width=15cm
  */
 class SmoothMotionPlanner {
 public:

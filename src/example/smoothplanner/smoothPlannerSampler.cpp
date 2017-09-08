@@ -10,8 +10,8 @@ using namespace robot::trajectory;
 void smoothPlannerSampler(){
 	SmoothMotionPlanner planner;
 	double h = 100;
-	double aMax = 25;
-	double vMax = 5;
+	double aMax = 15;
+	double vMax = 2;
 	double s = 2;
 	clock_t clockStart = clock();
 	Interpolator<double>* smoothLinearInterpolator = planner.query(s, h, aMax, vMax);
