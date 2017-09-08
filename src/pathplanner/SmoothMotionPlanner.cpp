@@ -19,46 +19,48 @@ namespace pathplanner {
 using namespace robot::trajectory;
 
 
-robot::trajectory::Interpolator<double>* SmoothMotionPlanner::query(double s, double h, double aMax, double vMax)
+robot::trajectory::Interpolator<double>* SmoothMotionPlanner::query(double s, double h, double aMax, double vMax, double start)
 {
-	if (s <= 0 || h <= 0 || aMax <= 0 || vMax <= 0)
+	if (h <= 0 || aMax <= 0 || vMax <= 0)
 		throw ("错误: 参数必须为正! < 来自 SmoothMotionPlanner::query");
 	if (vMax <= (aMax*aMax/h))
 	{
 		aMax = sqrt(vMax*h);
-		if (s > 2*s2(h, aMax))
-			return this->fiveLineMotion(s, h, aMax, vMax);
+		if (fabs(s) > 2*s2(h, aMax))
+			return this->fiveLineMotion(s, h, aMax, vMax, start);
 		else
 		{
-			aMax = pow((s*h*h/2.0), 1.0/3.0);
+			aMax = pow((fabs(s)*h*h/2.0), 1.0/3.0);
 			vMax = aMax*aMax/h;
-			return this->fourLineMotion(s, h, aMax, vMax);
+			return this->fourLineMotion(s, h, aMax, vMax, start);
 		}
 	}
 	else
 	{
-		if (s > 2*s1(h, vMax, aMax))
-			return this->sevenLineMotion(s, h, aMax, vMax);
+		if (fabs(s) > 2*s1(h, vMax, aMax))
+			return this->sevenLineMotion(s, h, aMax, vMax, start);
 		else
 		{
-			if (s > 2*s2(h, aMax))
+			if (fabs(s) > 2*s2(h, aMax))
 			{
-				vMax = (-aMax*aMax + sqrt(pow(aMax, 4) + 4*h*h*aMax*s))/(2*h);
-				return sixLineMotion(s, h, aMax, vMax);
+				vMax = (-aMax*aMax + sqrt(pow(aMax, 4) + 4*h*h*aMax*fabs(s)))/(2*h);
+				return sixLineMotion(s, h, aMax, vMax, start);
 			}
 			else
 			{
-				aMax = pow((s*h*h/2.0), 1.0/3.0);
+				aMax = pow((fabs(s)*h*h/2.0), 1.0/3.0);
 				vMax = aMax*aMax/h;
-				return this->fourLineMotion(s, h, aMax, vMax);
+				return this->fourLineMotion(s, h, aMax, vMax, start);
 			}
 		}
 	}
 }
 
-robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fourLineMotion(double s, double h, double aMax, double vMax)
+robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fourLineMotion(double s, double h, double aMax, double vMax, double start)
 {
 	println("四段规划器");
+	int sign = (s < 0)? -1:1;
+	s = fabs(s);
 	double t1 = aMax/h;
 	double t3 = t1;
 	double t5 = t3;
@@ -68,12 +70,12 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fourLineMotion(dou
 	double d3 = vMax*aMax/h;
 	double d4 = d3;
 
-	PolynomialInterpolator3<double>* interpolator1 = new PolynomialInterpolator3<double>(0, 0, 0, h/6, t1);
+	PolynomialInterpolator3<double>* interpolator1 = new PolynomialInterpolator3<double>(start, 0, 0, sign*(h/6), t1);
 	PolynomialInterpolator3<double>* interpolator2 = new PolynomialInterpolator3<double>(
-			d2, vMax - pow(t3, 2)*h/2, h*t3/2, -h/6, t3);
-	PolynomialInterpolator3<double>* interpolator3 = new PolynomialInterpolator3<double>(d4, vMax, 0, -h/6, t5);
+			sign*(d2) + start, sign*(vMax - pow(t3, 2)*h/2), sign*(h*t3/2), sign*(-h/6), t3);
+	PolynomialInterpolator3<double>* interpolator3 = new PolynomialInterpolator3<double>(sign*(d4) + start, sign*(vMax), 0, sign*(-h/6), t5);
 	PolynomialInterpolator3<double>* interpolator4 = new PolynomialInterpolator3<double>(
-			s - pow(t7, 3)*h/6, pow(t7, 2)*h/2, -t7*h/2, h/6, t7);
+			sign*(s - pow(t7, 3)*h/6) + start, sign*(pow(t7, 2)*h/2), sign*(-t7*h/2), sign*(h/6), t7);
 
 	SequenceInterpolator<double>* interpolator = new SequenceInterpolator<double>();
 	interpolator->addInterpolator(interpolator1);
@@ -90,9 +92,11 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fourLineMotion(dou
 	return interpolator;
 }
 
-robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fiveLineMotion(double s, double h, double aMax, double vMax)
+robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fiveLineMotion(double s, double h, double aMax, double vMax, double start)
 {
 	println("五段规划器");
+	int sign = (s < 0)? -1:1;
+	s = fabs(s);
 	double t1 = aMax/h;
 	double t3 = t1;
 	double t4 = s/vMax - 2*sqrt(vMax/h);
@@ -103,13 +107,13 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fiveLineMotion(dou
 	double d3 = vMax*aMax/h;
 	double d4 = s - d3;
 
-	PolynomialInterpolator3<double>* interpolator1 = new PolynomialInterpolator3<double>(0, 0, 0, h/6, t1);
+	PolynomialInterpolator3<double>* interpolator1 = new PolynomialInterpolator3<double>(start, 0, 0, sign*(h/6), t1);
 	PolynomialInterpolator3<double>* interpolator2 = new PolynomialInterpolator3<double>(
-			d2, vMax - h*pow(t3, 2)/2, h*t3/2, -h/6.0, t3);
-	PolynomialInterpolator3<double>* interpolator3 = new PolynomialInterpolator3<double>(d3, vMax, 0, 0, t4);
-	PolynomialInterpolator3<double>* interpolator4 = new PolynomialInterpolator3<double>(d4, vMax, 0, -h/6.0, t5);
+			sign*d2 + start, sign*(vMax - h*pow(t3, 2)/2), sign*h*t3/2, sign*(-h/6.0), t3);
+	PolynomialInterpolator3<double>* interpolator3 = new PolynomialInterpolator3<double>(sign*d3 + start, sign*vMax, 0, 0, t4);
+	PolynomialInterpolator3<double>* interpolator4 = new PolynomialInterpolator3<double>(sign*d4 + start, sign*vMax, 0, sign*(-h/6.0), t5);
 	PolynomialInterpolator3<double>* interpolator5 = new PolynomialInterpolator3<double>(
-			-pow(t7, 3)*h/6.0 + s, pow(t7, 2)*h/2.0, -h*t7/2.0, h/6.0, t7);
+			sign*(-pow(t7, 3)*h/6.0 + s) + start, sign*(pow(t7, 2)*h/2.0), sign*(-h*t7/2.0), sign*(h/6.0), t7);
 
 	SequenceInterpolator<double>* interpolator = new SequenceInterpolator<double>();
 	interpolator->addInterpolator(interpolator1);
@@ -128,9 +132,11 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::fiveLineMotion(dou
 	return interpolator;
 }
 
-robot::trajectory::Interpolator<double>* SmoothMotionPlanner::sixLineMotion(double s, double h, double aMax, double vMax)
+robot::trajectory::Interpolator<double>* SmoothMotionPlanner::sixLineMotion(double s, double h, double aMax, double vMax, double start)
 {
 	println("六段规划器");
+	int sign = (s < 0)? -1:1;
+	s = fabs(s);
 	double s1 = this->s1(h, vMax, aMax);
 	double t1 = aMax/h;
 	double t2 = vMax/aMax - aMax/h;
@@ -144,13 +150,16 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::sixLineMotion(doub
 	double d4 = s - d3;
 	double d5 = s - d2;
 
-	PolynomialInterpolator3<double>* interpolator1 = new PolynomialInterpolator3<double>(0, 0, 0, h/6, t1);
-	PolynomialInterpolator3<double>* interpolator2 = new PolynomialInterpolator3<double>(d1, h*pow(t1, 2)/2, aMax/2.0, 0, t2);
+	PolynomialInterpolator3<double>* interpolator1 = new PolynomialInterpolator3<double>(start, 0, 0, sign*h/6, t1);
+	PolynomialInterpolator3<double>* interpolator2 = new PolynomialInterpolator3<double>(
+			sign*d1 + start, sign*h*pow(t1, 2)/2, sign*aMax/2.0, 0, t2);
 	PolynomialInterpolator3<double>* interpolator3 = new PolynomialInterpolator3<double>(
-			d2, (vMax - h*t3*t3/2.0), h*t3/2.0, -h/6.0, t3);
-	PolynomialInterpolator3<double>* interpolator4 = new PolynomialInterpolator3<double>(d4, vMax, 0, -h/6.0, t5);
-	PolynomialInterpolator3<double>* interpolator5 = new PolynomialInterpolator3<double>(d5, vMax - h*t5*t5/2, -aMax/2, 0, t6);
-	PolynomialInterpolator3<double>* interpolator6 = new PolynomialInterpolator3<double>(s - h*pow(t7, 3)/6.0, h*t7*t7/2.0, -h*t7/2.0, h/6.0, t7);
+			sign*d2 + start, sign*(vMax - h*t3*t3/2.0), sign*h*t3/2.0, sign*(-h/6.0), t3);
+	PolynomialInterpolator3<double>* interpolator4 = new PolynomialInterpolator3<double>(sign*d4 + start, sign*vMax, 0, sign*(-h/6.0), t5);
+	PolynomialInterpolator3<double>* interpolator5 = new PolynomialInterpolator3<double>(
+			sign*d5 + start, sign*(vMax - h*t5*t5/2), sign*(-aMax/2), 0, t6);
+	PolynomialInterpolator3<double>* interpolator6 = new PolynomialInterpolator3<double>(
+			sign*(s - h*pow(t7, 3)/6.0) + start, sign*h*t7*t7/2.0, sign*(-h*t7/2.0), sign*h/6.0, t7);
 
 	SequenceInterpolator<double>* interpolator = new SequenceInterpolator<double>();
 	interpolator->addInterpolator(interpolator1);
@@ -171,9 +180,11 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::sixLineMotion(doub
 	return interpolator;
 }
 
-robot::trajectory::Interpolator<double>* SmoothMotionPlanner::sevenLineMotion(double s, double h, double aMax, double vMax)
+robot::trajectory::Interpolator<double>* SmoothMotionPlanner::sevenLineMotion(double s, double h, double aMax, double vMax, double start)
 {
 	println("七段规划器");
+	int sign = (s < 0)? -1:1;
+	s = fabs(s);
 	double s1 = this->s1(h, vMax, aMax);
 	double t1 = aMax/h;
 	double t2 = vMax/aMax - aMax/h;
@@ -188,14 +199,17 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::sevenLineMotion(do
 	double d4 = s - d3;
 	double d5 = s - d2;
 
-	PolynomialInterpolator3<double>* interpolator1 = new PolynomialInterpolator3<double>(0, 0, 0, h/6, t1);
-	PolynomialInterpolator3<double>* interpolator2 = new PolynomialInterpolator3<double>(d1, h*pow(t1, 2)/2, aMax/2.0, 0, t2);
+	PolynomialInterpolator3<double>* interpolator1 = new PolynomialInterpolator3<double>(start, 0, 0, sign*h/6, t1);
+	PolynomialInterpolator3<double>* interpolator2 = new PolynomialInterpolator3<double>(
+			sign*d1 + start, sign*h*pow(t1, 2)/2, sign*aMax/2.0, 0, t2);
 	PolynomialInterpolator3<double>* interpolator3 = new PolynomialInterpolator3<double>(
-			d2, (vMax - h*t3*t3/2.0), h*t3/2.0, -h/6.0, t3);
-	PolynomialInterpolator3<double>* interpolator4 = new PolynomialInterpolator3<double>(d3, vMax, 0, 0, t4);
-	PolynomialInterpolator3<double>* interpolator5 = new PolynomialInterpolator3<double>(d4, vMax, 0, -h/6.0, t5);
-	PolynomialInterpolator3<double>* interpolator6 = new PolynomialInterpolator3<double>(d5, vMax - h*t5*t5/2, -aMax/2, 0, t6);
-	PolynomialInterpolator3<double>* interpolator7 = new PolynomialInterpolator3<double>(s - h*pow(t7, 3)/6.0, h*t7*t7/2.0, -h*t7/2.0, h/6.0, t7);
+			sign*d2 + start, sign*(vMax - h*t3*t3/2.0), sign*h*t3/2.0, sign*(-h/6.0), t3);
+	PolynomialInterpolator3<double>* interpolator4 = new PolynomialInterpolator3<double>(sign*d3 + start, sign*vMax, 0, 0, t4);
+	PolynomialInterpolator3<double>* interpolator5 = new PolynomialInterpolator3<double>(sign*d4 + start, sign*vMax, 0, sign*(-h/6.0), t5);
+	PolynomialInterpolator3<double>* interpolator6 = new PolynomialInterpolator3<double>(
+			sign*d5 + start, sign*(vMax - h*t5*t5/2), sign*(-aMax/2), 0, t6);
+	PolynomialInterpolator3<double>* interpolator7 = new PolynomialInterpolator3<double>(
+			sign*(s - h*pow(t7, 3)/6.0) + start, sign*h*t7*t7/2.0, sign*(-h*t7/2.0), sign*h/6.0, t7);
 
 	SequenceInterpolator<double>* interpolator = new SequenceInterpolator<double>();
 	interpolator->addInterpolator(interpolator1);
