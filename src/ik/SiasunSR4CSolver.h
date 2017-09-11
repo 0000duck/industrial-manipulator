@@ -12,6 +12,7 @@
 # include "../model/DHTable.h"
 # include "../model/SerialLink.h"
 # include "../model/Config.h"
+# include "IKSolver.h"
 
 namespace robot {
 namespace ik {
@@ -30,7 +31,7 @@ namespace ik {
  *
  * 也可用于新松6kg机器人, 或者构造相同的其它机器人
  */
-class SiasunSR4CSolver {
+class SiasunSR4CSolver: public IKSolver {
 public:
 	/**
 	 * @brief 构造新松4kg机器人的逆解器
