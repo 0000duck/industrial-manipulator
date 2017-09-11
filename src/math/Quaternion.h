@@ -170,6 +170,15 @@ public:
 	Quaternion conjugate() const;
 
 	/**
+	 * @brief 取负
+	 * @return 返回@f$ \left( -r, -i \mathbf{i}, -j \mathbf{j}, -k \mathbf{k} \right)@f$
+	 */
+	Quaternion operator-()
+	{
+		return Quaternion(-_r, -_i, -_j, -_k);
+	}
+
+	/**
 	* @brief 四元数的范数，开平方形式
 	* @return double类型的数值
 	*/
