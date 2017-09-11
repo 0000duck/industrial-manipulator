@@ -185,6 +185,7 @@ public:
 	/**
 	 * @brief 向量相加操作
 	 * @param vSource [in] 加数
+	 * @return 两个向量对应位置元素相减得到的新向量
 	 */
 	Vector3D<T> operator+(Vector3D<T> vec) const
 	{
@@ -195,11 +196,34 @@ public:
 	/**
 	 * @brief 向量相减操作
 	 * @param vSource [in] 减数
+	 * @return 两个向量对应位置元素相减得到的新向量
 	 */
 	Vector3D<T> operator-(Vector3D<T> vec) const
 	{
 		return Vector3D<T>(
 				_v[0] - vec(0), _v[1] - vec(1), _v[2] - vec(2));
+	}
+
+	/**
+	 * @brief 向量与常亮相乘操作
+	 * @param factor [in] 相乘的常量
+	 * @return 向量每个元素与factor相乘得到的新向量
+	 */
+	Vector3D<T> operator*(T factor) const
+	{
+		return Vector3D<T>(
+				_v[0]*factor, _v[1]*factor, _v[2]*factor);
+	}
+
+	/**
+	 * @brief 向量与常亮相除操作
+	 * @param factor [in] 相除的常量
+	 * @return 向量每个元素与factor相除得到的新向量
+	 */
+	Vector3D<T> operator/(T factor) const
+	{
+		return Vector3D<T>(
+				_v[0]/factor, _v[1]/factor, _v[2]/factor);
 	}
 
 	/**

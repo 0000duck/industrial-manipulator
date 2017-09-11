@@ -129,6 +129,7 @@ private:
 	double _duration;
 };
 
+/** @} */
 } /* namespace trajectory */
 } /* namespace robot */
 

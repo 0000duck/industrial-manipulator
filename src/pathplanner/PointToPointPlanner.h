@@ -70,7 +70,7 @@ private:
 	vector<Interpolator<double>*> _interpolatorList;
 
 	/** @brief 记录这个类生成的插补器, 用于空间释放 */
-	vector<Interpolator<Q>*> _qInterpolatorList;
+	vector<ConvertedInterpolator<std::vector<Interpolator<double>* > , robot::math::Q>*> _qInterpolatorList;
 };
 
 /** @} */
