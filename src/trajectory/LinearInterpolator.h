@@ -99,6 +99,8 @@ public:
 				_duration(duration)
 	{
 		Quaternion deltaQuart = _quartStart.conjugate()*_quartEnd;
+		if (deltaQuart.r() < 0)
+			deltaQuart = -deltaQuart;
 		Quaternion::rotVar var = deltaQuart.getRotationVariables();
 		_theta = var.theta;
 		_n = var.n;
