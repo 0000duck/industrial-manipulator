@@ -22,9 +22,9 @@ PointToPointPlanner::PointToPointPlanner(Q h, Q aMax, Q vMax)
 		throw ("错误: 点对点规划器必须由同样大小的Q进行构造!");
 }
 
-Interpolator<Q>* PointToPointPlanner::querry(Q qStart, Q qEnd)
+Interpolator<Q>* PointToPointPlanner::query(Q qStart, Q qEnd)
 {
-	Q distance = qStart - qEnd;
+	Q distance = qEnd - qStart;
 	vector<Interpolator<double>* > seprateInterpolator;
 	vector<Interpolator<double>* > qInterpolators;
 	double tMax = 0;

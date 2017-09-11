@@ -68,6 +68,45 @@ public:
 	virtual double duration() const = 0;
 };
 
+/**
+ * @brief 常量插补器
+ *
+ * 返回固定常亮, 速度和加速度均为0.
+ */
+template <class T>
+class FixedInterpolator: public Interpolator<T>{
+public:
+	/**
+	 * @brief 构造函数
+	 * @param constant [in] 固定返回的常量
+	 * @param duration [in] 插补时长
+	 */
+	FixedInterpolator(T constant, double duration): _constant(constant), _zero(constant*0), _duration(duration){}
+	T x(double t) const
+	{
+		return _constant;
+	}
+
+	T dx(double t) const
+	{
+		return _zero;
+	}
+
+	T ddx(double t) const
+	{
+		return _zero;
+	}
+
+	double duration() const
+	{
+		return _duration;
+	}
+private:
+	T _constant;
+	T _zero;
+	double _duration;
+};
+
 /** @} */
 } /* namespace trajectory */
 } /* namespace robot */

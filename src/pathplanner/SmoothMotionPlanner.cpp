@@ -23,6 +23,12 @@ robot::trajectory::Interpolator<double>* SmoothMotionPlanner::query(double s, do
 {
 	if (h <= 0 || aMax <= 0 || vMax <= 0)
 		throw ("错误: 参数必须为正! < 来自 SmoothMotionPlanner::query");
+	if (s == 0)
+	{
+		Interpolator<double>* interpolator = new FixedInterpolator<double>(start, 0.001);
+		_interpolatorList.push_back(interpolator);
+		return interpolator;
+	}
 	if (vMax <= (aMax*aMax/h))
 	{
 		aMax = sqrt(vMax*h);

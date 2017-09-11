@@ -43,7 +43,7 @@ public:
 	 * @param qEnd [in] 结束位置
 	 * @return
 	 */
-	Interpolator<Q>* querry(Q qStart, Q qEnd);
+	Interpolator<Q>* query(Q qStart, Q qEnd);
 	virtual ~PointToPointPlanner();
 private:
 	/** @brief Q的大小 */

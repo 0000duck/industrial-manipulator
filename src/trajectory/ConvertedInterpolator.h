@@ -10,6 +10,7 @@
 # include "Interpolator.h"
 # include <vector>
 # include "../math/Q.h"
+# include "../common/printAdvance.h"
 
 namespace robot {
 namespace trajectory {

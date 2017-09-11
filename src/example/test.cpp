@@ -29,6 +29,7 @@
 # include "../trajectory/LinearInterpolator.h"
 # include "../trajectory/ConvertedInterpolator.h"
 # include "smoothplanner/smoothPlannerSampler.h"
+# include "../pathplanner/PointToPointPlanner.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -210,28 +211,25 @@ int main(){
 
 //	smoothPlannerSampler();
 
-	SmoothMotionPlanner planner;
-	double h = 100;
-	double aMax = 15;
-	double vMax = 2;
-	double s = 2;
-	Interpolator<double>* smoothLinearInterpolator1 = planner.query(-s, h, aMax, vMax);
-	Interpolator<double>* smoothLinearInterpolator2 = planner.query(s, h, aMax, vMax);
-	std::vector<Interpolator<double>* > interpolatorList;
-	interpolatorList.push_back(smoothLinearInterpolator1);
-	interpolatorList.push_back(smoothLinearInterpolator2);
-	ConvertedInterpolator<std::vector<Interpolator<double>* >, Q> QInterpolator(interpolatorList);
+	// Point to point planner
+	Q h = Q(100, 100, 100, 100, 100, 100);
+	Q aMax = Q(30, 30, 30, 30, 50, 50);
+	Q vMax = Q(1.5, 1.5, 1.5, 1.5, 1, 1);
+	Q start = Q(0, 0, 0, 0, 0, 0);
+	Q end = Q(2, 0.5, 0.5, 0, -1.2, 2);
+	PointToPointPlanner planner = PointToPointPlanner(h, aMax, vMax);
+	Interpolator<Q>* p2pPlanner = planner.query(start, end);
 	int step = 100;
-	double T = QInterpolator.duration();
+	double T = p2pPlanner->duration();
 	double dt = T/(step - 1);
 	std::vector<Q> x;
 	std::vector<Q> dx;
 	std::vector<Q> ddx;
 	for (double t=0; t<T; t+=dt)
 	{
-		x.push_back(QInterpolator.x(t));
-		dx.push_back(QInterpolator.dx(t));
-		ddx.push_back(QInterpolator.ddx(t));
+		x.push_back(p2pPlanner->x(t));
+		dx.push_back(p2pPlanner->dx(t));
+		ddx.push_back(p2pPlanner->ddx(t));
 	}
 	for (int i=0; i<(int)x.size(); i++)
 	{
