@@ -7,7 +7,6 @@
 
 # include "PointToPointPlanner.h"
 # include "../trajectory/CompositeInterpolator.h"
-# include "../trajectory/ConvertedInterpolator.h"
 
 namespace robot {
 namespace pathplanner {

@@ -11,6 +11,7 @@
 # include <vector>
 # include "../math/Q.h"
 # include "../common/printAdvance.h"
+# include <memory>
 
 namespace robot {
 namespace trajectory {
@@ -30,6 +31,7 @@ namespace trajectory {
 template <class B, class T>
 class ConvertedInterpolator: public Interpolator<T> {
 public:
+	typedef std::shared_ptr<ConvertedInterpolator<B, T> > ptr;
 	/**
 	 * @brief 构造函数
 	 *

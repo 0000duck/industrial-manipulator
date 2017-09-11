@@ -10,6 +10,7 @@
 # include "Interpolator.h"
 # include "../common/printAdvance.h"
 # include <math.h>
+# include <memory>
 
 namespace robot {
 namespace trajectory {
@@ -32,6 +33,7 @@ namespace trajectory {
 template <class T>
 class CompositeInterpolator: public Interpolator<T> {
 public:
+	typedef std::shared_ptr<CompositeInterpolator<T> > ptr;
 	/**
 	 * @brief 构造函数
 	 * @param interpolator [in] 主插补器
@@ -91,6 +93,7 @@ private:
 template <class T>
 class LinearCompositeInterpolator: public Interpolator<T> {
 public:
+	typedef std::shared_ptr<LinearCompositeInterpolator<T> > ptr;
 	/**
 	 * @brief 构造函数
 	 * @param interpolator [in] 主插补器
@@ -121,6 +124,17 @@ public:
 	double duration() const
 	{
 		return _duration;
+	}
+
+	double getFactor() const
+	{
+		return _factor;
+	}
+
+	void update(double factor)
+	{
+		_duration = _duration*_factor/factor;
+		_factor = factor;
 	}
 	virtual ~LinearCompositeInterpolator(){}
 private:

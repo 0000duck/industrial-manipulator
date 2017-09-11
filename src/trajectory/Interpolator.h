@@ -7,6 +7,8 @@
 #ifndef INTERPOLATOR_H_
 #define INTERPOLATOR_H_
 
+# include <memory>
+
 namespace robot {
 namespace trajectory {
 
@@ -37,6 +39,7 @@ namespace trajectory {
 template <class T>
 class Interpolator {
 public:
+	typedef std::shared_ptr<Interpolator<T> > ptr;
 	Interpolator(){}
 	virtual ~Interpolator(){}
 

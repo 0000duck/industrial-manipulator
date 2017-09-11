@@ -70,7 +70,7 @@ void Jacobian::print() const
 
 void Jacobian::update(std::vector< std::vector<double> > j)
 {
-	if (j.size() != _size)
+	if ((int)j.size() != _size)
 		throw("错误: 赋值的数组大小与被赋值的雅克比矩阵大小不同! ");
 	for (int i=0; i<6; i++)
 	{

@@ -14,6 +14,7 @@
 # include "../math/HTransform3D.h"
 # include "../math/Quaternion.h"
 # include "../math/Q.h"
+# include <memory>
 
 using namespace robot::math;
 
@@ -37,6 +38,7 @@ namespace trajectory {
 template <class T>
 class LinearInterpolator: public Interpolator<T> {
 public:
+	typedef std::shared_ptr<LinearInterpolator<T> > ptr;
 	/**
 	 * @brief 构造线性插补器
 	 * @param start [in] 开始位置
@@ -83,6 +85,7 @@ private:
 template <class T>
 class LinearInterpolator<Rotation3D<T> >: public Interpolator<Rotation3D<T> >{
 public:
+	typedef std::shared_ptr<LinearInterpolator<Rotation3D<T> > > ptr;
 	/**
 	 * @brief 构造函数
 	 * @param start [in] 开始位置

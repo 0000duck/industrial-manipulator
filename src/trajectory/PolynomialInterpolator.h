@@ -15,6 +15,7 @@
 # include "../math/Quaternion.h"
 # include "../math/Q.h"
 # include "../ext/Eigen/Dense"
+# include <memory>
 namespace robot {
 namespace trajectory {
 
@@ -23,8 +24,8 @@ namespace trajectory {
  */
 template <class T>
 class PolynomialInterpolator: public Interpolator<T> {
-
 public:
+	typedef std::shared_ptr<PolynomialInterpolator<T> > ptr;
 	PolynomialInterpolator(const T& a,const T& b,const T& c,double duration):
 		_a(a),_b(b),_c(c),_vel(b+c*duration),_acc(c),_duration(duration)
 {
@@ -61,6 +62,7 @@ private:
 template <class T>
 class PolynomialInterpolator3: public Interpolator<T> {
 public:
+	typedef std::shared_ptr<PolynomialInterpolator3<T> > ptr;
 	PolynomialInterpolator3(const T& a,const T& b,const T& c,const T&d,double duration):
 		_a(a),_b(b),_c(c),_d(d),_vel(b+c*duration),_acc(c),_duration(duration)
 	{

@@ -85,6 +85,22 @@ public:
 	Q operator/(double) const;
 
 	/**
+	 * @brief 判断两个数组是否相同
+	 * @param q [in] 判断相等的数
+	 * @retval true 两个数组相等
+	 * @retval false 两个数组不相等
+	 */
+	bool operator==(const Q& q) const;
+
+	/**
+	 * @brief 判断两个数组是否相同
+	 * @param q [in] 判断相等的数
+	 * @retval true 两个数组不相等
+	 * @retval false 两个数组相等
+	 */
+	bool operator!=(const Q& q) const;
+
+	/**
 	 * @brief 追加数据
 	 * @param  [in] 添加的数据
 	 *

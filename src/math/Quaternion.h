@@ -25,15 +25,17 @@ namespace math {
  * 用于计算旋转矩阵变化，包括四则运算、矩阵转化
  */
 class Quaternion {
+public:
 	/**
 	* @brief 四元数三角函数表示
 	*
 	* theta为旋转角度、n为方向向量
 	*/
-	typedef struct{
+	class rotVar{
+	public:
 		double theta;
 		Vector3D<double> n;
-	} rotVar;
+	};
 public:
 	/**
 	 * @brief 默认构造函数

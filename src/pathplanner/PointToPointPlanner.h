@@ -10,6 +10,7 @@
 # include "../trajectory/Interpolator.h"
 # include "../math/Q.h"
 # include "../pathplanner/SmoothMotionPlanner.h"
+# include "../trajectory/ConvertedInterpolator.h"
 
 using robot::math::Q;
 using std::vector;

@@ -129,6 +129,22 @@ public:
 	 * - Config::wfree     = -1
 	 */
 	int getWrist() const;
+
+	/**
+	 * @brief 判断与config是否相等
+	 * @param config [in] 判断相等的数
+	 * @retval true 四个参数都相同
+	 * @retval false 有不同的参数
+	 */
+	bool operator==(const Config& config) const;
+
+	/**
+	 * @brief 判断与config是否相等
+	 * @param config [in] 判断相等的数
+	 * @retval true 有不同的参数
+	 * @retval false 四个参数都相同
+	 */
+	bool operator!=(const Config& config) const;
 	virtual ~Config();
 private:
 	/** @brief 肩部配置 */

@@ -10,6 +10,7 @@
 # include "Interpolator.h"
 # include <vector>
 # include "../common/printAdvance.h"
+# include <memory>
 
 using namespace robot::trajectory;
 using namespace robot::common;
@@ -29,6 +30,7 @@ namespace trajectory {
 template <class T>
 class SequenceInterpolator: public Interpolator<T> {
 public:
+	typedef std::shared_ptr<SequenceInterpolator<T> > ptr;
 	/** @brief 默认构造函数 */
 	SequenceInterpolator(){}
 	/**

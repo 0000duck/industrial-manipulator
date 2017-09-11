@@ -56,6 +56,19 @@ int Config::getWrist() const
 	return _wrist;
 }
 
+bool Config::operator==(const Config& config) const
+{
+	if (_shoulder == config.getShoulder() && _elbow == config.getElbow() && _wrist == config.getWrist())
+		return true;
+	else
+		return false;
+}
+
+bool Config::operator!=(const Config& config) const
+{
+	return !(this->operator ==(config));
+}
+
 Config::~Config() {
 }
 

@@ -31,6 +31,8 @@
 # include "smoothplanner/smoothPlannerSampler.h"
 # include "../pathplanner/PointToPointPlanner.h"
 # include "p2pplanner/p2pPlannerSampler.h"
+# include "../pathplanner/LinePlanner.h"
+# include <memory>
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -210,13 +212,12 @@ int main(){
 
 //	ik2Test();
 
-//	smoothPlannerSampler();
+	smoothPlannerSampler();
 
 //	p2pPlannerSampler();
 
-//	std::vector<base*> a;
-//	class1 b;
-//	a.push_back(&b);
+//	std::vector<std::shared_ptr<base> > a;
+//	a.push_back(std::shared_ptr<class1>(new class1) );
 //	a[0]->print();
 	return 0;
 }

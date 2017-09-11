@@ -9,6 +9,7 @@
 
 # include "Interpolator.h"
 # include "../math/HTransform3D.h"
+# include <memory>
 
 using namespace robot::math;
 
@@ -38,6 +39,7 @@ public:
 template <class T>
 class CircularInterpolator<Vector3D<T> >: public Interpolator<Vector3D<T> > {
 public:
+	typedef std::shared_ptr<CircularInterpolator<Vector3D<T> > > ptr;
 	/**
 	 * @brief 构造函数
 	 * @param p1 [in] 开始点

@@ -94,6 +94,24 @@ Q Q::zero(int size)
 	return q;
 }
 
+bool Q::operator==(const Q& q) const
+{
+	if (_size != q.size())
+		return false;
+	for (int i=0; i<_size; i++)
+	{
+		if (_value[i] != q[i])
+			return false;
+	}
+	return true;
+}
+
+
+bool Q::operator!=(const Q& q) const
+{
+	return !(this->operator ==(q));
+}
+
 void Q::pushBack(double newValue)
 {
 	_size++;
