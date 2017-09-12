@@ -15,6 +15,7 @@
 # include "../math/Quaternion.h"
 # include "../math/Q.h"
 # include <memory>
+# include "../ik/IKSolver.h"
 
 using namespace robot::math;
 
@@ -38,7 +39,7 @@ namespace trajectory {
 template <class T>
 class LinearInterpolator: public Interpolator<T> {
 public:
-	typedef std::shared_ptr<LinearInterpolator<T> > ptr;
+	typedef typename std::shared_ptr<LinearInterpolator> ptr;
 	/**
 	 * @brief 构造线性插补器
 	 * @param start [in] 开始位置
@@ -85,7 +86,7 @@ private:
 template <class T>
 class LinearInterpolator<Rotation3D<T> >: public Interpolator<Rotation3D<T> >{
 public:
-	typedef std::shared_ptr<LinearInterpolator<Rotation3D<T> > > ptr;
+	typedef typename std::shared_ptr<LinearInterpolator> ptr;
 	/**
 	 * @brief 构造函数
 	 * @param start [in] 开始位置
@@ -107,8 +108,8 @@ public:
 		Quaternion::rotVar var = deltaQuart.getRotationVariables();
 		_theta = var.theta;
 		_n = var.n;
-		_vel = (Quaternion((1.0*_theta/_duration), _n)).toRotation3D();
-		_acc = Rotation3D<T>::identity();
+		_vel = _theta/duration;
+		_acc = _vel*_vel;
 	}
 
 	virtual ~LinearInterpolator(){}
@@ -120,12 +121,42 @@ public:
 
 	Rotation3D<T> dx(double t) const
 	{
-		return _vel; // TODO 定义无意义
+		double theta = t*_theta/_duration;
+		double s = sin(theta);
+		double c = cos(theta);
+		double n1 = _n(0);
+		double n2 = _n(1);
+		double n3 = _n(2);
+		double n12 = n1*n1;
+		double n22 = n2*n2;
+		double n32 = n3*n3;
+		double n1n2 = n1*n2;
+		double n1n3 = n1*n3;
+		double n2n3 = n2*n3;
+		return (Rotation3D<T>(
+				-s*(n22 + n32), s*n1n2 + c*n3, s*n1n3 - c*n2,
+				s*n1n2 - c*n3, -s*(n12 + n32), s*n2n3 + c*n1,
+				s*n1n3 + c*n2, s*n2n3 - c*n1, -s*(n12 + n22)))*_vel;
 	}
 
 	Rotation3D<T> ddx(double t) const
 	{
-		return _acc; // TODO 定义无意义
+		double theta = t*_theta/_duration;
+		double s = sin(theta);
+		double c = cos(theta);
+		double n1 = _n(0);
+		double n2 = _n(1);
+		double n3 = _n(2);
+		double n12 = n1*n1;
+		double n22 = n2*n2;
+		double n32 = n3*n3;
+		double n1n2 = n1*n2;
+		double n1n3 = n1*n3;
+		double n2n3 = n2*n3;
+		return (Rotation3D<T>(
+				-c*(n22 + n32), c*n1n2 - s*n3, c*n1n3 + s*n2,
+				c*n1n2 + s*n3, -c*(n12 + n32), c*n2n3 - s*n1,
+				c*n1n3 - s*n2, c*n2n3 + s*n1, -c*(n12 + n22)))*_acc;
 	}
 
 	double duration() const
@@ -133,6 +164,7 @@ public:
 		return _duration;
 	}
 private:
+	robot::ik::IKSolver* _ikSolver;
 	Rotation3D<T> _start;
 	Rotation3D<T> _end;
 	Quaternion _quartStart;
@@ -140,8 +172,8 @@ private:
 	double _duration;
 	double _theta;
 	Vector3D<T> _n;
-	Rotation3D<T> _vel;
-	Rotation3D<T> _acc;
+	double _vel;
+	double _acc;
 };
 
 /** @} */

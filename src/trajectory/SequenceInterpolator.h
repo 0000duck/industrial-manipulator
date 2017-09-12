@@ -39,7 +39,7 @@ public:
 	 *
 	 * 添加插补器到末端
 	 */
-	void addInterpolator(Interpolator<T>* interpolator)
+	void addInterpolator(std::shared_ptr<Interpolator<T> > interpolator)
 	{
 		_interpolatorSequence.push_back(interpolator);
 		if (_timeSequence.size() == 0)
@@ -53,11 +53,13 @@ public:
 	T x(double t) const
 	{
 		int i=0;
-		for (; i<_interpolatorSequence.size(); i++)
+		for (; i<(int)_interpolatorSequence.size(); i++)
 		{
 			if (_timeSequence[i] > t)
 				break;
 		}
+		if (i >= (int)_interpolatorSequence.size())
+			i--;
 		double interpolatorT = t - ((i == 0)? 0:_timeSequence[i - 1]);
 		return _interpolatorSequence[i]->x(interpolatorT);
 	}
@@ -70,6 +72,8 @@ public:
 			if (_timeSequence[i] > t)
 				break;
 		}
+		if (i >= (int)_interpolatorSequence.size())
+			i--;
 		double interpolatorT = t - ((i == 0)? 0:_timeSequence[i - 1]);
 		return _interpolatorSequence[i]->dx(interpolatorT);
 	}
@@ -82,6 +86,8 @@ public:
 			if (_timeSequence[i] > t)
 				break;
 		}
+		if (i >= (int)_interpolatorSequence.size())
+			i--;
 		double interpolatorT = t - ((i == 0)? 0:_timeSequence[i - 1]);
 		return _interpolatorSequence[i]->ddx(interpolatorT);
 	}
@@ -94,7 +100,7 @@ public:
 	virtual ~SequenceInterpolator(){}
 private:
 	/** @brief 插补器序列 */
-	std::vector<Interpolator<T>*> _interpolatorSequence;
+	std::vector<std::shared_ptr<Interpolator<T> > > _interpolatorSequence;
 
 	/** @brief 插补器最大时间序列 */
 	std::vector<double> _timeSequence;

@@ -26,7 +26,7 @@ void p2pPlannerSampler()
 	Q end = Q(2, 0.5, 0.5, 0, -1.2, 2);
 	PointToPointPlanner planner = PointToPointPlanner(h, aMax, vMax);
 	clock_t clockStart = clock();
-	Interpolator<Q>* p2pPlanner = planner.query(start, end);
+	Interpolator<Q>::ptr p2pPlanner = planner.query(start, end);
 	clock_t clockEnd = clock();
 	cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 	int step = 100;

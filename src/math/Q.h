@@ -61,18 +61,18 @@ public:
 	 * @param [in] 被加数组
 	 * @return 对应位置相加, 返回得到的数组
 	 */
-	Q operator+(const Q&) const;
+	Q operator+(const Q& q) const;
 
 	/**
 	 * @brief 数组相减
-	 * @param [in] 被减数组
+	 * @param q [in] 被减数组
 	 * @return 对应位置相减, 返回得到的数组
 	 */
-	Q operator-(const Q&) const;
+	Q operator-(const Q& q) const;
 
 	/**
 	 * @brief 与常量相乘
-	 * @param [in] 乘数
+	 * @param q [in] 乘数
 	 * @return 分别乘以乘数, 返回得到的数组
 	 */
 	Q operator*(double) const;

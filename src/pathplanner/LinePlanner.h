@@ -16,6 +16,7 @@
 # include "../model/SerialLink.h"
 # include "../trajectory/CompositeInterpolator.h"
 # include "../trajectory/LinearInterpolator.h"
+# include <memory>
 
 using robot::math::Q;
 using std::vector;
@@ -26,8 +27,10 @@ namespace pathplanner {
 
 class LinePlanner {
 public:
-	LinePlanner();
-	Interpolator<Q>* query(Q qStart, Q qEnd);
+	LinePlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
+			double vMaxLine, double aMaxLine, double hLine, double vMaxAngle, double aMaxAngle, double hAngle,
+			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink* serialLink);
+	Interpolator<Q>::ptr query(Q qStart, Q qEnd);
 	virtual ~LinePlanner();
 private:
 	double _vMaxLine;
@@ -36,7 +39,7 @@ private:
 	double _vMaxAngle;
 	double _aMaxAngle;
 	double _hAngle;
-	robot::ik::IKSolver* _ikSolver;
+	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
 	Q _qMin;
 	Q _qMax;
 	Q _dqLim;
@@ -46,9 +49,6 @@ private:
      */
     robot::model::SerialLink* _serialLink;
     SmoothMotionPlanner _smPlanner;
-    std::vector<LinearCompositeInterpolator<double>*> _lcInterpolatorList;
-    std::vector<LinearInterpolator<Vector3D<double> >*> _lvInterpolatorList;
-    std::vector<LinearInterpolator<Rotation3D<double> >*> _lrInterpolatorList;
 };
 
 } /* namespace pathplanner */

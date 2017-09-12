@@ -233,6 +233,13 @@ const robot::math::Q SerialLink::getEndVelocity(const robot::kinematic::State& s
 	return jacob*(state.getVelocity());
 }
 
+const robot::math::Q SerialLink::getEndVelocity(const robot::math::Q endVelocity, const robot::math::Q robotPos) const
+{
+	Jacobian jacob = getJacobian(robotPos);
+	jacob.doInverse();
+	return (jacob*endVelocity);
+}
+
 SerialLink::~SerialLink()
 {
 }

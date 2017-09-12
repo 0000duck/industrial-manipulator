@@ -39,7 +39,7 @@ namespace trajectory {
 template <class T>
 class Interpolator {
 public:
-	typedef std::shared_ptr<Interpolator<T> > ptr;
+	using ptr = std::shared_ptr<Interpolator<T> >;
 	Interpolator(){}
 	virtual ~Interpolator(){}
 

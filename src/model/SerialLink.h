@@ -152,6 +152,14 @@ public:
 	 */
 	const robot::math::Q getEndVelocity(const robot::kinematic::State& state) const;
 
+	/**
+	 * @brief 获取关节速度
+	 * @param endVelocity [in] 末端执行器的速度
+	 * @param robotPos [in] 机器人当前的姿态
+	 * @return 各个关节的速度
+	 */
+	const robot::math::Q getEndVelocity(const robot::math::Q endVelocity, const robot::math::Q robotPos) const;
+
 	/** @brief 格式化打印
 	 * @todo 未定义功能
 	 */

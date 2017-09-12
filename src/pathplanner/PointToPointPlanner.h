@@ -44,7 +44,7 @@ public:
 	 * @param qEnd [in] 结束位置
 	 * @return
 	 */
-	Interpolator<Q>* query(Q qStart, Q qEnd);
+	Interpolator<Q>::ptr query(Q qStart, Q qEnd);
 	virtual ~PointToPointPlanner();
 private:
 	/** @brief Q的大小 */
@@ -68,10 +68,10 @@ private:
 	SmoothMotionPlanner _smPlanner;
 
 	/** @brief 记录这个类生成的插补器, 用于空间释放 */
-	vector<Interpolator<double>*> _interpolatorList;
-
-	/** @brief 记录这个类生成的插补器, 用于空间释放 */
-	vector<ConvertedInterpolator<std::vector<Interpolator<double>* > , robot::math::Q>*> _qInterpolatorList;
+//	vector<Interpolator<double>::ptr> _interpolatorList;
+//
+//	/** @brief 记录这个类生成的插补器, 用于空间释放 */
+//	vector<ConvertedInterpolator<std::vector<Interpolator<double>* > , robot::math::Q>*> _qInterpolatorList;
 };
 
 /** @} */

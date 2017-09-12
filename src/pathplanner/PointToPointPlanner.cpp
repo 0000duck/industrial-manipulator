@@ -21,11 +21,11 @@ PointToPointPlanner::PointToPointPlanner(Q h, Q aMax, Q vMax)
 		throw ("错误: 点对点规划器必须由同样大小的Q进行构造!");
 }
 
-Interpolator<Q>* PointToPointPlanner::query(Q qStart, Q qEnd)
+Interpolator<Q>::ptr PointToPointPlanner::query(Q qStart, Q qEnd)
 {
 	Q distance = qEnd - qStart;
-	vector<Interpolator<double>* > seprateInterpolator;
-	vector<Interpolator<double>* > qInterpolators;
+	vector<Interpolator<double>::ptr > seprateInterpolator;
+	vector<Interpolator<double>::ptr > qInterpolators;
 	double tMax = 0;
 	for (int i=0; i<_size; i++)
 	{
@@ -35,23 +35,23 @@ Interpolator<Q>* PointToPointPlanner::query(Q qStart, Q qEnd)
 	}
 	for (int i=0; i<_size; i++)
 	{
-		LinearCompositeInterpolator<double>* lcI =
-				new LinearCompositeInterpolator<double>(seprateInterpolator[i], seprateInterpolator[i]->duration()/tMax);
+		LinearCompositeInterpolator<double>::ptr lcI(
+				new LinearCompositeInterpolator<double>(seprateInterpolator[i], seprateInterpolator[i]->duration()/tMax));
 		qInterpolators.push_back(lcI);
-		_interpolatorList.push_back(lcI);
+//		_interpolatorList.push_back(lcI);
 	}
-	ConvertedInterpolator<std::vector<Interpolator<double>* > , robot::math::Q>* qInterpolator =
-			new ConvertedInterpolator<std::vector<Interpolator<double>* > , robot::math::Q>(qInterpolators);
-	_qInterpolatorList.push_back(qInterpolator);
+	std::shared_ptr<ConvertedInterpolator<std::vector<Interpolator<double>::ptr > , robot::math::Q> > qInterpolator(
+			new ConvertedInterpolator<std::vector<Interpolator<double>::ptr > , robot::math::Q>(qInterpolators));
+//	_qInterpolatorList.push_back(qInterpolator);
 	return qInterpolator;
 }
 
 PointToPointPlanner::~PointToPointPlanner()
 {
-	for (int i=0; i<(int)_interpolatorList.size(); i++)
-		delete _interpolatorList[i];
-	for (int i=0; i<(int)_qInterpolatorList.size(); i++)
-		delete _qInterpolatorList[i];
+//	for (int i=0; i<(int)_interpolatorList.size(); i++)
+//		delete _interpolatorList[i];
+//	for (int i=0; i<(int)_qInterpolatorList.size(); i++)
+//		delete _qInterpolatorList[i];
 }
 
 } /* namespace pathplanner */

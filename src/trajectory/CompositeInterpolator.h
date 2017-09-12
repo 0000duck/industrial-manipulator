@@ -12,6 +12,8 @@
 # include <math.h>
 # include <memory>
 
+using namespace robot::common;
+
 namespace robot {
 namespace trajectory {
 
@@ -33,16 +35,17 @@ namespace trajectory {
 template <class T>
 class CompositeInterpolator: public Interpolator<T> {
 public:
-	typedef std::shared_ptr<CompositeInterpolator<T> > ptr;
+	using ptr = std::shared_ptr<CompositeInterpolator<T> >;
 	/**
 	 * @brief 构造函数
 	 * @param interpolator [in] 主插补器
 	 * @param mapper [in] 映射插补器
 	 */
-	CompositeInterpolator(Interpolator<T>* interpolator, Interpolator<double>* mapper)
+	CompositeInterpolator(std::shared_ptr<Interpolator<T> > interpolator, Interpolator<double>::ptr mapper)
 	{
 		_interpolator = interpolator;
 		_mapper = mapper;
+		mapper->x(0);
 		if (fabs(mapper->x(mapper->duration()) - interpolator->duration()) > 1e-3)
 			common::println("警告: 复合插补器, mapper的范围与源插补器的时间周期不一致(误差超出0.001)");
 	}
@@ -71,12 +74,12 @@ private:
 	/**
 	 * @brief 主插补器地址
 	 */
-	Interpolator<T>* _interpolator;
+	std::shared_ptr<Interpolator<T> > _interpolator;
 
 	/**
 	 * @brief 映射器地址
 	 */
-	Interpolator<double>* _mapper;
+	Interpolator<double>::ptr _mapper;
 };
 
 /**
@@ -93,13 +96,13 @@ private:
 template <class T>
 class LinearCompositeInterpolator: public Interpolator<T> {
 public:
-	typedef std::shared_ptr<LinearCompositeInterpolator<T> > ptr;
+	using ptr = std::shared_ptr<LinearCompositeInterpolator>;
 	/**
 	 * @brief 构造函数
 	 * @param interpolator [in] 主插补器
 	 * @param factor [in] 系数
 	 */
-	LinearCompositeInterpolator(Interpolator<T>* interpolator, double factor)
+	LinearCompositeInterpolator(std::shared_ptr<Interpolator<T> > interpolator, double factor)
 	{
 		_interpolator = interpolator;
 		_factor = factor;
@@ -108,6 +111,7 @@ public:
 
 	T x(double t) const
 	{
+		_interpolator->x(_factor*t);
 		return _interpolator->x(_factor*t);
 	}
 
@@ -138,7 +142,7 @@ public:
 	}
 	virtual ~LinearCompositeInterpolator(){}
 private:
-	Interpolator<T>* _interpolator;
+	std::shared_ptr<Interpolator<T> > _interpolator;
 	double _factor;
 	double _duration;
 };

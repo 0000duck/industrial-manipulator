@@ -39,7 +39,7 @@ public:
 template <class T>
 class CircularInterpolator<Vector3D<T> >: public Interpolator<Vector3D<T> > {
 public:
-	typedef std::shared_ptr<CircularInterpolator<Vector3D<T> > > ptr;
+	using ptr = std::shared_ptr<CircularInterpolator<Vector3D<T> > >;
 	/**
 	 * @brief 构造函数
 	 * @param p1 [in] 开始点

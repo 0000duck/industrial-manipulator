@@ -14,7 +14,7 @@ void smoothPlannerSampler(){
 	double vMax = 2;
 	double s = 2;
 	clock_t clockStart = clock();
-	Interpolator<double>* smoothLinearInterpolator = planner.query(s, h, aMax, vMax);
+	Interpolator<double>::ptr smoothLinearInterpolator = planner.query(s, h, aMax, vMax);
 	clock_t clockEnd = clock();
 	cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 	int step = 1000;

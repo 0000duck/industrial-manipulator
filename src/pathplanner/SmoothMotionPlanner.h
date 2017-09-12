@@ -9,6 +9,7 @@
 
 # include "../trajectory/Interpolator.h"
 # include <vector>
+# include "../trajectory/SequenceInterpolator.h"
 
 namespace robot {
 namespace pathplanner {
@@ -59,7 +60,7 @@ public:
 	 * @return 规划好的插补器
 	 * @warning 插补器的生命周期和这个规划器对象的周期相同.
 	 */
-	robot::trajectory::Interpolator<double>* query(double s, double h, double aMax, double vMax, double start=0);
+	robot::trajectory::SequenceInterpolator<double>::ptr query(double s, double h, double aMax, double vMax, double start=0);
 
 	/**
 	 * @brief 四段规划方法生成插补器
@@ -70,7 +71,7 @@ public:
 	 * @param start [in] 开始位置@f$ x_0 @f$
 	 * @return 规划好的插补器
 	 */
-	robot::trajectory::Interpolator<double>* fourLineMotion(double s, double h, double aMax, double vMax, double start=0);
+	robot::trajectory::SequenceInterpolator<double>::ptr fourLineMotion(double s, double h, double aMax, double vMax, double start=0);
 
 	/**
 	 * @brief 五段规划方法生成插补器
@@ -81,7 +82,7 @@ public:
 	 * @param start [in] 开始位置@f$ x_0 @f$
 	 * @return 规划好的插补器
 	 */
-	robot::trajectory::Interpolator<double>* fiveLineMotion(double s, double h, double aMax, double vMax, double start=0);
+	robot::trajectory::SequenceInterpolator<double>::ptr fiveLineMotion(double s, double h, double aMax, double vMax, double start=0);
 
 	/**
 	 * @brief 六段规划方法生成插补器
@@ -92,7 +93,7 @@ public:
 	 * @param start [in] 开始位置@f$ x_0 @f$
 	 * @return 规划好的插补器
 	 */
-	robot::trajectory::Interpolator<double>* sixLineMotion(double s, double h, double aMax, double vMax, double start=0);
+	robot::trajectory::SequenceInterpolator<double>::ptr sixLineMotion(double s, double h, double aMax, double vMax, double start=0);
 
 	/**
 	 * @brief 七段规划方法生成插补器
@@ -103,7 +104,7 @@ public:
 	 * @param start [in] 开始位置@f$ x_0 @f$
 	 * @return 规划好的插补器
 	 */
-	robot::trajectory::Interpolator<double>* sevenLineMotion(double s, double h, double aMax, double vMax, double start=0);
+	robot::trajectory::SequenceInterpolator<double>::ptr sevenLineMotion(double s, double h, double aMax, double vMax, double start=0);
 
 	/**
 	 * @brief 析构函数
@@ -130,8 +131,6 @@ private:
 	 */
 	double s2(double h, double aMax);
 private:
-	/** @brief 规划出的插补器, 记录下来用于空间释放 */
-	std::vector<robot::trajectory::Interpolator<double>*> _interpolatorList;
 };
 
 /** @} */

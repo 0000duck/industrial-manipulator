@@ -296,6 +296,32 @@ public:
 	}
 
 	/**
+	 * @brief 相减
+	 * @param rot [in] 减数
+	 * @return 返回矩阵相减的结果
+	 */
+	Rotation3D<T> operator-(const Rotation3D<T> rot) const
+	{
+		return Rotation3D<T>(
+				_m[0][0] - rot(0, 0), _m[0][1] - rot(0, 1), _m[0][2] - rot(0, 2),
+				_m[1][0] - rot(1, 0), _m[1][1] - rot(1, 1), _m[1][2] - rot(1, 2),
+				_m[2][0] - rot(2, 0), _m[2][1] - rot(2, 1), _m[2][2] - rot(2, 2));
+	}
+
+	/**
+	 * @brief 相加
+	 * @param rot [in] 加数
+	 * @return 返回矩阵相加的结果
+	 */
+	Rotation3D<T> operator+(const Rotation3D<T> rot) const
+	{
+		return Rotation3D<T>(
+				_m[0][0] + rot(0, 0), _m[0][1] + rot(0, 1), _m[0][2] + rot(0, 2),
+				_m[1][0] + rot(1, 0), _m[1][1] + rot(1, 1), _m[1][2] + rot(1, 2),
+				_m[2][0] + rot(2, 0), _m[2][1] + rot(2, 1), _m[2][2] + rot(2, 2));
+	}
+
+	/**
 	 * @brief 相乘
 	 * @param rot [in] 乘数
 	 * @return 返回矩阵相乘的结果
@@ -316,6 +342,19 @@ public:
 				_m[0][0]*vec(0) + _m[0][1]*vec(1) + _m[0][2]*vec(2),
 				_m[1][0]*vec(0) + _m[1][1]*vec(1) + _m[1][2]*vec(2),
 				_m[2][0]*vec(0) + _m[2][1]*vec(1) + _m[2][2]*vec(2));
+	}
+
+	/**
+	 * @brief 矩阵与常数相乘
+	 * @param num [in] 乘数
+	 * @return 返回相乘得到的旋转矩阵
+	 */
+	Rotation3D<T> operator*(const T& num) const
+	{
+		return Rotation3D<T>(
+				_m[0][0]*num, _m[0][1]*num, _m[0][2]*num,
+				_m[1][0]*num, _m[1][1]*num, _m[1][2]*num,
+				_m[2][0]*num, _m[2][1]*num, _m[2][2]*num);
 	}
 
 	/**

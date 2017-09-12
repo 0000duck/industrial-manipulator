@@ -12,6 +12,9 @@
 # include "../math/Q.h"
 # include "../common/printAdvance.h"
 # include <memory>
+# include "../ik/IKSolver.h"
+# include "../model/Config.h"
+# include "../common/printAdvance.h"
 
 namespace robot {
 namespace trajectory {
@@ -31,14 +34,14 @@ namespace trajectory {
 template <class B, class T>
 class ConvertedInterpolator: public Interpolator<T> {
 public:
-	typedef std::shared_ptr<ConvertedInterpolator<B, T> > ptr;
+	using ptr = std::shared_ptr<ConvertedInterpolator<B, T> >;
 	/**
 	 * @brief 构造函数
 	 *
 	 * 记录源插补器的指针
 	 * @param origin [in] 源插补器
 	 */
-	ConvertedInterpolator(Interpolator<B>* origin)
+	ConvertedInterpolator(std::shared_ptr<Interpolator<B> > origin)
 	{
 		_OriginalInterpolator = origin;
 	}
@@ -65,16 +68,16 @@ public:
 	virtual ~ConvertedInterpolator(){}
 private:
 	/** @brief 源插补器 */
-	Interpolator<B>* _OriginalInterpolator;
+	std::shared_ptr<Interpolator<B> > _OriginalInterpolator;
 };
 
 /**
  * @brief 转换自double类型插补器指针容器, 转换至Q
  */
 template<>
-class ConvertedInterpolator<std::vector<Interpolator<double>* > , robot::math::Q>: public Interpolator<robot::math::Q> {
+class ConvertedInterpolator<std::vector<Interpolator<double>::ptr > , robot::math::Q>: public Interpolator<robot::math::Q> {
 public:
-	ConvertedInterpolator(std::vector<Interpolator<double>* > origin)
+	ConvertedInterpolator(std::vector<Interpolator<double>::ptr > origin)
 	{
 		_interpolatorList.assign(origin.begin(), origin.end());
 		_size = _interpolatorList.size();
@@ -113,11 +116,60 @@ public:
 	virtual ~ConvertedInterpolator(){}
 private:
 	/** @brief 源插补器列表 */
-	std::vector<Interpolator<double>* > _interpolatorList;
+	std::vector<Interpolator<double>::ptr > _interpolatorList;
 
 	/** @brief 插补器列表大小 */
 	int _size;
 };
+
+/**
+ * @brief 转换位姿插补器容器到Q(使用ikSolver)
+ */
+template<>
+class ConvertedInterpolator<std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr > , robot::math::Q>: public Interpolator<robot::math::Q> {
+public:
+	using ptr = std::shared_ptr<ConvertedInterpolator<std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr > , robot::math::Q> >;
+	ConvertedInterpolator(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin, std::shared_ptr<robot::ik::IKSolver> iksolver, robot::model::Config config)
+	{
+		_ikSolver = iksolver;
+		_posInterpolator = origin.first;
+		_rotInterpolator = origin.second;
+		if (fabs(_posInterpolator->duration() - _rotInterpolator->duration()) > 0.001)
+			common::println("警告: 位置插补器与姿态插补器的周期不同!");
+	}
+
+	robot::math::Q x(double t) const
+	{
+		std::vector<robot::math::Q> result = (_ikSolver->solve(HTransform3D<double>(_posInterpolator->x(t), _rotInterpolator->x(t)), _config));
+		if ((int)result.size() <= 0)
+			throw ("ik_unsolvable""错误: 无法进行逆解!");
+		return result[0];
+	}
+
+	/** @todo 如何处理 */
+	robot::math::Q dx(double t) const
+	{
+		return (this->x(t + 0.0001) - this->x(t))*10000.0;
+	}
+
+	robot::math::Q ddx(double t) const
+	{
+		return ((this->x(t + 0.0002)) - (this->x(t + 0.0001))*2.0 +( this->x(t)))*100000000.0;
+	}
+
+	double duration() const
+	{
+		return _posInterpolator->duration();
+	}
+	virtual ~ConvertedInterpolator(){}
+private:
+	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
+	Interpolator<Vector3D<double> >::ptr _posInterpolator;
+	Interpolator<Rotation3D<double> >::ptr _rotInterpolator;
+	robot::model::Config _config;
+};
+
+using ikInterpolator = ConvertedInterpolator<std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr > , robot::math::Q>;
 
 /** @} */
 } /* namespace trajectory */
