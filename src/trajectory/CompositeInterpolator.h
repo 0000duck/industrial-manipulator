@@ -41,11 +41,10 @@ public:
 	 * @param interpolator [in] 主插补器
 	 * @param mapper [in] 映射插补器
 	 */
-	CompositeInterpolator(std::shared_ptr<Interpolator<T> > interpolator, Interpolator<double>::ptr mapper)
+	CompositeInterpolator(const std::shared_ptr<Interpolator<T> > interpolator, Interpolator<double>::ptr mapper)
 	{
 		_interpolator = interpolator;
 		_mapper = mapper;
-		mapper->x(0);
 		if (fabs(mapper->x(mapper->duration()) - interpolator->duration()) > 1e-3)
 			common::println("警告: 复合插补器, mapper的范围与源插补器的时间周期不一致(误差超出0.001)");
 	}

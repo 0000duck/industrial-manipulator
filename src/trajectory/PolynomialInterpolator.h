@@ -62,7 +62,7 @@ public:
 			Eigen::MatrixXd z=(3,1);
 			z=j*v;
 
-			return PolynomialInterpolator (_a=z(0,0),_b=z(1,0),_c=z(2,0),_duration=duration);
+			return PolynomialInterpolator (z(0,0), z(1,0), z(2,0), duration);
 		}
 private:
 	T _a;
@@ -115,7 +115,7 @@ public:
 		Eigen::MatrixXd z=(4,1);
 		z=j*v;
 
-		return PolynomialInterpolator3(_a=z(0,0),_b=z(1,0),_c=z(2,0),_d=z(3,0),_duration=duration);
+		return PolynomialInterpolator3(z(0,0), z(1,0), z(2,0), z(3,0), duration);
 	}
 
 private:

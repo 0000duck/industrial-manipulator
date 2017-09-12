@@ -33,9 +33,18 @@ Quaternion::Quaternion(const Rotation3D<double>& rot)
 {
 	_r = 0.5*sqrt(1 + rot(0, 0) + rot(1, 1) + rot(2, 2));
 	double _r4 = _r*4;
-	_i = (rot(2, 1) - rot(1, 2))/_r4;
-	_j = (rot(0, 2) - rot(2, 0))/_r4;
-	_k = (rot(1, 0) - rot(0, 1))/_r4;
+	if (fabs(_r4) > 1e-12)
+	{
+		_i = (rot(2, 1) - rot(1, 2))/_r4;
+		_j = (rot(0, 2) - rot(2, 0))/_r4;
+		_k = (rot(1, 0) - rot(0, 1))/_r4;
+	}
+	else
+	{
+		_i = sqrt((rot(0, 0) + 1.0)/2.0);
+		_j = sqrt((rot(1, 1) + 1.0)/2.0);
+		_k = sqrt((rot(2, 2) + 1.0)/2.0);
+	}
 }
 
 Quaternion::Quaternion(const HTransform3D<double>& tran)
@@ -163,7 +172,10 @@ Quaternion::rotVar Quaternion::getRotationVariables() const
 	double st = sin(theta/2);
 	Quaternion::rotVar var;
 	var.theta = theta;
-	var.n = Vector3D<double>(_i/st, _j/st, _k/st);
+	if (fabs(st) > 1e-12)
+		var.n = Vector3D<double>(_i/st, _j/st, _k/st);
+	else
+		var.n = Vector3D<double>(0, 0, 0);
 	return var;
 }
 

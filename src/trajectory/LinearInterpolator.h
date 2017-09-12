@@ -48,11 +48,19 @@ public:
 	 */
 	LinearInterpolator(const T& start, const T& end, double duration):
 		_a(start),
-		_b((end - start)/duration),
-		_vel(_b),
 		_acc(start*0),
 		_duration(duration)
 	{
+		if (duration == 0)
+		{
+			_b = start*0;
+			_vel = _b;
+		}
+		else
+		{
+			_b = (end - start)/duration;
+			_vel = _b;
+		}
 	}
 	virtual ~LinearInterpolator(){}
 
@@ -108,7 +116,7 @@ public:
 		Quaternion::rotVar var = deltaQuart.getRotationVariables();
 		_theta = var.theta;
 		_n = var.n;
-		_vel = _theta/duration;
+		_vel = (duration == 0)? 0 : (_theta/duration);
 		_acc = _vel*_vel;
 	}
 
@@ -116,7 +124,7 @@ public:
 
 	Rotation3D<T> x(double t) const
 	{
-		return (Quaternion((t*_theta/_duration), _n)).toRotation3D();
+		return (_quartStart*Quaternion((t*_vel), _n)).toRotation3D();
 	}
 
 	Rotation3D<T> dx(double t) const
@@ -164,7 +172,6 @@ public:
 		return _duration;
 	}
 private:
-	robot::ik::IKSolver* _ikSolver;
 	Rotation3D<T> _start;
 	Rotation3D<T> _end;
 	Quaternion _quartStart;

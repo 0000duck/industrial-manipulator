@@ -142,7 +142,10 @@ public:
 	{
 		std::vector<robot::math::Q> result = (_ikSolver->solve(HTransform3D<double>(_posInterpolator->x(t), _rotInterpolator->x(t)), _config));
 		if ((int)result.size() <= 0)
+		{
+			HTransform3D<double>(_posInterpolator->x(t), _rotInterpolator->x(t)).print();
 			throw ("ik_unsolvable""错误: 无法进行逆解!");
+		}
 		return result[0];
 	}
 

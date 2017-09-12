@@ -7,6 +7,7 @@
 
 # include "SerialLink.h"
 # include "../kinematics/Frame.h"
+# include "../common/common.h"
 # include "../common/printAdvance.h"
 # include "Jacobian.h"
 
@@ -216,6 +217,8 @@ Config SerialLink::getConfig(const robot::math::Q& q) const
 	double j2 = q[1] + dHTable[1].theta();
 	double j3 = q[2] + dHTable[2].theta();
 	double j5 = q[4] + dHTable[4].theta();
+	j3 = common::fixAngle(j3);
+	j5 = common::fixAngle(j5);
 	double a2 = dHTable[1].a();
 	double a3 = dHTable[2].a();
 	double a4 = dHTable[3].a();

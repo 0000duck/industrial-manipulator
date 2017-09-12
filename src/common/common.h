@@ -30,6 +30,14 @@ namespace common{
  * @return double类型的随机数
  */
 double fRand(double fMin, double fMax);
+
+/**
+ * @brief 将角度映射到[-pi, pi]的区间内
+ * @param angle [in] 原始角度
+ * @return [-pi, pi]的区间内的角度值
+ */
+double fixAngle(double angle);
+
 }
 }
 
