@@ -48,6 +48,21 @@ public:
 	{
 		return _duration;
 	}
+
+	static PolynomialInterpolator make(double x1,double x2,double x3,double y1,double y2,double y3,double duration)
+		{
+			Eigen::MatrixXd j=(3,3);
+			j(0,0)=1;j(0,1)=x1;j(0,2)=x1*x1;
+			j(1,0)=1;j(1,1)=x2;j(1,2)=x2*x2;
+			j(2,0)=1;j(2,1)=x3;j(2,2)=x3*x3;
+			j.inverse();
+			Eigen::MatrixXd v=(3,1);
+			v<<y1,y2,y3;
+			Eigen::MatrixXd z=(3,1);
+			z=j*v;
+
+			return PolynomialInterpolator (_a=z(0,0),_b=z(1,0),_c=z(2,0),_duration=duration);
+		}
 private:
 	T _a;
 	T _b;
@@ -85,18 +100,20 @@ public:
 	{
 		return _duration;
 	}
-	static PolynomialInterpolator3 make(double x1,double x2,double x3,double y1,double y2,double y3)
+	static PolynomialInterpolator3 make(double x1,double x2,double x3,double x4,double y1,double y2,double y3,double y4,double duration)
 	{
-		Eigen::MatrixXd j=(3,3);
+		Eigen::MatrixXd j=(4,4);
 		j(0,0)=1;j(0,1)=x1;j(0,2)=x1*x1;
 		j(1,0)=1;j(1,1)=x2;j(1,2)=x2*x2;
 		j(2,0)=1;j(2,1)=x3;j(2,2)=x3*x3;
+		j(3,0)=1;j(3,1)=x4;j(3,2)=x4*x4;
 		j.inverse();
-		Eigen::MatrixXd v=(3,1);
-		v<<y1,y2,y3;
-		Eigen::MatrixXd z=(3,1);
+		Eigen::MatrixXd v=(4,1);
+		v<<y1,y2,y3,y4;
+		Eigen::MatrixXd z=(4,1);
 		z=j*v;
-		return 0;
+
+		return PolynomialInterpolator3(_a=z(0,0),_b=z(1,0),_c=z(2,0),_d=z(3,0),_duration=duration);
 	}
 
 private:
