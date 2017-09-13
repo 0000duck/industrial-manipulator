@@ -1,8 +1,7 @@
-/*
- * LinePlanner.h
- *
- *  Created on: Sep 11, 2017
- *      Author: a1994846931931
+/**
+ * @brief LinePlanner类
+ * @date Sep 11, 2017
+ * @author a1994846931931
  */
 
 #ifndef LINEPLANNER_H_
@@ -25,11 +24,47 @@ using namespace robot::trajectory;
 namespace robot {
 namespace pathplanner {
 
+/** @addtogroup pathplanner
+ * @{
+ */
+
+/**
+ * @brief 直线规划器
+ *
+ * 给定两个点, 规划中间的路径, 返回Q插补器. 需要指明机器人各个关节的
+ * 最大速度和最大加速度, 以及要规划路线的最大速度, 最大加速度, 以及加加速度.
+ * - 如果按照路线设置的最大速度, 最大加速度, 以及加加速度规划出符合关节约束的路径, 则返回这条路径.
+ * - 如果直线段有路径无法到达, 则抛出错误.
+ * - 如果路径超出了关节的最大速度约束或者最大加速度约束, 则降低速度, 返回降速后的路径(插补器).
+ * - 规划器会检查起始和结束位置的config参数, 若config参数不相同, 则抛出错误(直线规划器的首末config必须相同)
+ */
 class LinePlanner {
 public:
+	/**
+	 * @brief 构造函数
+	 * @param qMin [in] 关节下限
+	 * @param qMax [in] 关节上限
+	 * @param dqLim [in] 关节最大速度
+	 * @param ddqLim [in] 关节最大加速度
+	 * @param vMaxLine [in] 直线路径最大速度
+	 * @param aMaxLine [in] 直线路径最大加速度
+	 * @param hLine [in] 直线路径加加速度
+	 * @param vMaxAngle [in] 直线路径最大角速度
+	 * @param aMaxAngle [in] 直线路径最大角加速度
+	 * @param hAngle [in] 直线路径角加加速度
+	 * @param ikSolver [in] 逆解器
+	 * @param serialLink [in] 机器人模型
+	 */
 	LinePlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
 			double vMaxLine, double aMaxLine, double hLine, double vMaxAngle, double aMaxAngle, double hAngle,
 			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink* serialLink);
+
+	/**
+	 * @brief 询问路径
+	 * @param qStart [in] 起始位置
+	 * @param qEnd [in] 终点位置
+	 * @return 直线路径的Q插补器
+	 */
 	Interpolator<Q>::ptr query(Q qStart, Q qEnd);
 	virtual ~LinePlanner();
 private:
@@ -51,6 +86,8 @@ private:
     robot::model::SerialLink* _serialLink;
     SmoothMotionPlanner _smPlanner;
 };
+
+/** @} */
 
 } /* namespace pathplanner */
 } /* namespace robot */
