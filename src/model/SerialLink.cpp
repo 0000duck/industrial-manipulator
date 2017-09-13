@@ -249,9 +249,32 @@ const robot::math::Q SerialLink::getEndVelocity(const robot::math::Q endVelocity
 	return (jacob*endVelocity);
 }
 
-Frame* SerialLink::getTool() const
+Frame SerialLink::getTool() const
 {
 	return _endToTool;
+}
+
+Q SerialLink::getJointMin() const
+{
+	Q q = Q::zero(this->getDOF());
+	for (int i=0; i<this->getDOF(); i++)
+		q(i) = _linkList[i]->lmin();
+	return q;
+}
+
+Q SerialLink::getJointMax() const
+{
+	Q q = Q::zero(this->getDOF());
+	for (int i=0; i<this->getDOF(); i++)
+		q(i) = _linkList[i]->lmax();
+	return q;
+}
+
+bool SerialLink::isJointValid(const Q& joint) const
+{
+	if (((this->getJointMax()) >= joint) && ((this->getJointMin() <= joint)))
+		return true;
+	return false;
 }
 
 SerialLink::~SerialLink()

@@ -38,6 +38,16 @@ double fRand(double fMin, double fMax);
  */
 double fixAngle(double angle);
 
+/**
+ * @brief 消除由于计算误差得到极小负数的情况
+ * @param num [in] 要处理的数
+ * @return
+ * - 如果@f$ num >= 0@f$ 那么返回num
+ * - 如果@f$ -1e-12 < num < 0@f$ 那么返回0
+ * - 如果@f$ num < -1e-12 @f$ 那么返回num
+ */
+double fixZero(double num);
+
 }
 }
 

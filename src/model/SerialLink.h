@@ -170,7 +170,27 @@ public:
 	 * @brief 获取tool
 	 * @return tool的地址
 	 */
-	Frame* getTool() const;
+	Frame getTool() const;
+
+	/**
+	 * @brief 返回关节下限
+	 * @return 关节下限
+	 */
+	Q getJointMin() const;
+
+	/**
+	 * @brief 返回关节上限
+	 * @return 关节上限
+	 */
+	Q getJointMax() const;
+
+	/**
+	 * @brief 判断关节数值是否合理
+	 * @param joint [in] 关节数值
+	 * @retval true 关节数值在各个关节设定范围内
+	 * @retval false 关节数值不在关节设定范围内
+	 */
+	bool isJointValid(const Q& joint) const;
 
 	/** @brief 格式化打印
 	 * @todo 未定义功能

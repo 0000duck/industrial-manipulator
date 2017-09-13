@@ -8,6 +8,7 @@
 #define LINEARINTERPOLATOR_H_
 
 # include <vector>
+# include "../common/printAdvance.h"
 # include "Interpolator.h"
 # include "../math/Quaternion.h"
 # include "../math/Rotation3D.h"
@@ -18,6 +19,7 @@
 # include "../ik/IKSolver.h"
 
 using namespace robot::math;
+using namespace robot::common;
 
 namespace robot {
 namespace trajectory {

@@ -8,9 +8,12 @@
 # include "Quaternion.h"
 # include <math.h>
 # include "../common/printAdvance.h"
+# include "../common/common.h"
 
 namespace robot {
 namespace math {
+
+using namespace robot::common;
 
 Quaternion::Quaternion():_r(1),_i(0),_j(0),_k(0)
 {
@@ -31,7 +34,7 @@ Quaternion::Quaternion(const Quaternion& QuatA)
 
 Quaternion::Quaternion(const Rotation3D<double>& rot)
 {
-	_r = 0.5*sqrt(1 + rot(0, 0) + rot(1, 1) + rot(2, 2));
+	_r = 0.5*sqrt(fixZero(1 + rot(0, 0) + rot(1, 1) + rot(2, 2)));
 	double _r4 = _r*4;
 	if (fabs(_r4) > 1e-12)
 	{
@@ -41,9 +44,9 @@ Quaternion::Quaternion(const Rotation3D<double>& rot)
 	}
 	else
 	{
-		_i = sqrt((rot(0, 0) + 1.0)/2.0);
-		_j = sqrt((rot(1, 1) + 1.0)/2.0);
-		_k = sqrt((rot(2, 2) + 1.0)/2.0);
+		_i = sqrt(fixZero((rot(0, 0) + 1.0)/2.0));
+		_j = sqrt(fixZero((rot(1, 1) + 1.0)/2.0));
+		_k = sqrt(fixZero((rot(2, 2) + 1.0)/2.0));
 	}
 }
 

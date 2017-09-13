@@ -110,6 +110,17 @@ const double Link::alpha() const
 	return _alpha;
 }
 
+double Link::lmin() const
+{
+	return _lmin;
+}
+
+
+double Link::lmax() const
+{
+	return _lmax;
+}
+
 const DHParameters& Link::getDHParams() const
 {
 	return _dHParam;

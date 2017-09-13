@@ -52,7 +52,7 @@ SiasunSR4CSolver::SiasunSR4CSolver(robot::model::SerialLink& serialRobot) {
     _d6 = _dHTable[5].d();
 
     _0Tbase = (HTransform3D<>::DH(_alpha1, _a1, _d1, 0)).inverse();
-    _endTjoint6 = ((HTransform3D<>::DH(0, 0, _d6, 0))*serialRobot.getTool()->getTransform()).inverse();
+    _endTjoint6 = ((HTransform3D<>::DH(0, 0, _d6, 0))*serialRobot.getTool().getTransform()).inverse();
 }
 
 
@@ -127,6 +127,19 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend, const mod
     for (std::vector<Q>::iterator it = result.begin(); it != result.end(); ++it) {
         for (size_t i = 0; i<(size_t)(*it).size(); i++)
             (*it)(i) -= _dHTable[i].theta();
+    }
+    /**> 根据关节范围去除不符合的结果 */
+    if ((int)result.size() > 0)
+    {
+		for (int i=0;;)
+		{
+			if (i >= result.size())
+				break;
+			if (_serialLink->isJointValid(result[i]))
+				i++;
+			else
+				result.erase(result.begin() + i);
+		}
     }
     return result;
 }

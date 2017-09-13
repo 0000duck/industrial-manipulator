@@ -97,7 +97,7 @@ void lineplannerTest()
 	LinePlanner planner = LinePlanner(qMin, qMax, dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle,
 			std::shared_ptr<SiasunSR4CSolver>(new SiasunSR4CSolver(robot)), &robot);
 	clock_t clockStart = clock();
-	Interpolator<Q>::ptr qInterpoaltor = planner.query(Q::zero(6), Q(1, 2, 1, 2, 1, 2));
+	Interpolator<Q>::ptr qInterpoaltor = planner.query(Q::zero(6), Q(1.5, 0, 0, 0, 0, 0));
 	clock_t clockEnd = clock();
 	cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 		int step = 1000;

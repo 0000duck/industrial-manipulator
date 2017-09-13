@@ -23,6 +23,13 @@ double fixAngle(double angle)
 	double fix = fmod((angle + M_PI), 2*M_PI);
 	return  (fix < 0)? (fix + M_PI):(fix - M_PI);
 }
+
+double fixZero(double num)
+{
+	if (num < 0 && num > -1e-12)
+		return 0;
+	return num;
+}
 }
 }
 

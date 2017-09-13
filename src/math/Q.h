@@ -115,6 +115,30 @@ public:
 	bool operator!=(const Q& q) const;
 
 	/**
+	 * @brief 比较数组大小
+	 * @param q [in] 比较的数组
+	 */
+	bool operator<(const Q& q) const;
+
+	/**
+	 * @brief 比较数组大小
+	 * @param q [in] 比较的数组
+	 */
+	bool operator<=(const Q& q) const;
+
+	/**
+	 * @brief 比较数组大小
+	 * @param q [in] 比较的数组
+	 */
+	bool operator>(const Q& q) const;
+
+	/**
+	 * @brief 比较数组大小
+	 * @param q [in] 比较的数组
+	 */
+	bool operator>=(const Q& q) const;
+
+	/**
 	 * @brief 追加数据
 	 * @param  [in] 添加的数据
 	 *

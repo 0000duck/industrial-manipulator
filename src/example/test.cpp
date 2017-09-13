@@ -215,7 +215,6 @@ int main(){
 
 	lineplannerTest();
 
-
 //	std::vector<std::shared_ptr<base> > a;
 //	a.push_back(std::shared_ptr<class1>(new class1) );
 //	a[0]->print();

@@ -75,6 +75,18 @@ public:
 * @return 返回参数alpha
 */
 	const double alpha() const;
+
+	/**
+	 * @brief 返回关节下限
+	 * @return 关节最小值
+	 */
+	double lmin() const;
+
+	/**
+	 * @brief 返回关节上限
+	 * @return 关节最大值
+	 */
+	double lmax() const;
 /**
 * @brief 获取DH参数类
 * @return 返回DH参数类

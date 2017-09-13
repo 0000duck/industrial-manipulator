@@ -132,6 +132,46 @@ bool Q::operator!=(const Q& q) const
 	return !(this->operator ==(q));
 }
 
+bool Q::operator<(const Q& q) const
+{
+	for (int i=0; i<_size; i++)
+	{
+		if (_value[i] >= q[i])
+			return false;
+	}
+	return true;
+}
+
+bool Q::operator<=(const Q& q) const
+{
+	for (int i=0; i<_size; i++)
+	{
+		if (_value[i] > q[i])
+			return false;
+	}
+	return true;
+}
+
+bool Q::operator>(const Q& q) const
+{
+	for (int i=0; i<_size; i++)
+	{
+		if (_value[i] <= q[i])
+			return false;
+	}
+	return true;
+}
+
+bool Q::operator>=(const Q& q) const
+{
+	for (int i=0; i<_size; i++)
+	{
+		if (_value[i] < q[i])
+			return false;
+	}
+	return true;
+}
+
 void Q::pushBack(double newValue)
 {
 	_size++;

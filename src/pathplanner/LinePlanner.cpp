@@ -6,6 +6,7 @@
  */
 
 # include "LinePlanner.h"
+# include "../common/printAdvance.h"
 # include "../model/Config.h"
 # include "../math/Quaternion.h"
 # include "../trajectory/CompositeInterpolator.h"
