@@ -9,18 +9,13 @@
 # include "../math/HTransform3D.h"
 # include "../kinematics/Trsf.h"
 # include "../kinematics/Frame.h"
-# include <iostream>
 # include <math.h>
 # include <string>
 # include "../common/printAdvance.h"
-//# include "model/SerialLink.h"
 # include "../model/Link.h"
-# include "test.h"
-# include "../ik/PieperSolver.h"
 # include "../ik/SiasunSR4CSolver.h"
+# include "test.h"
 # include "testIK.h"
-# include "../ext/Eigen/Dense"
-# include "../ext/Eigen/QR"
 # include "testIK2.h"
 # include "../model/Config.h"
 # include "../kinematics/State.h"
@@ -33,6 +28,8 @@
 # include "p2pplanner/p2pPlannerSampler.h"
 # include "../pathplanner/LinePlanner.h"
 # include <memory>
+# include <string>
+# include "lineplanner/lineplannertest.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -216,22 +213,8 @@ int main(){
 
 //	p2pPlannerSampler();
 
-	Q qMin = Q(lmin1, lmin2, lmin3, lmin4, lmin5, lmin6);
-	Q qMax = Q(lmax1, lmax2, lmax3, lmax4, lmax5, lmax6);
-	Q dqLim = Q(2, 2, 2, 2, 3, 3);
-	Q ddqLim = Q(20, 20, 20, 20, 20, 20);
-	double vMaxLine = 1.0;
-	double aMaxLine = 20.0;
-	double hLine = 50;
-	double vMaxAngle = 1.0;
-	double aMaxAngle = 10.0;
-	double hAngle = 30;
-	LinePlanner planner = LinePlanner(qMin, qMax, dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle,
-			std::shared_ptr<SiasunSR4CSolver>(new SiasunSR4CSolver(robot)), &robot);
-	clock_t clockStart = clock();
-	Interpolator<Q>::ptr qInterpoaltor = planner.query(Q::zero(6), Q(1, 2, 1, 2, 1, 2));
-	clock_t clockEnd = clock();
-	cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
+	lineplannerTest();
+
 
 //	std::vector<std::shared_ptr<base> > a;
 //	a.push_back(std::shared_ptr<class1>(new class1) );

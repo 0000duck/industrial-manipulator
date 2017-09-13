@@ -44,6 +44,7 @@ private:
 	Q _qMax;
 	Q _dqLim;
 	Q _ddqLim;
+	int _size;
     /**
      * @brief 机器人的模型
      */

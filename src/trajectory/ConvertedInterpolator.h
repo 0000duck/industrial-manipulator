@@ -135,7 +135,7 @@ public:
 		_posInterpolator = origin.first;
 		_rotInterpolator = origin.second;
 		if (fabs(_posInterpolator->duration() - _rotInterpolator->duration()) > 0.001)
-			common::println("警告: 位置插补器与姿态插补器的周期不同!");
+			common::println("警告<ikInterpolator>: 位置插补器与姿态插补器的周期不同!");
 	}
 
 	robot::math::Q x(double t) const
@@ -144,7 +144,7 @@ public:
 		if ((int)result.size() <= 0)
 		{
 			HTransform3D<double>(_posInterpolator->x(t), _rotInterpolator->x(t)).print();
-			throw ("ik_unsolvable""错误: 无法进行逆解!");
+			throw ("错误<ikInterpolator>: 无法进行逆解!");
 		}
 		return result[0];
 	}

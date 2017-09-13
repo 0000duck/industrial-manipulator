@@ -26,7 +26,9 @@ LinePlanner::LinePlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
 	_vMaxLine(vMaxLine), _aMaxLine(aMaxLine), _hLine(hLine), _vMaxAngle(vMaxLine), _aMaxAngle(aMaxLine), _hAngle(hLine),
 	_ikSolver(ikSolver), _qMin(qMin), _qMax(qMax), _dqLim(dqLim), _ddqLim(ddqLim), _serialLink(serialLink)
 {
-
+	_size = qMin.size();
+	if (qMax.size() != _size || qMax.size() != _size || dqLim.size() != _size || ddqLim.size() != _size)
+		throw ("错误<直线规划器>:　构造参数中数组的长度不一致！");
 }
 
 /**
@@ -39,10 +41,10 @@ Interpolator<Q>::ptr LinePlanner::query(Q qStart, Q qEnd)
 {
 	Config config = _serialLink->getConfig(qStart);
 	if (config != _serialLink->getConfig(qEnd))
-		throw ("错误: 初始和结束的Config不同!");
+		throw ("错误<直线规划>: 初始和结束的Config不同!");
 	double dof = _serialLink->getDOF();
 	if (dof != qStart.size() || dof != qEnd.size())
-		throw ("错误: 直线规划: 查询的关节数值与机器人的自由度不符!");
+		throw ("错误<直线规划>: 查询的关节数值与机器人的自由度不符!");
 	Quaternion startQuaternion = _serialLink->getEndQuaternion(qStart);
 	Quaternion endQuaternion = _serialLink->getEndQuaternion(qEnd);
 	Quaternion startToEndQuat = startQuaternion.conjugate()*endQuaternion;
@@ -81,6 +83,49 @@ Interpolator<Q>::ptr LinePlanner::query(Q qStart, Q qEnd)
 	/**> 合并为位姿插补器, 构造Q插补器 */
 	std::pair<Interpolator<Vector3D<double> >::ptr, Interpolator<Rotation3D<double> >::ptr > endInterpolator(pos_t, quat_t);
 	ikInterpolator::ptr qInterpolator(new ikInterpolator(endInterpolator, _ikSolver, config)); /**> Q插补器 */
+	/**> 采样检查约束 */
+	int step = 1000;
+	double T = qInterpolator->duration();
+	double dt = T/(step - 1);
+	std::vector<Q> result;
+	Q xresult;
+	Q dxresult;
+	Q ddxresult;
+	Q dqMax = _dqLim;
+	Q ddqMax = _ddqLim;
+	try{
+		for (double t=0; t<T; t+=dt)
+		{
+			dxresult = qInterpolator->dx(t);
+			ddxresult = qInterpolator->ddx(t);
+			for (int i=0; i<_size; i++)
+			{
+				if (dqMax(i) < fabs(dxresult[i]))
+					dqMax(i) = fabs(dxresult[i]);
+				if (ddqMax(i) < fabs(ddxresult[i]))
+					ddqMax(i) = fabs(ddxresult[i]);
+			}
+		}
+	}
+	catch(char const* msg)
+	{
+		if (std::string(msg).find("无法进行逆解"))
+			throw("错误<直线规划>: 路径位置无法达到!");
+	}
+	Q kv = _dqLim/dqMax;
+	Q ka = _ddqLim/ddqMax;
+	double k = 1.0;
+	for (int i=0; i<_size; i++)
+	{
+		ka(i) = sqrt(ka[i]);
+	}
+	for (int i=0; i<_size; i++)
+	{
+		k = (k <= kv[i])? k:kv[i];
+		k = (k <= ka[i])? k:ka[i];
+	}
+	mappedlt->update(mappedlt->getFactor()*k);
+	mappedtt->update(mappedtt->getFactor()*k);
 	return qInterpolator;
 
 }

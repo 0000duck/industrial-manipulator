@@ -69,6 +69,26 @@ Q Q::operator-(const Q& q1) const
 	return q;
 }
 
+Q Q::operator*(const Q& q1) const
+{
+	if (this->size() != q1.size())
+		throw("错误: 尝试将不同大小的数组相乘!!");
+	Q q(*this);
+	for (int i=0; i<(int)_size; i++)
+		q(i) *= q1[i];
+	return q;
+}
+
+Q Q::operator/(const Q& q1) const
+{
+	if (this->size() != q1.size())
+		throw("错误: 尝试将不同大小的数组相除!!");
+	Q q(*this);
+	for (int i=0; i<(int)_size; i++)
+		q(i) = q(i)/q1[i];
+	return q;
+}
+
 Q Q::operator*(double num) const
 {
 	Q q(*this);
