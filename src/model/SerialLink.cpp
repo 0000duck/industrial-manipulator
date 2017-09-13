@@ -21,13 +21,17 @@ SerialLink::SerialLink(Frame* tool)
 {
 	if (tool != NULL)
 		_endToTool = tool;
+	else
+		_endToTool = &_defaultTool;
 }
 
 SerialLink::SerialLink(std::vector<Link*> linkList,Frame* tool)
 {
 	static Frame worldFrame;
 	if (tool != NULL)
-			_endToTool = tool;
+		_endToTool = tool;
+	else
+		_endToTool = &_defaultTool;
 	Frame* parent = &_worldFrame;
 	for (int i=0; i<(int)linkList.size(); i++)
 	{
@@ -51,6 +55,12 @@ void SerialLink::append(Link* link)
 void SerialLink::setTool(Frame* tool)
 {
 	_endToTool = tool;
+//	_endToTool.getTransform().print();
+}
+
+void SerialLink::setDefaultTool()
+{
+	_endToTool = &_defaultTool;
 }
 
 Link* SerialLink::pop()
@@ -93,7 +103,7 @@ HTransform3D<double> SerialLink::getTransform(
 				_linkList[i]->d(),
 				_linkList[i]->theta() + q[i]);
 	}
-	tran *= _endToTool.getTransform();
+	tran *= _endToTool->getTransform();
 	return tran;
 }
 
@@ -128,9 +138,6 @@ Quaternion SerialLink::getEndQuaternion(const Q& q) const
 	return getQuaternion(0, getDOF(), q);
 }
 
-/*
- * 根据关节角度获取雅克比矩阵；
- */
 Jacobian SerialLink::getJacobian() const
 {
 	return getJacobian(getQ());
@@ -166,7 +173,7 @@ Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
 	}
 
 	// 计算工具末端相对于哥哥关节坐标的坐标值
-	Vector3D<double> nPend = _endToTool.getTransform().getPosition();
+	Vector3D<double> nPend = _endToTool->getTransform().getPosition();
 	std::vector< Vector3D<double> > iPend; // i=n~1 注意为逆向储存
 	iPend.push_back(nPend);
 	for (int i=dof; i>1; i--)
@@ -249,7 +256,7 @@ const robot::math::Q SerialLink::getEndVelocity(const robot::math::Q endVelocity
 	return (jacob*endVelocity);
 }
 
-Frame SerialLink::getTool() const
+Frame* SerialLink::getTool() const
 {
 	return _endToTool;
 }

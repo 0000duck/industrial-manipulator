@@ -59,13 +59,13 @@ void lineplannerTest()
 	double lmin2 = M_PI/180.0*-130;
 	double lmin3 = M_PI/180.0*-70;
 	double lmin4 = M_PI/180.0*-240;
-	double lmin5 = M_PI/180.0*-30;
+	double lmin5 = M_PI/180.0*-200;
 	double lmin6 = M_PI/180.0*-360;
 	double lmax1 = M_PI/180.0*180;
 	double lmax2 = M_PI/180.0*80;
 	double lmax3 = M_PI/180.0*160;
 	double lmax4 = M_PI/180.0*240;
-	double lmax5 = M_PI/180.0*200;
+	double lmax5 = M_PI/180.0*30;
 	double lmax6 = M_PI/180.0*360;
 
 //	Link(alpha, a, d, theta, min, max, sigma=0)
@@ -82,7 +82,10 @@ void lineplannerTest()
 	robot.append(&l5);
 	robot.append(&l6);
 
-	SiasunSR4CSolver solver(robot);
+	HTransform3D<double> tran = HTransform3D<double>(Vector3D<double>(0, 0, 0.2), Rotation3D<double>());
+	Frame tool = Frame(tran);
+
+	std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robot));
 	Q qMin = Q(lmin1, lmin2, lmin3, lmin4, lmin5, lmin6);
 	Q qMax = Q(lmax1, lmax2, lmax3, lmax4, lmax5, lmax6);
 	Q dqLim = Q(3, 3, 3, 3, 5, 5);
@@ -95,12 +98,16 @@ void lineplannerTest()
 	double hAngle = 30;
 	try{
 	LinePlanner planner = LinePlanner(qMin, qMax, dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle,
-			std::shared_ptr<SiasunSR4CSolver>(new SiasunSR4CSolver(robot)), &robot);
+			solver, &robot);
+
+//	robot.setTool(&tool);
+//	solver->init();
+
 	clock_t clockStart = clock();
-	Interpolator<Q>::ptr qInterpoaltor = planner.query(Q::zero(6), Q(1.5, 0, 0, 0, 0, 0));
+	Interpolator<Q>::ptr qInterpoaltor = planner.query(Q::zero(6), Q(1.5, 0, 0, 0, -1.5, 0));
 	clock_t clockEnd = clock();
 	cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
-		int step = 1000;
+		int step = 100;
 		double T = qInterpoaltor->duration();
 		double dt = T/(step - 1);
 		cout << "总时长: " << T << "s" << endl;

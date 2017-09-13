@@ -69,6 +69,11 @@ public:
 	void setTool(Frame* tool);
 
 	/**
+	 * @brief 设置默认tool
+	 */
+	void setDefaultTool();
+
+	/**
 	 * @brief 移除关节
 	 * @return 将移除的最后一个关节的地址返回
 	 */
@@ -132,6 +137,7 @@ public:
 	Jacobian getJacobian() const;
 
 	/**
+	 * @brief todo 考虑tool计算雅克比矩阵
 	 * @brief 获取雅克比矩阵
 	 * @param q [in] 关节数值
 	 * @return 当关节为Q时机器人的雅克比矩阵
@@ -170,7 +176,7 @@ public:
 	 * @brief 获取tool
 	 * @return tool的地址
 	 */
-	Frame getTool() const;
+	Frame* getTool() const;
 
 	/**
 	 * @brief 返回关节下限
@@ -205,7 +211,8 @@ private:
 	Frame _worldFrame;
 
 	/** @brief 末端到工具中心点的偏置 */
-	Frame _endToTool;
+	Frame* _endToTool;
+	Frame _defaultTool;
 
 };
 

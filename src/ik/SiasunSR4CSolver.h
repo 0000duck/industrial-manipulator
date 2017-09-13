@@ -40,6 +40,11 @@ public:
 	SiasunSR4CSolver(robot::model::SerialLink& serialRobot);
 
 	/**
+	 * @brief 初始化
+	 */
+	void init();
+
+	/**
 	 * @brief 逆运动学求解
 	 * @param baseTend [in] 基坐标系到末端执行器的变换矩阵
 	 * @param config [in] 逆解的Config参数

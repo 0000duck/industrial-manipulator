@@ -60,7 +60,7 @@ PieperSolver::PieperSolver(robot::model::SerialLink& serialRobot) {
 
     HTransform3D<> baseT0 = HTransform3D<>::DH(alpha0, a0, d1, 0);
     _0Tbase = baseT0.inverse();
-    _endTjoint6 = ((HTransform3D<>::DH(0, 0, d6, 0))*serialRobot.getTool().getTransform()).inverse();
+    _endTjoint6 = ((HTransform3D<>::DH(0, 0, d6, 0))*serialRobot.getTool()->getTransform()).inverse();
 }
 
 void PieperSolver::init() {
