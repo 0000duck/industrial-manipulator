@@ -63,6 +63,12 @@ public:
 	void append(Link*);
 
 	/**
+	 * @brief 设置末端工具
+	 * @param tool
+	 */
+	void setTool(Frame* tool);
+
+	/**
 	 * @brief 移除关节
 	 * @return 将移除的最后一个关节的地址返回
 	 */
@@ -159,6 +165,12 @@ public:
 	 * @return 各个关节的速度
 	 */
 	const robot::math::Q getEndVelocity(const robot::math::Q endVelocity, const robot::math::Q robotPos) const;
+
+	/**
+	 * @brief 获取tool
+	 * @return tool的地址
+	 */
+	Frame* getTool() const;
 
 	/** @brief 格式化打印
 	 * @todo 未定义功能

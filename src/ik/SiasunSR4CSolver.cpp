@@ -52,7 +52,7 @@ SiasunSR4CSolver::SiasunSR4CSolver(robot::model::SerialLink& serialRobot) {
     _d6 = _dHTable[5].d();
 
     _0Tbase = (HTransform3D<>::DH(_alpha1, _a1, _d1, 0)).inverse();
-    _endTjoint6 = (HTransform3D<>::DH(0, 0, _d6, 0)).inverse();
+    _endTjoint6 = ((HTransform3D<>::DH(0, 0, _d6, 0))*serialRobot.getTool()->getTransform()).inverse();
 }
 
 

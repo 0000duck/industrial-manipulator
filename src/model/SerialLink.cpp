@@ -48,6 +48,11 @@ void SerialLink::append(Link* link)
 	parent->addChild(link->getFrame());
 }
 
+void SerialLink::setTool(Frame* tool)
+{
+	_endToTool = tool;
+}
+
 Link* SerialLink::pop()
 {
 	Link* link = *_linkList.end();
@@ -88,6 +93,7 @@ HTransform3D<double> SerialLink::getTransform(
 				_linkList[i]->d(),
 				_linkList[i]->theta() + q[i]);
 	}
+	tran *= _endToTool.getTransform();
 	return tran;
 }
 
@@ -241,6 +247,11 @@ const robot::math::Q SerialLink::getEndVelocity(const robot::math::Q endVelocity
 	Jacobian jacob = getJacobian(robotPos);
 	jacob.doInverse();
 	return (jacob*endVelocity);
+}
+
+Frame* SerialLink::getTool() const
+{
+	return _endToTool;
 }
 
 SerialLink::~SerialLink()
