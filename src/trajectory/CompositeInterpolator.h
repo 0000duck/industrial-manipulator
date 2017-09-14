@@ -116,12 +116,12 @@ public:
 
 	T dx(double t) const
 	{
-		return _factor*(_interpolator->dx(_factor*t));
+		return (_interpolator->dx(_factor*t))*_factor;
 	}
 
 	T ddx(double t) const
 	{
-		return _factor*_factor*(_interpolator->ddx(_factor*t));
+		return (_interpolator->ddx(_factor*t))*(_factor*_factor);
 	}
 
 	double duration() const

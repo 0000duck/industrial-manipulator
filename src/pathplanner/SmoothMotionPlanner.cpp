@@ -19,7 +19,7 @@ namespace pathplanner {
 using namespace robot::trajectory;
 
 
-robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::query(double s, double h, double aMax, double vMax, double start)
+robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::query(double s, double h, double aMax, double vMax, double start) const
 {
 	if (h <= 0 || aMax <= 0 || vMax <= 0)
 		throw ("错误: 参数必须为正! < 来自 SmoothMotionPlanner::query");
@@ -63,7 +63,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::query(
 	}
 }
 
-robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::fourLineMotion(double s, double h, double aMax, double vMax, double start)
+robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::fourLineMotion(double s, double h, double aMax, double vMax, double start) const
 {
 	println("四段规划器");
 	int sign = (s < 0)? -1:1;
@@ -93,7 +93,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::fourLi
 	return interpolator;
 }
 
-robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::fiveLineMotion(double s, double h, double aMax, double vMax, double start)
+robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::fiveLineMotion(double s, double h, double aMax, double vMax, double start) const
 {
 	println("五段规划器");
 	int sign = (s < 0)? -1:1;
@@ -126,7 +126,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::fiveLi
 	return interpolator;
 }
 
-robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::sixLineMotion(double s, double h, double aMax, double vMax, double start)
+robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::sixLineMotion(double s, double h, double aMax, double vMax, double start) const
 {
 	println("六段规划器");
 	int sign = (s < 0)? -1:1;
@@ -166,7 +166,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::sixLin
 	return interpolator;
 }
 
-robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::sevenLineMotion(double s, double h, double aMax, double vMax, double start)
+robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::sevenLineMotion(double s, double h, double aMax, double vMax, double start) const
 {
 	println("七段规划器");
 	int sign = (s < 0)? -1:1;
@@ -213,12 +213,12 @@ SmoothMotionPlanner::~SmoothMotionPlanner()
 {
 }
 
-double SmoothMotionPlanner::s1(double h, double vMax, double aMax)
+double SmoothMotionPlanner::s1(double h, double vMax, double aMax) const
 {
 	return (h*vMax*vMax + vMax*aMax*aMax)/(2*h*aMax);
 }
 
-double SmoothMotionPlanner::s2(double h, double aMax)
+double SmoothMotionPlanner::s2(double h, double aMax) const
 {
 	return (aMax*aMax*aMax)/(h*h);
 }

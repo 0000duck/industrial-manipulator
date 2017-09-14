@@ -9,6 +9,8 @@
 
 # include "../math/Q.h"
 
+using robot::math::Q;
+
 namespace robot {
 namespace kinematic {
 
@@ -30,6 +32,14 @@ public:
 	 * 全部数据会被初始化为0
 	 */
 	State(int size);
+
+	/**
+	 * @brief 构造函数
+	 * @param pos [in] 关节位置
+	 * @param vel [in] 关节速度
+	 * @param acc [in] 关节加速度
+	 */
+	State(Q& pos, Q& vel, Q& acc);
 
 	/**
 	 * @brief 获取所有位置
@@ -116,19 +126,9 @@ private:
 	int _size;
 
 	/**
-	 * @brief 关节位置信息
+	 * @brief 关节信息[位置, 速度, 加速度]
 	 */
-	robot::math::Q _jointAngle;
-
-	/**
-	 * @brief 关节速度信息
-	 */
-	robot::math::Q _jointVelocity;
-
-	/**
-	 * @brief 关节加速度信息
-	 */
-	robot::math::Q _jointAccleration;
+	std::vector<Q> _state;
 };
 
 /** @} */

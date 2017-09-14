@@ -65,7 +65,7 @@ public:
 	 * @param qEnd [in] 终点位置
 	 * @return 直线路径的Q插补器
 	 */
-	Interpolator<Q>::ptr query(Q qStart, Q qEnd);
+	Interpolator<Q>::ptr query(const Q qStart, const Q qEnd) const;
 	virtual ~LinePlanner();
 private:
 	double _vMaxLine;

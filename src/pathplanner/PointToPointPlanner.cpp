@@ -18,7 +18,7 @@ PointToPointPlanner::PointToPointPlanner(Q h, Q aMax, Q vMax)
 	_vMax = vMax;
 	_size = _h.size();
 	if (_aMax.size() != _size || _vMax.size() != _size)
-		throw ("错误: 点对点规划器必须由同样大小的Q进行构造!");
+		throw ("错误<点对点规划器>: 点对点规划器必须由同样大小的Q进行构造!");
 }
 
 Interpolator<Q>::ptr PointToPointPlanner::query(Q qStart, Q qEnd)

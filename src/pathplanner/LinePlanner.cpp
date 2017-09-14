@@ -38,7 +38,7 @@ LinePlanner::LinePlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
  * @param qEnd
  * @return
  */
-Interpolator<Q>::ptr LinePlanner::query(Q qStart, Q qEnd)
+Interpolator<Q>::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 {
 	/**> 检查config参数 */
 	Config config = _serialLink->getConfig(qStart);
@@ -98,7 +98,7 @@ Interpolator<Q>::ptr LinePlanner::query(Q qStart, Q qEnd)
 	Q dqMax = _dqLim;
 	Q ddqMax = _ddqLim;
 	try{
-		for (double t=0; t<T; t+=dt)
+		for (double t=0; t<=T; t+=dt)
 		{
 			dxresult = qInterpolator->dx(t);
 			ddxresult = qInterpolator->ddx(t);
@@ -111,10 +111,12 @@ Interpolator<Q>::ptr LinePlanner::query(Q qStart, Q qEnd)
 			}
 		}
 	}
-	catch(char const* msg)
+	catch(std::string& msg)
 	{
-		if (std::string(msg).find("无法进行逆解"))
-			throw("错误<直线规划>: 路径位置无法达到!");
+		if (msg.find("无法进行逆解"))
+		{
+			throw(std::string("错误<直线规划>: 路径位置无法达到!\n") + std::string(msg));
+		}
 	}
 	/**> 若超出关节的速度与加速度约束, 则降低速度 */
 	Q kv = _dqLim/dqMax;

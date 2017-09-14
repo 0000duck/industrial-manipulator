@@ -170,18 +170,22 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend, const mod
         for (size_t i = 0; i<(size_t)(*it).size(); i++)
             (*it)(i) -= _dHTable[i].theta();
     }
+    if ((int)result.size() <= 0)
+    	throw (std::string("错误<SiasunSR4CSolver>: 没有符合config的解"));
     /**> 根据关节范围去除不符合的结果 */
     if ((int)result.size() > 0)
     {
 		for (int i=0;;)
 		{
-			if (i >= result.size())
+			if (i >= (int)result.size())
 				break;
 			if (_serialLink->isJointValid(result[i]))
 				i++;
 			else
 				result.erase(result.begin() + i);
 		}
+	    if ((int)result.size() == 0)
+	    	throw(std::string("错误<SiasunSR4CSolver>: 结果超出关节范围"));
     }
     return result;
 }

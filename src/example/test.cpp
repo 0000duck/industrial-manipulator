@@ -30,6 +30,7 @@
 # include <memory>
 # include <string>
 # include "lineplanner/lineplannertest.h"
+# include "../pathplanner/QBlend.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -47,6 +48,12 @@ public:
 	virtual void print(){}
 	virtual ~base(){}
 };
+
+Q getQ(){
+	Q q = Q::zero(6);
+//	println(&q);
+	return q;
+}
 class class1:public base{
 public:
 	class1(){}
@@ -54,7 +61,18 @@ public:
 	{
 		cout << "class1 method" << endl;
 	}
+	void setQ()
+	{
+		Q q = getQ();
+		_q = q;
+	}
+	void printQ()
+	{
+		_q.print();
+	}
 	virtual ~class1(){}
+private:
+	Q _q;
 };
 
 int main(){
@@ -156,13 +174,13 @@ int main(){
 	double lmin2 = M_PI/180.0*-130;
 	double lmin3 = M_PI/180.0*-70;
 	double lmin4 = M_PI/180.0*-240;
-	double lmin5 = M_PI/180.0*-30;
+	double lmin5 = M_PI/180.0*-200;
 	double lmin6 = M_PI/180.0*-360;
 	double lmax1 = M_PI/180.0*180;
 	double lmax2 = M_PI/180.0*80;
 	double lmax3 = M_PI/180.0*160;
 	double lmax4 = M_PI/180.0*240;
-	double lmax5 = M_PI/180.0*200;
+	double lmax5 = M_PI/180.0*30;
 	double lmax6 = M_PI/180.0*360;
 
 //	Link(alpha, a, d, theta, min, max, sigma=0)
@@ -179,7 +197,7 @@ int main(){
 	robot.append(&l5);
 	robot.append(&l6);
 
-	SiasunSR4CSolver solver(robot);
+//	SiasunSR4CSolver solver(robot);
 //	std::vector<Q> result = solver.solve(robot.getEndTransform(), Config(Config::ssame, Config::esame, Config::wsame));
 //	println("results are;");
 //	int counter = 0;
@@ -213,7 +231,67 @@ int main(){
 
 //	p2pPlannerSampler();
 
-	lineplannerTest();
+//	lineplannerTest();
+
+	HTransform3D<double> tran = HTransform3D<double>(Vector3D<double>(0, 0, 0.2), Rotation3D<double>());
+	Frame tool = Frame(tran);
+
+	std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robot));
+	Q qMin = Q(lmin1, lmin2, lmin3, lmin4, lmin5, lmin6);
+	Q qMax = Q(lmax1, lmax2, lmax3, lmax4, lmax5, lmax6);
+	Q dqLim = Q(3, 3, 3, 3, 5, 5);
+	Q ddqLim = Q(20, 20, 20, 20, 20, 20);
+	double vMaxLine = 1.0;
+	double aMaxLine = 20.0;
+	double hLine = 50;
+	double vMaxAngle = 1.0;
+	double aMaxAngle = 10.0;
+	double hAngle = 30;
+	try{
+		LinePlanner lineplanner = LinePlanner(qMin, qMax, dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle,
+				solver, &robot);
+		QBlend blendder = QBlend(ddqLim, dqLim, qMin, qMax);
+
+//		robot.setTool(&tool);
+//		solver->init();
+		Q p1 = Q::zero(6);
+		Q p2 = Q(1.5, 0, 0, 0, -1.5, 0);
+		Q p3 = Q(3, 0, 0, 0, 0, 0);
+		println("line1");
+		Interpolator<Q>::ptr line1 = lineplanner.query(p1, p2);
+		println("line2");
+		Interpolator<Q>::ptr line2 = lineplanner.query(p2, p3);
+		double T1 = line1->duration();
+		double T2 = line2->duration();
+		double k = 0.2;
+		double t1 = T1*(1 - k);
+		double t2 = T2*k;
+		clock_t clockStart = clock();
+		Interpolator<Q>::ptr qInterpoaltor = blendder.query(line1->getState(t1), line2->getState(t2), T1 - t1 + t2);
+		clock_t clockEnd = clock();
+		cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
+		int step = 100;
+		double T = qInterpoaltor->duration();
+		double dt = T/(step - 1);
+		cout << "总时长: " << T << "s" << endl;
+		std::vector<Q> x;
+		std::vector<Q> dx;
+		std::vector<Q> ddx;
+		clockStart = clock();
+		for (double t=0; t<=T; t+=dt)
+		{
+			x.push_back(qInterpoaltor->x(t));
+			dx.push_back(qInterpoaltor->dx(t));
+			ddx.push_back(qInterpoaltor->ddx(t));
+		}
+		clockEnd = clock();
+		cout << "每次插补用时: " << (clockEnd - clockStart)/(double)step << "us" << endl;
+
+	}
+	catch (std::string& msg)
+	{
+		std::cerr << msg;
+	}
 
 //	std::vector<std::shared_ptr<base> > a;
 //	a.push_back(std::shared_ptr<class1>(new class1) );

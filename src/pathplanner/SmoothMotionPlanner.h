@@ -60,7 +60,7 @@ public:
 	 * @return 规划好的插补器
 	 * @warning 插补器的生命周期和这个规划器对象的周期相同.
 	 */
-	robot::trajectory::SequenceInterpolator<double>::ptr query(double s, double h, double aMax, double vMax, double start=0);
+	robot::trajectory::SequenceInterpolator<double>::ptr query(double s, double h, double aMax, double vMax, double start=0) const;
 
 	/**
 	 * @brief 四段规划方法生成插补器
@@ -71,7 +71,7 @@ public:
 	 * @param start [in] 开始位置@f$ x_0 @f$
 	 * @return 规划好的插补器
 	 */
-	robot::trajectory::SequenceInterpolator<double>::ptr fourLineMotion(double s, double h, double aMax, double vMax, double start=0);
+	robot::trajectory::SequenceInterpolator<double>::ptr fourLineMotion(double s, double h, double aMax, double vMax, double start=0) const;
 
 	/**
 	 * @brief 五段规划方法生成插补器
@@ -82,7 +82,7 @@ public:
 	 * @param start [in] 开始位置@f$ x_0 @f$
 	 * @return 规划好的插补器
 	 */
-	robot::trajectory::SequenceInterpolator<double>::ptr fiveLineMotion(double s, double h, double aMax, double vMax, double start=0);
+	robot::trajectory::SequenceInterpolator<double>::ptr fiveLineMotion(double s, double h, double aMax, double vMax, double start=0) const;
 
 	/**
 	 * @brief 六段规划方法生成插补器
@@ -93,7 +93,7 @@ public:
 	 * @param start [in] 开始位置@f$ x_0 @f$
 	 * @return 规划好的插补器
 	 */
-	robot::trajectory::SequenceInterpolator<double>::ptr sixLineMotion(double s, double h, double aMax, double vMax, double start=0);
+	robot::trajectory::SequenceInterpolator<double>::ptr sixLineMotion(double s, double h, double aMax, double vMax, double start=0) const;
 
 	/**
 	 * @brief 七段规划方法生成插补器
@@ -104,7 +104,7 @@ public:
 	 * @param start [in] 开始位置@f$ x_0 @f$
 	 * @return 规划好的插补器
 	 */
-	robot::trajectory::SequenceInterpolator<double>::ptr sevenLineMotion(double s, double h, double aMax, double vMax, double start=0);
+	robot::trajectory::SequenceInterpolator<double>::ptr sevenLineMotion(double s, double h, double aMax, double vMax, double start=0) const;
 
 	/**
 	 * @brief 析构函数
@@ -120,7 +120,7 @@ private:
 	 * 到0(此时认为达到@f$ v_{max} @f$ ), 所经过的总路径长度(前提是匀加速时间段大于等于0). <br>
 	 *  - @f$ s_1 = \frac{h v_{max}^2 + v_{max} a_{max}^2}{2 h a+_{max}} @f$
 	 */
-	double s1(double h, double vMax, double aMax);
+	double s1(double h, double vMax, double aMax) const;
 
 	/**
 	 * @brief @f$ s_2 @f$ 长度
@@ -129,7 +129,7 @@ private:
 	 * 所经过的总路径长度. <br>
 	 *  - @f$ s_2 = \frac{a_{max}^3}{h^2} @f$
 	 */
-	double s2(double h, double aMax);
+	double s2(double h, double aMax) const;
 private:
 };
 

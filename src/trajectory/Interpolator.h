@@ -8,6 +8,12 @@
 #define INTERPOLATOR_H_
 
 # include <memory>
+# include "../math/Q.h"
+# include "../kinematics/State.h"
+# include <math.h>
+
+using namespace robot::math;
+using robot::kinematic::State;
 
 namespace robot {
 namespace trajectory {
@@ -69,6 +75,128 @@ public:
 	 * @return 规定的总时长
 	 */
 	virtual double duration() const = 0;
+};
+
+/**
+ * @brief Q插补器
+ *
+ * 添加了采样获取极限值的方法
+ */
+template <>
+class Interpolator<Q>{
+public:
+	using ptr = std::shared_ptr<Interpolator<Q> >;
+	Interpolator(){}
+	virtual ~Interpolator(){}
+
+	/**
+	 * @brief t时刻的位置
+	 * @param t [in] 时间t
+	 * @return 位置
+	 */
+	virtual Q x(double t) const = 0;
+
+	/**
+	 * @brief t时刻的速度
+	 * @param t [in] 时间t
+	 * @return 速度
+	 */
+	virtual Q dx(double t) const = 0;
+
+	/**
+	 * @brief t时刻的加速度
+	 * @param t [in] 时间t
+	 * @return 加速度
+	 */
+	virtual Q ddx(double t) const = 0;
+
+	/**
+	 * @brief 总时长
+	 * @return 规定的总时长
+	 */
+	virtual double duration() const = 0;
+
+	/**
+	 * @brief 获得State(Q, dQ, ddQ)
+	 * @param t [in] 时间
+	 * @param precision [in] 采样精度
+	 * @return [Q, dQ, ddQ]
+	 * @note 返回std::vector<Q>而不是State的原因是目前构造State的方法不合理, 需要
+	 * 复制各个Q, 相比之下用std::vector<Q>更为经济.
+	 *
+	 * 采用数值方法求速度和加速度, 可以指定采样的精度. 由于速度需要求解两次x(t), 加速度
+	 * 需要求解三次x(t), 如果用数值方法分开求解这三个数据将需要6次求x(t). 用这个方法只
+	 * 需要求解3次x(t), 计算上更为节省.
+	 */
+	virtual State getState(double t, double precision=0.0001) const
+	{
+		Q x0 = this->x(t);
+		Q x1 = this->x(t + precision);
+		Q x2 = this->x(t + precision*2);
+		Q dx = (x1 - x0)/precision;
+		Q ddx = (x0 + x2 - x1*2.0)/(precision*precision);
+		return State(x0, dx, ddx);
+	}
+
+	virtual std::pair<Q, Q> getLimQ(int step)
+	{
+		double T = this->duration();
+		double dt = T/(step - 1);
+		int size = (this->x(0)).size();
+		Q minQ = this->x(0);
+		Q maxQ = minQ;
+		Q xresult;
+		for (double t=0; t<=T; t+=dt)
+		{
+			xresult = this->dx(t);
+			for (int i=0; i<size; i++)
+			{
+				if (xresult[i] > maxQ[i])
+					maxQ(i) = xresult[i];
+				else if (xresult[i] < minQ[i])
+					minQ(i) = xresult[i];
+			}
+		}
+		return std::pair<Q, Q>(minQ, maxQ);
+	}
+
+	virtual Q getMaxdQ(int step)
+	{
+		double T = this->duration();
+		double dt = T/(step - 1);
+		int size = (this->dx(0)).size();
+		Q dqMax = Q::zero(size);
+		Q dxresult;
+		for (double t=0; t<=T; t+=dt)
+		{
+			dxresult = this->dx(t);
+			for (int i=0; i<size; i++)
+			{
+				if (dqMax(i) < fabs(dxresult[i]))
+					dqMax(i) = fabs(dxresult[i]);
+			}
+		}
+		return dqMax;
+	}
+
+	virtual Q getMaxddQ(int step) const
+	{
+		double T = this->duration();
+		double dt = T/(step - 1);
+		int size = (this->ddx(0)).size();
+		Q ddqMax = Q::zero(size);
+		Q ddxresult;
+		for (double t=0; t<=T; t+=dt)
+		{
+			ddxresult = this->ddx(t);
+			for (int i=0; i<size; i++)
+			{
+				if (ddqMax(i) < fabs(ddxresult[i]))
+					ddqMax(i) = fabs(ddxresult[i]);
+			}
+		}
+		return ddqMax;
+	}
 };
 
 /**
