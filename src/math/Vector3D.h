@@ -184,7 +184,7 @@ public:
 
 	/**
 	 * @brief 向量相加操作
-	 * @param vSource [in] 加数
+	 * @param vec [in] 加数
 	 * @return 两个向量对应位置元素相减得到的新向量
 	 */
 	Vector3D<T> operator+(Vector3D<T> vec) const
@@ -195,7 +195,7 @@ public:
 
 	/**
 	 * @brief 向量相减操作
-	 * @param vSource [in] 减数
+	 * @param vec [in] 减数
 	 * @return 两个向量对应位置元素相减得到的新向量
 	 */
 	Vector3D<T> operator-(Vector3D<T> vec) const

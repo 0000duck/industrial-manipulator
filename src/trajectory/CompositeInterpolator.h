@@ -141,8 +141,13 @@ public:
 	}
 	virtual ~LinearCompositeInterpolator(){}
 private:
+	/** @brief 主插补器 */
 	std::shared_ptr<Interpolator<T> > _interpolator;
+
+	/** @brief 系数 */
 	double _factor;
+
+	/** @brief 时长 */
 	double _duration;
 };
 

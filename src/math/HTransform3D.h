@@ -114,7 +114,6 @@ public:
 
 	/**
 	 * @brief 根据旋转矩阵构造
-	 * @param d [in] 位移
 	 * @param R [in] 旋转矩阵
 	 *
 	 * 构造的矩阵如下:
@@ -133,9 +132,8 @@ public:
 	{}
 
 	/**
-	 * @brief 根据位移和旋转矩阵构造
+	 * @brief 根据位移构造
 	 * @param d [in] 位移
-	 * @param R [in] 旋转矩阵
 	 *
 	 * 构造的矩阵如下:
 	 * @f$
@@ -181,7 +179,7 @@ public:
 
 	/**
 	 * @brief 变换矩阵相乘
-	 * @param tran [in] 右手边的被乘矩阵
+	 * @param vec [in] 右手边的被乘矩阵
 	 * @return 表达如下:
 	 * @f$
 	 * \left[ \begin{array}{cc}

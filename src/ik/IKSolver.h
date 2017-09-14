@@ -17,12 +17,22 @@ using namespace robot::math;
 namespace robot {
 namespace ik {
 
+/**
+ * @addtogroup ik
+ * @{
+ */
+
+/**
+ * @brief 逆解器基类
+ */
 class IKSolver {
 public:
 	IKSolver(){}
 	virtual std::vector<Q> solve(const HTransform3D<>& baseTend, const model::Config& config) const = 0;
 	virtual ~IKSolver();
 };
+
+/**@}*/
 
 } /* namespace ik */
 } /* namespace robot */

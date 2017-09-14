@@ -47,18 +47,18 @@ public:
 
 	/**
 	 * @brief 指定变换矩阵的构造函数.
-	 * @param HTransform<double> [in] 指定的变换矩阵
+	 * @param transform [in] 指定的变换矩阵
 	 *
 	 * 父为空(NULL).
 	 */
-	Frame(HTransform3D<double>&);
+	Frame(HTransform3D<double>& transform);
 
 	/**
 	 * @brief 指定父Frame和变换矩阵的构造函数.
 	 * @param parent [in] 父Frame的地址
-	 * @param  HTransform3D<double> [in] 指定的变换矩阵
+	 * @param  transform [in] 指定的变换矩阵
 	 */
-	Frame(Frame* parent, HTransform3D<double>&);
+	Frame(Frame* parent, HTransform3D<double>& transform);
 
 	/**
 	 * @brief 指定父Frame的构造函数.
@@ -137,9 +137,9 @@ public:
 
 	/**
 	 * @brief 设置变换矩阵
-	 * @param HTransform3D<double> [in] 要设置的变换矩阵
+	 * @param transform [in] 要设置的变换矩阵
 	 */
-	void setTransform(HTransform3D<double>&);
+	void setTransform(HTransform3D<double>& transform);
 
 	/**
 	 * @brief 显式地更新变换矩阵的值

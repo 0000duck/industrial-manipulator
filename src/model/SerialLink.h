@@ -212,6 +212,10 @@ private:
 
 	/** @brief 末端到工具中心点的偏置 */
 	Frame* _endToTool;
+
+	/** @brief 默认工具
+	 *
+	 * 法兰 */
 	Frame _defaultTool;
 
 };

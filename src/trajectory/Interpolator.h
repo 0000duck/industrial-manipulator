@@ -119,12 +119,10 @@ public:
 	virtual double duration() const = 0;
 
 	/**
-	 * @brief 获得State(Q, dQ, ddQ)
+	 * @brief 获得State
 	 * @param t [in] 时间
 	 * @param precision [in] 采样精度
-	 * @return [Q, dQ, ddQ]
-	 * @note 返回std::vector<Q>而不是State的原因是目前构造State的方法不合理, 需要
-	 * 复制各个Q, 相比之下用std::vector<Q>更为经济.
+	 * @return state
 	 *
 	 * 采用数值方法求速度和加速度, 可以指定采样的精度. 由于速度需要求解两次x(t), 加速度
 	 * 需要求解三次x(t), 如果用数值方法分开求解这三个数据将需要6次求x(t). 用这个方法只
@@ -140,6 +138,11 @@ public:
 		return State(x0, dx, ddx);
 	}
 
+	/**
+	 * @brief 获取关节上下限
+	 * @param step [in] 采样数量
+	 * @return 返回关节上下限制[min, maax]
+	 */
 	virtual std::pair<Q, Q> getLimQ(int step)
 	{
 		double T = this->duration();
@@ -162,6 +165,11 @@ public:
 		return std::pair<Q, Q>(minQ, maxQ);
 	}
 
+	/**
+	 * @brief 返回关节最大速度
+	 * @param step [in] 采样数量
+	 * @return 各个关节的最大速度(绝对值)
+	 */
 	virtual Q getMaxdQ(int step)
 	{
 		double T = this->duration();
@@ -181,6 +189,11 @@ public:
 		return dqMax;
 	}
 
+	/**
+	 * @brief 返回关节的最大加速度
+	 * @param step [in] 采样数量
+	 * @return 各个关节的最大加速度(绝对值)
+	 */
 	virtual Q getMaxddQ(int step) const
 	{
 		double T = this->duration();
@@ -200,6 +213,11 @@ public:
 		return ddqMax;
 	}
 
+	/**
+	 * @brief 对x(t)函数进行采样
+	 * @param step [in] 采样数量
+	 * @return 在0~duration()之间采样的step个位置点
+	 */
 	virtual std::vector<Q> xSample(int step)
 	{
 		std::vector<Q> q;
@@ -210,6 +228,11 @@ public:
 		return q;
 	}
 
+	/**
+	 * @brief 对dx(t)函数进行采样
+	 * @param step [in] 采样数量
+	 * @return 在0~duration()之间采样的step个速度点
+	 */
 	virtual std::vector<Q> dxSample(int step)
 	{
 		std::vector<Q> q;
@@ -220,6 +243,11 @@ public:
 		return q;
 	}
 
+	/**
+	 * @brief 对ddx(t)函数进行采样
+	 * @param step [in] 采样数量
+	 * @return 在0~duration()之间采样的step个加速度点
+	 */
 	virtual std::vector<Q> ddxSample(int step)
 	{
 		std::vector<Q> q;

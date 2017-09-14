@@ -66,12 +66,6 @@ private:
 	 * 返回的插补器的生命周期与它自身相同)
 	 */
 	SmoothMotionPlanner _smPlanner;
-
-	/** @brief 记录这个类生成的插补器, 用于空间释放 */
-//	vector<Interpolator<double>::ptr> _interpolatorList;
-//
-//	/** @brief 记录这个类生成的插补器, 用于空间释放 */
-//	vector<ConvertedInterpolator<std::vector<Interpolator<double>* > , robot::math::Q>*> _qInterpolatorList;
 };
 
 /** @} */

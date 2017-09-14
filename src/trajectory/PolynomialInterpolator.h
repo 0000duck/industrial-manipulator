@@ -238,7 +238,7 @@ public:
 	 * @param a1 [in] t1时刻的加速度
 	 * @param x2 [in] t2时刻的位置
 	 * @param v2 [in] t2时刻的速度
-	 * @param a3 [in] t2时刻的加速度
+	 * @param a2 [in] t2时刻的加速度
 	 * @param duration [in] 插补时长
 	 * @return 指向构造的五次多项式插补器的shared_ptr
 	 */

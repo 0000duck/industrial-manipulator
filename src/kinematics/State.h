@@ -82,21 +82,21 @@ public:
 
     /**
      * @brief 设置记录的位置
-     * @param Q [in] 位置
+     * @param pos [in] 位置
      */
-	void setAngle(const robot::math::Q&);
+	void setAngle(const robot::math::Q& pos);
 
     /**
      * @brief 设置记录的速度值
-     * @param Q [in] 速度值
+     * @param velocity [in] 速度值
      */
-	void setVelocity(const robot::math::Q&);
+	void setVelocity(const robot::math::Q& velocity);
 
     /**
      * @brief 设置记录的加速度值
-     * @param Q [in] 加速度值
+     * @param acceleration [in] 加速度值
      */
-	void setAcceleration(const robot::math::Q&);
+	void setAcceleration(const robot::math::Q& acceleration);
 
     /**
      * @brief 设定索引对应关节的位置

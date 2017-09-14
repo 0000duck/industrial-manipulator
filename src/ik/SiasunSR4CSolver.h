@@ -68,67 +68,67 @@ public:
 
     /**
      * @brief 判断关节角能否满足config中的肩部约束
-     * @param Q [in] 机器人的关节角
-     * @param Config [in] Config参数
+     * @param q [in] 机器人的关节角
+     * @param config [in] Config参数
      * @retval true 满足约束
      * @retval false 不满足约束
      */
-	bool isShoulderValid(const robot::math::Q&, const model::Config&) const;
+	bool isShoulderValid(const robot::math::Q& q, const model::Config& config) const;
 
     /**
      * @brief 判断关节角能否满足config中的肩部约束
      * @param r [in] 第三轴原点到第一轴的距离
-     * @param Config [in] Config参数
+     * @param config [in] Config参数
      * @retval true 满足约束
      * @retval false 不满足约束
      */
-	bool isShoulderValid(const double r, const model::Config&) const;
+	bool isShoulderValid(const double r, const model::Config& config) const;
 
     /**
      * @brief 判断关节角能否满足config中的肘部约束
-     * @param Q [in] 机器人的关节角
-     * @param Config [in] Config参数
+     * @param q [in] 机器人的关节角
+     * @param config [in] Config参数
      * @retval true 满足约束
      * @retval false 不满足约束
      */
-	bool isElbowValid(const robot::math::Q&, const model::Config&) const;
+	bool isElbowValid(const robot::math::Q& q, const model::Config& config) const;
 
     /**
      * @brief 判断关节角能否满足config中的肘部约束
      * @param j3 [in] 第三关节角度
-     * @param Config [in] Config参数
+     * @param config [in] Config参数
      * @retval true 满足约束
      * @retval false 不满足约束
      */
-	bool isElbowValid(const double j3, const model::Config&) const;
+	bool isElbowValid(const double j3, const model::Config& config) const;
 
     /**
      * @brief 判断关节角能否满足config中的腕部约束
-     * @param Q [in] 机器人的关节角
-     * @param Config [in] Config参数
+     * @param q [in] 机器人的关节角
+     * @param config [in] Config参数
      * @retval true 满足约束
      * @retval false 不满足约束
      */
-	bool isWristValid(const robot::math::Q&, const model::Config&) const;
+	bool isWristValid(const robot::math::Q& q, const model::Config& config) const;
 
     /**
      * @brief 判断关节角能否满足config中的腕部约束
      * @param j5 [in] 第五关节角度
-     * @param Config [in] Config参数
+     * @param config [in] Config参数
      * @retval true 满足约束
      * @retval false 不满足约束
      */
-	bool isWristValid(const double j5, const model::Config&) const;
+	bool isWristValid(const double j5, const model::Config& config) const;
 
 	/**
 	 * @brief 分析关节角所满足的是哪一种Config参数
-	 * @param Q [in] 要分析的关节角度数组
+	 * @param q [in] 要分析的关节角度数组
 	 * @return 只会明式地给出匹配的Config类型 <br>
 	 * 对于肩部, 返回的是lefty或righty <br>
 	 * 对于肘部, 返回的是epositive或enegtive <br>
 	 * 对于腕部, 返回的是wpositive或wnegtive
 	 */
-	robot::model::Config getConfig(const robot::math::Q&) const;
+	robot::model::Config getConfig(const robot::math::Q& q) const;
 	virtual ~SiasunSR4CSolver();
 private:
     double _alpha1, _a1, _calpha1, _salpha1, _d1;

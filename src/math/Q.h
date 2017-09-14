@@ -58,7 +58,7 @@ public:
 
 	/**
 	 * @brief 数组相加
-	 * @param [in] 被加数组
+	 * @param q [in] 被加数组
 	 * @return 对应位置相加, 返回得到的数组
 	 */
 	Q operator+(const Q& q) const;
@@ -86,17 +86,17 @@ public:
 
 	/**
 	 * @brief 与常量相乘
-	 * @param q [in] 乘数
+	 * @param num [in] 乘数
 	 * @return 分别乘以乘数, 返回得到的数组
 	 */
-	Q operator*(double) const;
+	Q operator*(double num) const;
 
 	/**
 	 * @brief 与常量相除
-	 * @param [in] 除数
+	 * @param num [in] 除数
 	 * @return 分别乘以除数, 返回得到的数组
 	 */
-	Q operator/(double) const;
+	Q operator/(double num) const;
 
 	/**
 	 * @brief 判断两个数组是否相同
@@ -140,11 +140,11 @@ public:
 
 	/**
 	 * @brief 追加数据
-	 * @param  [in] 添加的数据
+	 * @param num [in] 添加的数据
 	 *
 	 * 在数组末尾增加一个数据, 数组长度增加1.
 	 */
-	void pushBack(double);
+	void pushBack(double num);
 
 	/**
 	 * @brief 格式化打印
