@@ -11,9 +11,11 @@
 # include "../math/Q.h"
 # include "../kinematics/State.h"
 # include <math.h>
+# include "../common/printAdvance.h"
 
 using namespace robot::math;
 using robot::kinematic::State;
+using namespace robot::common;
 
 namespace robot {
 namespace trajectory {
@@ -196,6 +198,36 @@ public:
 			}
 		}
 		return ddqMax;
+	}
+
+	virtual std::vector<Q> xSample(int step)
+	{
+		std::vector<Q> q;
+		double T = this->duration();
+		double dt = T/double(step - 1);
+		for (double t=0; t<=T; t+=dt)
+			q.push_back(this->x(t));
+		return q;
+	}
+
+	virtual std::vector<Q> dxSample(int step)
+	{
+		std::vector<Q> q;
+		double T = this->duration();
+		double dt = T/double(step - 1);
+		for (double t=0; t<=T; t+=dt)
+			q.push_back(this->dx(t));
+		return q;
+	}
+
+	virtual std::vector<Q> ddxSample(int step)
+	{
+		std::vector<Q> q;
+		double T = this->duration();
+		double dt = T/double(step - 1);
+		for (double t=0; t<=T; t+=dt)
+			q.push_back(this->ddx(t));
+		return q;
 	}
 };
 
