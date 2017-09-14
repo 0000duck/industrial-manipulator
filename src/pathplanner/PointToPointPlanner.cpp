@@ -38,11 +38,9 @@ Interpolator<Q>::ptr PointToPointPlanner::query(Q qStart, Q qEnd)
 		LinearCompositeInterpolator<double>::ptr lcI(
 				new LinearCompositeInterpolator<double>(seprateInterpolator[i], seprateInterpolator[i]->duration()/tMax));
 		qInterpolators.push_back(lcI);
-//		_interpolatorList.push_back(lcI);
 	}
 	std::shared_ptr<ConvertedInterpolator<std::vector<Interpolator<double>::ptr > , robot::math::Q> > qInterpolator(
 			new ConvertedInterpolator<std::vector<Interpolator<double>::ptr > , robot::math::Q>(qInterpolators));
-//	_qInterpolatorList.push_back(qInterpolator);
 	return qInterpolator;
 }
 
