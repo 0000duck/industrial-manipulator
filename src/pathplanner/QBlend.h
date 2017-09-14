@@ -40,6 +40,8 @@ private:
 
 	Q _qMin;
 	Q _qMax;
+	/**> 至少要达到速度, 加速度限制的百分比 */
+	const double _kMin = 0.9;
 };
 
 } /* namespace pathplanner */

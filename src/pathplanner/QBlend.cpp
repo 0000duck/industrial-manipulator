@@ -33,12 +33,12 @@ QBlend::QBlend(Q aMax, Q vMax, Q qMin, Q qMax)
 
 Interpolator<Q>::ptr QBlend::query(State qStart, State qEnd, double maxDuration)
 {
-	Q startQ = qStart.getAngle();
-	Q startVel = qStart.getVelocity();
-	Q startAcc = qStart.getAcceleration();
-	Q endQ = qEnd.getAngle();
-	Q endVel = qEnd.getVelocity();
-	Q endAcc = qEnd.getAcceleration();
+	const Q startQ = qStart.getAngle();
+	const Q startVel = qStart.getVelocity();
+	const Q startAcc = qStart.getAcceleration();
+	const Q endQ = qEnd.getAngle();
+	const Q endVel = qEnd.getVelocity();
+	const Q endAcc = qEnd.getAcceleration();
 
 	vector<Interpolator<double>::ptr > polynomialInterpolators;
 	vector<Interpolator<double>::ptr > mappedPolyIpr;
@@ -53,15 +53,15 @@ Interpolator<Q>::ptr QBlend::query(State qStart, State qEnd, double maxDuration)
 	/**> 打包成Q插补器 */
 	std::shared_ptr<ConvertedInterpolator<std::vector<Interpolator<double>::ptr > , robot::math::Q> > QIpr(
 				new ConvertedInterpolator<std::vector<Interpolator<double>::ptr > , robot::math::Q>(polynomialInterpolators));
-	/**> 检查约束, 改变时长 */
+	/**> 检查约束 */
 	int step = 1000;
 	std::pair<Q, Q> qLim = QIpr->getLimQ(step);
 	if (qLim.first < _qMin || qLim.second > _qMax)
 		throw ("错误<Q混合规划器>: 无法混合, 关节超出限位");
 	Q vMax = QIpr->getMaxdQ(step);
 	Q aMax = QIpr->getMaxddQ(step);
-	Q kv = _vMax/vMax;
-	Q ka = _aMax/aMax;
+	Q kv = vMax/_vMax;
+	Q ka = aMax/_aMax;
 	double k = kv[0];
 	for (int i=0; i<_size; i++)
 	{
@@ -69,14 +69,17 @@ Interpolator<Q>::ptr QBlend::query(State qStart, State qEnd, double maxDuration)
 	}
 	for (int i=0; i<_size; i++)
 	{
-		k = (k <= kv[i])? k:kv[i];
-		k = (k <= ka[i])? k:ka[i];
+		k = (k >= kv[i])? k:kv[i];
+		k = (k >= ka[i])? k:ka[i];
 	}
-	/** 若k<=1说明规划器的时长大于maxDurarion */
-	if (k <= 1)
-		println("警告: 混合插补器时长超出限制");
-	LinearCompositeInterpolator<Q>::ptr mappedQIpr(new LinearCompositeInterpolator<Q>(QIpr, k));
-	return mappedQIpr;
+	/**> 速度过慢, 迭代处理 */
+	if (k < _kMin)
+		return this->query(qStart, qEnd, maxDuration*2*k/(1.0 + _kMin));
+	/**> 速度过快, 迭代处理 */
+	if (k > 1.0)
+		return this->query(qStart, qEnd, maxDuration*2*k/(1.0 + _kMin));
+	/**> 速度适中, 返回 */
+	return QIpr;
 }
 
 QBlend::~QBlend() {
