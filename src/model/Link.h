@@ -95,6 +95,24 @@ public:
 	double lmax() const;
 
 	/**
+	 * @brief 返回sin(alpha)
+	 * @return  @f$ sin(\alpha) @f$
+	 */
+	inline double sa() const
+	{
+		return _sa;
+	}
+
+	/**
+	 * @brief 返回cos(alpha)
+	 * @return  @f$ cos(\alpha) @f$
+	 */
+	inline double ca() const
+	{
+		return _ca;
+	}
+
+	/**
 	* @brief 获取DH参数类
 	* @return 返回DH参数类
 	*/
@@ -121,7 +139,10 @@ private:
 	double _lmax;
 	Frame* _frame;
 	DHParameters _dHParam;
-
+	const double _sa;
+	const double _ca;;
+	const double _st;
+	const double _ct;
 };
 
 /** @} */

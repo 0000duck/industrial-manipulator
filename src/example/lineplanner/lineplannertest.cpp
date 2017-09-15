@@ -97,17 +97,19 @@ void lineplannerTest()
 	double aMaxAngle = 10.0;
 	double hAngle = 30;
 	try{
-	LinePlanner planner = LinePlanner(qMin, qMax, dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle,
-			solver, &robot);
+		LinePlanner planner = LinePlanner(qMin, qMax, dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle,
+				solver, &robot);
 
-//	robot.setTool(&tool);
-//	solver->init();
+	//	robot.setTool(&tool);
+	//	solver->init();
 
-	clock_t clockStart = clock();
-	Interpolator<Q>::ptr qInterpoaltor = planner.query(Q::zero(6), Q(1.5, 0, 0, 0, -1.5, 0));
-	clock_t clockEnd = clock();
-	cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
-		int step = 100;
+		clock_t clockStart = clock();
+		Q start = Q::zero(6);
+		Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
+		Interpolator<Q>::ptr qInterpoaltor = planner.query(start, end);
+		clock_t clockEnd = clock();
+		cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
+		int step = 1000;
 		double T = qInterpoaltor->duration();
 		double dt = T/(step - 1);
 		cout << "总时长: " << T << "s" << endl;
@@ -145,6 +147,23 @@ void lineplannerTest()
 			out3 << ddx[i][0] << ", " << ddx[i][1] << ", " << ddx[i][2] << ", " << ddx[i][3] << ", " << ddx[i][4] << ", " << ddx[i][5] << ";" << endl;
 		}
 		out3.close();
+
+		clockStart = clock();
+		qInterpoaltor->doLengthAnalysis(&robot);
+		clockEnd = clock();
+		cout << "分析路径长度耗时: " << clockEnd - clockStart << "us" << endl;
+
+		std::vector<std::pair<double, double> > _trajectoryLength;
+		Vector3D<double> position1;
+		Vector3D<double> position2 = (&robot)->getEndPosition(qInterpoaltor->x(0));
+		_trajectoryLength.push_back(std::pair<double, double>(0, 0));
+		int i = 0;
+		for (double t = dt; t<= T; t+=dt)
+		{
+			position1 = position2;
+			position2 = (&robot)->getEndPosition(qInterpoaltor->x(t));
+			_trajectoryLength.push_back(std::pair<double, double>(t, _trajectoryLength[i++].second + (position2 - position1).getLengh()));
+		}
 	}
 	catch (char const* msg)
 	{

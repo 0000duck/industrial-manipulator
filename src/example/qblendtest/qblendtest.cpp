@@ -122,7 +122,7 @@ void qblendtest()
 		clock_t clockEnd = clock();
 		cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 		/**> 采样 */
-		int step = 100;
+		int step = 300;
 		cout << "线段1时长: " << T1 << "s" << endl;
 		cout << "线段2时长: " << T2 << "s" << endl;
 		cout << "原时长: " << k*(T1 + T2) << "s" << endl;
@@ -130,8 +130,12 @@ void qblendtest()
 		std::vector<Q> line1x;
 		std::vector<Q> line2x;
 		std::vector<Q> blendx;
+		std::vector<Q> blenddx;
+		std::vector<Q> blendddx;
 		clockStart = clock();
 		blendx = qInterpolator->xSample(step);
+		blenddx = qInterpolator->dxSample(step);
+		blendddx = qInterpolator->ddxSample(step);
 		clockEnd = clock();
 		cout << "每次插补用时: " << (clockEnd - clockStart)/(double)step << "us" << endl;
 		/**> 两条直线采样 */
@@ -141,6 +145,8 @@ void qblendtest()
 		const char* filename1 = "src/example/qblendtest/templine1x.txt";
 		const char* filename2 = "src/example/qblendtest/templine2x.txt";
 		const char* filename3 = "src/example/qblendtest/tempblendx.txt";
+		const char* filename4 = "src/example/qblendtest/tempblenddx.txt";
+		const char* filename5 = "src/example/qblendtest/tempblendddx.txt";
 		std::ofstream out1(filename1);
 		for (int i=0; i<(int)line1x.size(); i++)
 		{
@@ -159,6 +165,18 @@ void qblendtest()
 			out3 << blendx[i][0] << ", " << blendx[i][1] << ", " << blendx[i][2] << ", " << blendx[i][3] << ", " << blendx[i][4] << ", " << blendx[i][5] << ";" << endl;
 		}
 		out3.close();
+		std::ofstream out4(filename4);
+		for (int i=0; i<(int)line1x.size(); i++)
+		{
+			out4 << blenddx[i][0] << ", " << blenddx[i][1] << ", " << blenddx[i][2] << ", " << blenddx[i][3] << ", " << blenddx[i][4] << ", " << blenddx[i][5] << ";" << endl;
+		}
+		out4.close();
+		std::ofstream out5(filename5);
+		for (int i=0; i<(int)line1x.size(); i++)
+		{
+			out5 << blendddx[i][0] << ", " << blendddx[i][1] << ", " << blendddx[i][2] << ", " << blendddx[i][3] << ", " << blendddx[i][4] << ", " << blendddx[i][5] << ";" << endl;
+		}
+		out5.close();
 	}
 	catch (std::string& msg)
 	{

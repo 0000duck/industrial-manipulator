@@ -228,6 +228,19 @@ public:
 	}
 
 	/**
+	 * @brief 与向量相乘并将结果赋值给向量
+	 * @param vec [in] 相乘的向量
+	 */
+	void operator*=(Vector3D<T>& vec) const
+	{
+		double v0 = _m[0][0]*vec(0) + _m[0][1]*vec(1) + _m[0][2]*vec(2);
+		double v1 = _m[1][0]*vec(0) + _m[1][1]*vec(1) + _m[1][2]*vec(2);
+		vec[2] = _m[2][0]*vec(0) + _m[2][1]*vec(1) + _m[2][2]*vec(2);
+		vec[0] = v0;
+		vec[1] = v1;
+	}
+
+	/**
 	 * @brief 矩阵赋值操作
 	 * @param RotB [in] 赋值矩阵
 	 */

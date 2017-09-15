@@ -44,7 +44,7 @@ void p2pPlannerSampler()
 		ddx.push_back(p2pPlanner->ddx(t));
 	}
 	clockEnd = clock();
-	cout << "插补用时: " << clockEnd - clockStart << "us" << endl;
+	cout << "每次插补用时: " << (clockEnd - clockStart)/(double)step << "us" << endl;
 
 	/**> 保存文件 */
 	const char* filename1 = "src/example/p2pplanner/tempx.txt";

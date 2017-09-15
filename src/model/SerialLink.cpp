@@ -97,13 +97,16 @@ HTransform3D<double> SerialLink::getTransform(
 	HTransform3D<double> tran = HTransform3D<double>::identity();
 	for (unsigned int i=startLink; i<endLink; i++)
 	{
-		tran *= HTransform3D<double>::DH(
-				_linkList[i]->alpha(),
+		tran *= (HTransform3D<double>::DHFast(
+				_linkList[i]->sa(),
+				_linkList[i]->ca(),
 				_linkList[i]->a(),
 				_linkList[i]->d(),
-				_linkList[i]->theta() + q[i]);
+				sin(_linkList[i]->theta() + q[i]),
+				cos(_linkList[i]->theta() + q[i])));
 	}
-	tran *= _endToTool->getTransform();
+	if (endLink == _linkList.size())
+		tran *= _endToTool->getTransform();
 	return tran;
 }
 
@@ -116,6 +119,28 @@ HTransform3D<double> SerialLink::getEndTransform() const
 HTransform3D<double> SerialLink::getEndTransform(const robot::math::Q& q) const
 {
 	return this->getTransform(0, _linkList.size(), q);
+}
+
+Vector3D<double> SerialLink::getEndPosition(void) const
+{
+	return this->getEndPosition(Q::zero(getDOF()));
+}
+
+
+Vector3D<double> SerialLink::getEndPosition(const robot::math::Q& q) const
+{
+	Vector3D<double> endPos = (_endToTool->getTransform()).getPosition();
+	for (int i=_linkList.size() - 1; i>=0; i--)
+	{
+		(HTransform3D<double>::DHFast(
+			_linkList[i]->sa(),
+			_linkList[i]->ca(),
+			_linkList[i]->a(),
+			_linkList[i]->d(),
+			sin(_linkList[i]->theta() + q[i]),
+			cos(_linkList[i]->theta() + q[i]))) *= endPos;
+	}
+	return endPos;
 }
 
 Quaternion SerialLink::getQuaternion(unsigned int startLink, unsigned int endLink, const robot::math::Q& q) const

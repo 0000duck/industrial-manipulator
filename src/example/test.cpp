@@ -198,6 +198,11 @@ int main(){
 	robot.append(&l5);
 	robot.append(&l6);
 
+	HTransform3D<double> tran = HTransform3D<double>(Vector3D<double>(0, 0, 0.2), Rotation3D<double>());
+	Frame tool = Frame(tran);
+	robot.setTool(&tool);
+//	solver->init();
+
 //	SiasunSR4CSolver solver(robot);
 //	std::vector<Q> result = solver.solve(robot.getEndTransform(), Config(Config::ssame, Config::esame, Config::wsame));
 //	println("results are;");
@@ -232,9 +237,7 @@ int main(){
 
 //	p2pPlannerSampler();
 
-//	lineplannerTest();
-
-	qblendtest();
+	lineplannerTest();
 
 //	std::vector<std::shared_ptr<base> > a;
 //	a.push_back(std::shared_ptr<class1>(new class1) );

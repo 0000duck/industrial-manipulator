@@ -17,38 +17,38 @@ SiasunSR4CSolver::SiasunSR4CSolver(robot::model::SerialLink& serialRobot) {
 	_dHTable = serialRobot.getDHTable();
     _alpha1 = _dHTable[0].alpha();
     _a1 = _dHTable[0].a();
-    _calpha1 = cos(_dHTable[0].alpha());
-    _salpha1 = sin(_dHTable[0].alpha());
+    _calpha1 = _serialLink->getLink(0)->ca();
+    _salpha1 = _serialLink->getLink(0)->sa();
     _d1 = _dHTable[0].d();
 
     _alpha2 = _dHTable[1].alpha();
     _a2 = _dHTable[1].a();
-    _calpha2 = cos(_dHTable[1].alpha());
-    _salpha2 = sin(_dHTable[1].alpha());
+    _calpha2 = _serialLink->getLink(1)->ca();
+    _salpha2 = _serialLink->getLink(1)->sa();
     _d2 = _dHTable[1].d();
 
     _alpha3 = _dHTable[2].alpha();
     _a3 = _dHTable[2].a();
-    _calpha3 = cos(_dHTable[2].alpha());
-    _salpha3 = sin(_dHTable[2].alpha());
+    _calpha3 = _serialLink->getLink(2)->ca();
+    _salpha3 = _serialLink->getLink(2)->sa();
     _d3 = _dHTable[2].d();
 
     _alpha4 = _dHTable[3].alpha();
     _a4 = _dHTable[3].a();
-    _calpha4 = cos(_dHTable[3].alpha());
-    _salpha4 = sin(_dHTable[3].alpha());
+    _calpha4 = _serialLink->getLink(3)->ca();
+    _salpha4 = _serialLink->getLink(3)->sa();
     _d4 = _dHTable[3].d();
 
     _alpha5 = _dHTable[4].alpha();
     _a5 = _dHTable[4].a();
-    _calpha5 = cos(_dHTable[4].alpha());
-    _salpha5 = sin(_dHTable[4].alpha());
+    _calpha5 = _serialLink->getLink(4)->ca();
+    _salpha5 = _serialLink->getLink(4)->sa();
     _d5 = _dHTable[4].d();
 
     _alpha6 = _dHTable[5].alpha();
     _a6 = _dHTable[5].a();
-    _calpha6 = cos(_dHTable[5].alpha());
-    _salpha6 = sin(_dHTable[5].alpha());
+    _calpha6 = _serialLink->getLink(5)->ca();
+    _salpha6 = _serialLink->getLink(5)->sa();
     _d6 = _dHTable[5].d();
 
     _0Tbase = (HTransform3D<>::DH(_alpha1, _a1, _d1, 0)).inverse();
@@ -60,38 +60,38 @@ void SiasunSR4CSolver::init()
 	_dHTable = _serialLink->getDHTable();
     _alpha1 = _dHTable[0].alpha();
     _a1 = _dHTable[0].a();
-    _calpha1 = cos(_dHTable[0].alpha());
-    _salpha1 = sin(_dHTable[0].alpha());
+    _calpha1 = _serialLink->getLink(0)->ca();
+    _salpha1 = _serialLink->getLink(0)->sa();
     _d1 = _dHTable[0].d();
 
     _alpha2 = _dHTable[1].alpha();
     _a2 = _dHTable[1].a();
-    _calpha2 = cos(_dHTable[1].alpha());
-    _salpha2 = sin(_dHTable[1].alpha());
+    _calpha2 = _serialLink->getLink(1)->ca();
+    _salpha2 = _serialLink->getLink(1)->sa();
     _d2 = _dHTable[1].d();
 
     _alpha3 = _dHTable[2].alpha();
     _a3 = _dHTable[2].a();
-    _calpha3 = cos(_dHTable[2].alpha());
-    _salpha3 = sin(_dHTable[2].alpha());
+    _calpha3 = _serialLink->getLink(2)->ca();
+    _salpha3 = _serialLink->getLink(2)->sa();
     _d3 = _dHTable[2].d();
 
     _alpha4 = _dHTable[3].alpha();
     _a4 = _dHTable[3].a();
-    _calpha4 = cos(_dHTable[3].alpha());
-    _salpha4 = sin(_dHTable[3].alpha());
+    _calpha4 = _serialLink->getLink(3)->ca();
+    _salpha4 = _serialLink->getLink(3)->sa();
     _d4 = _dHTable[3].d();
 
     _alpha5 = _dHTable[4].alpha();
     _a5 = _dHTable[4].a();
-    _calpha5 = cos(_dHTable[4].alpha());
-    _salpha5 = sin(_dHTable[4].alpha());
+    _calpha5 = _serialLink->getLink(4)->ca();
+    _salpha5 = _serialLink->getLink(4)->sa();
     _d5 = _dHTable[4].d();
 
     _alpha6 = _dHTable[5].alpha();
     _a6 = _dHTable[5].a();
-    _calpha6 = cos(_dHTable[5].alpha());
-    _salpha6 = sin(_dHTable[5].alpha());
+    _calpha6 = _serialLink->getLink(5)->ca();
+    _salpha6 = _serialLink->getLink(5)->sa();
     _d6 = _dHTable[5].d();
 
     _0Tbase = (HTransform3D<>::DH(_alpha1, _a1, _d1, 0)).inverse();

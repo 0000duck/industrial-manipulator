@@ -8,7 +8,7 @@
 #define HTRANSFORM3D_H_
 
 # include "Rotation3D.h"
-# include "Vector3D.h"
+//# include "Vector3D.h"
 # include <iostream>
 # include <assert.h>
 # include <math.h>
@@ -215,6 +215,16 @@ public:
 	}
 
 	/**
+	 * @brief 与向量相乘, 并将结果赋值给向量
+	 * @param vec [in] 相乘的向量
+	 */
+	void operator*= (Vector3D<T>& vec) const
+	{
+		_rot *= vec;
+		vec += _vec;
+	}
+
+	/**
 	 * @brief =赋值操作
 	 * @param tran [in] 赋值矩阵
 	 */
@@ -353,6 +363,31 @@ public:
 	static const HTransform3D<T> DH(const T alpha, const T a, const T d, const T theta)
 	{
 		double st=sin(theta); double ct=cos(theta);double sa=sin(alpha);double ca=cos(alpha);
+		return robot::math::HTransform3D<double>(
+				ct, -st, 0, a,
+				st*ca, ct*ca, -sa, -d*sa,
+				st*sa, ct*sa, ca, d*ca);
+	}
+
+	/**
+	 * @brief 快速根据DH参数构造变换矩阵
+	 * @param sa [in] @f$ sin(\alpha) @f$
+	 * @param ca [in] @f$ cos(\alpha) @f$
+	 * @param a  [in] @f$ a @f$
+	 * @param d  [in] @f$ d @f$
+	 * @param st [in] @f$ sin(\theta) @f$
+	 * @param ct [in] @f$ cos(\theta) @f$
+	 * @return 构造的变换矩阵为:
+	 * @f$ \left[ \begin{array}{cccc}
+     * cos(\theta) & -sin(\theta) & 0 & a \\
+     * sin(\theta)*cos(\alpha) & cos(\theta)*cos(\alpha) & -sin(\alpha) & -d*sin(\alpha) \\
+     * sin(\theta)*sin(\alpha) & cos(\theta)*sin(\alpha) & cos(\alpha) & d*cos(\alpha)) \\
+	 * 0 & 0 & 0 & 1
+	 * \end{array} \right]
+	 * @f$
+	 */
+	static const HTransform3D<T> DHFast(const T sa, const T ca, const T a, const T d, const T st, const T ct)
+	{
 		return robot::math::HTransform3D<double>(
 				ct, -st, 0, a,
 				st*ca, ct*ca, -sa, -d*sa,

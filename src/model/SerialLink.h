@@ -79,6 +79,12 @@ public:
 	 */
 	Link* pop();
 
+	/** @brief 获取关节 */
+	inline Link* getLink(int index) const
+	{
+		return _linkList[index];
+	}
+
 	/**
 	 * @brief 获取自由度
 	 * @return 关节的个数
@@ -108,6 +114,19 @@ public:
 	 * @return 当关节为Q时, 末端执行器相对于基座标的变换矩阵
 	 */
 	HTransform3D<double> getEndTransform(const robot::math::Q& q) const;
+
+	/**
+	 * @brief 获取末端的位置
+	 * @return 当所有关节均为0时, 末端执行器的位置
+	 */
+	Vector3D<double> getEndPosition(void) const;
+
+	/**
+	 * @brief 获取末端的位置
+	 * @param q [in] 关节位置
+	 * @return  当关节为Q时, 末端执行器的位置
+	 */
+	Vector3D<double> getEndPosition(const robot::math::Q& q) const;
 
 	/**
 	 * @brief 获取四元数表达的旋转量

@@ -198,7 +198,7 @@ public:
 	 * @param vec [in] 减数
 	 * @return 两个向量对应位置元素相减得到的新向量
 	 */
-	Vector3D<T> operator-(Vector3D<T> vec) const
+	Vector3D<T> operator-(const Vector3D<T>& vec) const
 	{
 		return Vector3D<T>(
 				_v[0] - vec(0), _v[1] - vec(1), _v[2] - vec(2));

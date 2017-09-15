@@ -10,11 +10,15 @@
 # include <memory>
 # include "../math/Q.h"
 # include "../kinematics/State.h"
+# include "../model/SerialLink.h"
+# include "../math/Vector3D.h"
 # include <math.h>
 # include "../common/printAdvance.h"
 
 using namespace robot::math;
+using robot::model::SerialLink;
 using robot::kinematic::State;
+using robot::math::Vector3D;
 using namespace robot::common;
 
 namespace robot {
@@ -257,6 +261,65 @@ public:
 			q.push_back(this->ddx(t));
 		return q;
 	}
+
+	virtual void doLengthAnalysis(const SerialLink* serialink)
+	{
+		if ((int)_trajectoryLength.size() > 0)
+		{
+			println("路径分析仅做一次");
+			return;
+		}
+		int step = 1000; //采样次数
+		double T = this->duration();
+		double dt = T/(step - 1);
+		Vector3D<double> position1;
+		Vector3D<double> position2 = serialink->getEndPosition(this->x(0));
+		_trajectoryLength.push_back(std::pair<double, double>(0, 0));
+		int i = 0;
+		for (double t = dt; t<= T; t+=dt)
+		{
+			position1 = position2;
+			position2 = serialink->getEndPosition(this->x(t));
+			_trajectoryLength.push_back(std::pair<double, double>(t, _trajectoryLength[i++].second + (position2 - position1).getLengh()));
+		}
+	}
+
+	virtual double timeAt(double length)
+	{
+		if ((int)_trajectoryLength.size() <= 0)
+			throw(std::string("错误<Interpolator>: 尚未进行过路径长度分析, 无法获取目标位置的时间!"));
+		double t;
+		int size = _trajectoryLength.size();
+		if (length <= 0)
+			t = 0;
+		else if (length >= _trajectoryLength[size - 1].second)
+			t = _trajectoryLength[size - 1].first;
+		else
+		{
+			int a = 0;
+			int b = size - 1;
+			int c;
+			while((b - a) > 1)
+			{
+				c = (int)((a + b)/2);
+				if (length < _trajectoryLength[c].second)
+					b = c;
+				else
+					a = c;
+			}
+			double ta = _trajectoryLength[a].first;
+			double tb = _trajectoryLength[b].first;
+			double ya = _trajectoryLength[a].second;
+			double yb = _trajectoryLength[b].second;
+			if (ya == yb)
+				t = ta;
+			else
+				t = (tb - ta)*(length - ya)/(yb - ya) + ta;
+		}
+		return t;
+	}
+private:
+	std::vector<std::pair<double, double> > _trajectoryLength;
 };
 
 /**
