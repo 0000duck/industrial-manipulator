@@ -262,6 +262,13 @@ public:
 		return q;
 	}
 
+	/**
+	 * @brief 路径长度分析
+	 * @param serialink [in] 用于正运动学的机器人模型
+	 *
+	 * 分析路径的长度, 并保存采样结果到类内部.
+	 * @note 会检查是否已经做过路径分析, 同样的路径不会做两次分析
+	 */
 	virtual void doLengthAnalysis(const SerialLink* serialink)
 	{
 		if ((int)_trajectoryLength.size() > 0)
@@ -280,10 +287,17 @@ public:
 		{
 			position1 = position2;
 			position2 = serialink->getEndPosition(this->x(t));
-			_trajectoryLength.push_back(std::pair<double, double>(t, _trajectoryLength[i++].second + (position2 - position1).getLengh()));
+			_trajectoryLength.push_back(std::pair<double, double>(t, _trajectoryLength[i++].second + (position2 - position1).getLength()));
 		}
 	}
 
+	/**
+	 * @brief 根据长度获取时刻
+	 * @param length [in] 路径长度(位置)
+	 * @return 从路径起点开始, 经过length长度时, 所在的时刻
+	 *
+	 * 由于路径长度关于时间是递增的, 因此采用二分法来进行计算.
+	 */
 	virtual double timeAt(double length)
 	{
 		if ((int)_trajectoryLength.size() <= 0)
@@ -319,6 +333,11 @@ public:
 		return t;
 	}
 private:
+	/**
+	 * @brief 路径长度采样
+	 *
+	 * 保存方式为(时刻, 对应时刻上路径长度)
+	 */
 	std::vector<std::pair<double, double> > _trajectoryLength;
 };
 

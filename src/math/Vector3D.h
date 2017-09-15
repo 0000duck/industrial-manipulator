@@ -83,7 +83,7 @@ public:
 	 * Length = \sqrt{v_1^2 + v_2^2 + v_3^2}
 	 * @f$
 	 */
-	double getLengh() const
+	double getLength() const
 	{
 		return sqrt(_v[0]*_v[0] + _v[1]*_v[1] + _v[2]*_v[2]);
 	}

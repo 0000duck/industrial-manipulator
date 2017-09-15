@@ -77,6 +77,10 @@ private:
 template<>
 class ConvertedInterpolator<std::vector<Interpolator<double>::ptr > , robot::math::Q>: public Interpolator<robot::math::Q> {
 public:
+	/**
+	 * @brief 构造函数
+	 * @param origin [in] 用于构造Q插补器的double插补器集合
+	 */
 	ConvertedInterpolator(std::vector<Interpolator<double>::ptr > origin)
 	{
 		_interpolatorList.assign(origin.begin(), origin.end());
@@ -129,6 +133,12 @@ template<>
 class ConvertedInterpolator<std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr > , robot::math::Q>: public Interpolator<robot::math::Q> {
 public:
 	using ptr = std::shared_ptr<ConvertedInterpolator<std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr > , robot::math::Q> >;
+	/**
+	 * @brief 构造函数
+	 * @param origin [in] 位姿插补器, 由一个Vector3D<double>类型的插补器和Rotation3D<double>类型的插补器构成
+	 * @param iksolver [in] 用于逆解的逆解器
+	 * @param config [in] 用于逆解的位姿参数
+	 */
 	ConvertedInterpolator(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin, std::shared_ptr<robot::ik::IKSolver> iksolver, robot::model::Config config)
 	{
 		_ikSolver = iksolver;

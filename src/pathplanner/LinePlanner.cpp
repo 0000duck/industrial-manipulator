@@ -58,7 +58,7 @@ Interpolator<Q>::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 	Vector3D<double> startPos = (_serialLink->getEndTransform(qStart)).getPosition();
 	Vector3D<double> endPos = (_serialLink->getEndTransform(qEnd)).getPosition();
 	Vector3D<double> startToEndPos = startPos - endPos;
-	double Length = startToEndPos.getLengh();
+	double Length = startToEndPos.getLength();
 //	Vector3D<double> direction = startToEndPos/Length;
 	/**> 直线平滑插补器l(t) */
 	SequenceInterpolator<double>::ptr lt = _smPlanner.query(Length, _hLine, _aMaxLine, _vMaxLine, 0);

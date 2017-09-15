@@ -112,7 +112,7 @@ std::vector<Q> PieperSolver::solve(const HTransform3D<>& baseTend) const
 	HTransform3D<> T06 = _0Tbase*baseTend*_endTjoint6;
 //	cout << "T06 is: " << std::endl;
 //	T06.print();
-    double r = Power(T06.getPosition().getLengh(), 2);
+    double r = Power(T06.getPosition().getLength(), 2);
     double x = T06.getPosition()(0);
     double y = T06.getPosition()(1);
     double z = T06.getPosition()(2);

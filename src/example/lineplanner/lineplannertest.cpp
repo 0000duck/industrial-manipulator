@@ -162,7 +162,7 @@ void lineplannerTest()
 		{
 			position1 = position2;
 			position2 = (&robot)->getEndPosition(qInterpoaltor->x(t));
-			_trajectoryLength.push_back(std::pair<double, double>(t, _trajectoryLength[i++].second + (position2 - position1).getLengh()));
+			_trajectoryLength.push_back(std::pair<double, double>(t, _trajectoryLength[i++].second + (position2 - position1).getLength()));
 		}
 	}
 	catch (char const* msg)
