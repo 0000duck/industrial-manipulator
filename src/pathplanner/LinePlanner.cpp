@@ -92,22 +92,19 @@ Interpolator<Q>::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 	double T = qInterpolator->duration();
 	double dt = T/(step - 1);
 	std::vector<Q> result;
-	Q xresult;
-	Q dxresult;
-	Q ddxresult;
+	State state(_size);
 	Q dqMax = _dqLim;
 	Q ddqMax = _ddqLim;
 	try{
 		for (double t=0; t<=T; t+=dt)
 		{
-			dxresult = qInterpolator->dx(t);
-			ddxresult = qInterpolator->ddx(t);
+			state = qInterpolator->getState(t);
 			for (int i=0; i<_size; i++)
 			{
-				if (dqMax(i) < fabs(dxresult[i]))
-					dqMax(i) = fabs(dxresult[i]);
-				if (ddqMax(i) < fabs(ddxresult[i]))
-					ddqMax(i) = fabs(ddxresult[i]);
+				if (dqMax(i) < fabs(state.getVelocity()[i]))
+					dqMax(i) = fabs(state.getVelocity()[i]);
+				if (ddqMax(i) < fabs(state.getAcceleration()[i]))
+					ddqMax(i) = fabs(state.getAcceleration()[i]);
 			}
 		}
 	}
