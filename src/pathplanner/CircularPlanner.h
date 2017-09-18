@@ -30,7 +30,7 @@ public:
 	CircularPlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
 			double vMaxLine, double aMaxLine, double hLine, double vMaxAngle, double aMaxAngle, double hAngle,
 			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink* serialLink);
-	Interpolator<Q>::ptr query(const Q qStart, const Q qEnd) const;
+	Interpolator<Q>::ptr query(const Q qStart, const Q intermediate, const Q qEnd) const;
 	virtual ~CircularPlanner(){}
 };
 
