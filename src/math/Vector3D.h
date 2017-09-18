@@ -305,7 +305,7 @@ public:
 	 */
 	static Vector3D<T> normalize(const Vector3D<T>& a)
 	{
-		T len = a.getLengh();
+		T len = a.getLength();
 		return Vector3D<T>(a(0)/len, a(1)/len, a(2)/len);
 	}
 

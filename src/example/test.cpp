@@ -9,29 +9,31 @@
 # include "../math/HTransform3D.h"
 # include "../kinematics/Trsf.h"
 # include "../kinematics/Frame.h"
-# include <math.h>
-# include <string>
+# include "../kinematics/State.h"
 # include "../common/printAdvance.h"
 # include "../model/Link.h"
 # include "../ik/SiasunSR4CSolver.h"
+# include "../model/Config.h"
+# include "../math/Quaternion.h"
+# include "../trajectory/LinearInterpolator.h"
+# include "../trajectory/ConvertedInterpolator.h"
+# include "../pathplanner/PointToPointPlanner.h"
+# include "../pathplanner/LinePlanner.h"
+# include "../pathplanner/QBlend.h"
+# include "../pathplanner/CircularPlanner.h"
+# include <math.h>
+# include <string>
+# include <vector>
+# include <memory>
+# include <string>
 # include "test.h"
 # include "testIK.h"
 # include "testIK2.h"
-# include "../model/Config.h"
-# include "../kinematics/State.h"
-# include "../math/Quaternion.h"
-# include <vector>
-# include "../trajectory/LinearInterpolator.h"
-# include "../trajectory/ConvertedInterpolator.h"
 # include "smoothplanner/smoothPlannerSampler.h"
-# include "../pathplanner/PointToPointPlanner.h"
 # include "p2pplanner/p2pPlannerSampler.h"
-# include "../pathplanner/LinePlanner.h"
-# include <memory>
-# include <string>
 # include "lineplanner/lineplannertest.h"
-# include "../pathplanner/QBlend.h"
 # include "qblendtest/qblendtest.h"
+# include "circularplanner/circularplannertest.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -237,7 +239,9 @@ int main(){
 
 //	p2pPlannerSampler();
 
-	lineplannerTest();
+//	lineplannerTest();
+
+	circularplannerTest();
 
 //	std::vector<std::shared_ptr<base> > a;
 //	a.push_back(std::shared_ptr<class1>(new class1) );
