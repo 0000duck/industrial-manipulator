@@ -131,7 +131,48 @@ Interpolator<Q>::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 	mappedlt->update(mappedlt->getFactor()*k);
 	mappedtt->update(mappedtt->getFactor()*k);
 	return qInterpolator;
+private:
+	/** @brief 末端预定最大直线速度 */
+	double _vMaxLine;
 
+	/** @brief 末端预定最大直线加速度 */
+	double _aMaxLine;
+
+	/** @brief 末端预定最大直线加加速度 */
+	double _hLine;
+
+	/** @brief 末端预定最大角速度 */
+	double _vMaxAngle;
+
+	/** @brief 末端预定最大角加速度 */
+	double _aMaxAngle;
+
+	/** @brief 末端预定最大角加加速度 */
+	double _hAngle;
+
+	/** @brief 逆解器 */
+	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
+
+	/** @brief 关节下限 */
+	Q _qMin;
+
+	/** @brief 关节上限 */
+	Q _qMax;
+
+	/** @brief 关节最大速度 */
+	Q _dqLim;
+
+	/** @brief 关节最大加速度 */
+	Q _ddqLim;
+
+	/** @brief 关节个数 */
+	int _size;
+
+    /** @brief 机器人的模型 */
+    robot::model::SerialLink* _serialLink;
+
+    /** @brief 平滑路径规划器 */
+    SmoothMotionPlanner _smPlanner;
 }
 
 LinePlanner::~LinePlanner() {
