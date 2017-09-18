@@ -21,5 +21,7 @@ CircularPlanner::CircularPlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
 		throw ("错误<圆弧规划器>:　构造参数中数组的长度不一致！");
 }
 
+
+
 } /* namespace pathplanner */
 } /* namespace robot */
