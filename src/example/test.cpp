@@ -205,7 +205,7 @@ int main(){
 	robot.setTool(&tool);
 //	solver->init();
 
-//	SiasunSR4CSolver solver(robot);
+	SiasunSR4CSolver solver(robot);
 //	std::vector<Q> result = solver.solve(robot.getEndTransform(), Config(Config::ssame, Config::esame, Config::wsame));
 //	println("results are;");
 //	int counter = 0;
@@ -241,7 +241,27 @@ int main(){
 
 //	lineplannerTest();
 
-	circularplannerTest();
+//	circularplannerTest();
+
+
+	Q pos(0, 0, 0, 0, 0, 0);
+	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);
+	HTransform3D<> end = robot.getEndTransform(pos);
+	double dt = 0.00000001;
+	HTransform3D<> end2 = HTransform3D<>(Vector3D<>(dt*velocity(0), dt*velocity(1), dt*velocity(2)))*end;
+	Config config = robot.getConfig(pos);
+	Q shuzhi;
+	Q jacobian;
+	clock_t start_t = clock();
+	shuzhi = (solver.solve(end2, config)[0] - solver.solve(end, config)[0])/dt; //数值求法
+	clock_t end_t = clock();
+	cout << "数值求法用时: " << end_t - start_t << "us" << endl;
+	start_t = clock();
+	jacobian = robot.getEndVelocity(velocity, pos); //雅克比算法
+	end_t = clock();
+	cout << "雅克比求法用时: " << end_t - start_t << "us" << endl;
+	(shuzhi -jacobian).print();
+
 
 //	std::vector<std::shared_ptr<base> > a;
 //	a.push_back(std::shared_ptr<class1>(new class1) );

@@ -186,7 +186,8 @@ Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
 	for (int i=0; i<dof; i++)
 	{
 		Link* link = _linkList[i];
-		dTi_1i.push_back(Rotation3D<double>::dDH(link->alpha(), link->a(), link->d(), link->theta() + q[i]));
+//		dTi_1i.push_back(Rotation3D<double>::dDH(link->alpha(), link->a(), link->d(), link->theta() + q[i]));
+		dTi_1i.push_back(Rotation3D<double>::dDHFast(link->sa(), link->ca(), link->a(), link->d(), sin(link->theta() + q[i]), cos(link->theta() + q[i])));
 	}
 
 	// 计算每个关节相对于0坐标系的矩阵变换
@@ -197,7 +198,7 @@ Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
 		R0i.push_back(R0i[i-1]*(Ti_1i[i].getRotation()));
 	}
 
-	// 计算工具末端相对于哥哥关节坐标的坐标值
+	// 计算工具末端相对于各个关节坐标的坐标值
 	Vector3D<double> nPend = _endToTool->getTransform().getPosition();
 	std::vector< Vector3D<double> > iPend; // i=n~1 注意为逆向储存
 	iPend.push_back(nPend);

@@ -418,6 +418,31 @@ public:
 	}
 
 	/**
+	 * @brief 构造由DH参数制定的旋转矩阵关于theta的求导形式；
+	 * 依据DH参数(Modified DH)构造b旋转矩阵
+	 * @param sa [in] @f$ sin(\alpha) @f$
+	 * @param ca [in] @f$ cos(\alpha) @f$
+	 * @param a  [in] @f$ a @f$
+	 * @param d  [in] @f$ d @f$
+	 * @param st [in] @f$ sin(\theta) @f$
+	 * @param ct [in] @f$ cos(\theta) @f$
+	 * @return 构造的旋转矩阵为:
+	 * @f$ \left[ \begin{array}{ccc}
+	 * -sin(\theta) & -cos(\theta) & 0 \\
+	 * cos(\theta)*cos(\alpha) & -sin(\theta)*cos(\alpha) & 0 \\
+	 * cos(\theta)*sin(\alpha) & -sin(\theta)*sin(\alpha) & 0
+	 * \end{array} \right]
+	 * @f$
+	 */
+	static const Rotation3D<T> dDHFast(const T sa, const T ca, const T a, const T d, const T st, const T ct)
+	{
+		return robot::math::Rotation3D<double>(
+				-st, -ct, 0,
+				ct*ca, -st*ca, 0,
+				ct*sa, -st*sa, 0);
+	}
+
+	/**
 	 * @brief 格式化打印
 	 */
 	void print() const
