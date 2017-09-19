@@ -26,7 +26,6 @@
 # include <string>
 # include <vector>
 # include <memory>
-# include <string>
 # include <fstream>
 # include "test.h"
 # include "testIK.h"
@@ -36,6 +35,7 @@
 # include "lineplanner/lineplannertest.h"
 # include "qblendtest/qblendtest.h"
 # include "circularplanner/circularplannertest.h"
+# include "simulation/simulationtest.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -222,56 +222,7 @@ int main(){
 
 //	circularplannerTest();
 
-	std::shared_ptr<SiasunSR4CSolver> solverPtr(new SiasunSR4CSolver(robot));
-	Q qMin = Q(lmin1, lmin2, lmin3, lmin4, lmin5, lmin6);
-	Q qMax = Q(lmax1, lmax2, lmax3, lmax4, lmax5, lmax6);
-	Q dqLim = Q(3, 3, 3, 3, 5, 5);
-	Q ddqLim = Q(20, 20, 20, 20, 20, 20);
-	double vMaxLine = 1.0;
-	double aMaxLine = 20.0;
-	double hLine = 50;
-	double vMaxAngle = 1.0;
-	double aMaxAngle = 10.0;
-	double hAngle = 30;
-	IterativeSimulator simulator(&robot);
-	LinePlanner planner = LinePlanner(qMin, qMax, dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle,
-			solverPtr, &robot);
-//	robot.setTool(&tool);
-//	solver->init();
-	clock_t clockStart = clock();
-	Q start = simulator.getState().getAngle();
-	Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
-	Interpolator<Q>::ptr qInterpolator = planner.query(start, end);
-	clock_t clockEnd = clock();
-	cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
-	int step = 1000;
-	double T = qInterpolator->duration();
-	double dt = T/(step - 1);
-	vector<Q> linePosition;
-	vector<Q> realPosition;
-	cout << "总时长: " << T << "s" << endl;
-	for (double t=0; t<=T; t+=dt)
-	{
-		simulator.setSpeed(qInterpolator->dx(t), dt);
-		realPosition.push_back(simulator.getState().getAngle());
-		linePosition.push_back(qInterpolator->x(t));
-	}
-	const char* filename = "src/example/temprealx.txt";
-	std::ofstream out(filename);
-	for (int i=0; i<(int)realPosition.size(); i++)
-	{
-		out << realPosition[i][0] << ", " << realPosition[i][1] << ", " << realPosition[i][2] << ", "
-				<< realPosition[i][3] << ", " << realPosition[i][4] << ", " << realPosition[i][5] << ";" << endl;
-	}
-	out.close();
-	filename = "src/example/templinex.txt";
-	out.open(filename);
-	for (int i=0; i<(int)realPosition.size(); i++)
-	{
-		out << linePosition[i][0] << ", " << linePosition[i][1] << ", " << linePosition[i][2] << ", "
-				<< linePosition[i][3] << ", " << linePosition[i][4] << ", " << linePosition[i][5] << ";" << endl;
-	}
-	out.close();
+	simulationtest();
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);
