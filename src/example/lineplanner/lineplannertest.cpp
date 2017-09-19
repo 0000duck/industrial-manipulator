@@ -106,11 +106,11 @@ void lineplannerTest()
 		clock_t clockStart = clock();
 		Q start = Q::zero(6);
 		Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
-		Interpolator<Q>::ptr qInterpoaltor = planner.query(start, end);
+		Interpolator<Q>::ptr qInterpolator = planner.query(start, end);
 		clock_t clockEnd = clock();
 		cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 		int step = 1000;
-		double T = qInterpoaltor->duration();
+		double T = qInterpolator->duration();
 		double dt = T/(step - 1);
 		cout << "总时长: " << T << "s" << endl;
 		std::vector<Q> x;
@@ -119,9 +119,9 @@ void lineplannerTest()
 		clockStart = clock();
 		for (double t=0; t<=T; t+=dt)
 		{
-			x.push_back(qInterpoaltor->x(t));
-			dx.push_back(qInterpoaltor->dx(t));
-			ddx.push_back(qInterpoaltor->ddx(t));
+			x.push_back(qInterpolator->x(t));
+			dx.push_back(qInterpolator->dx(t));
+			ddx.push_back(qInterpolator->ddx(t));
 		}
 		clockEnd = clock();
 		cout << "每次插补用时: " << (clockEnd - clockStart)/(double)step << "us" << endl;
@@ -149,19 +149,19 @@ void lineplannerTest()
 		out3.close();
 
 		clockStart = clock();
-		qInterpoaltor->doLengthAnalysis(&robot);
+		qInterpolator->doLengthAnalysis(&robot);
 		clockEnd = clock();
 		cout << "分析路径长度耗时: " << clockEnd - clockStart << "us" << endl;
 
 		std::vector<std::pair<double, double> > _trajectoryLength;
 		Vector3D<double> position1;
-		Vector3D<double> position2 = (&robot)->getEndPosition(qInterpoaltor->x(0));
+		Vector3D<double> position2 = (&robot)->getEndPosition(qInterpolator->x(0));
 		_trajectoryLength.push_back(std::pair<double, double>(0, 0));
 		int i = 0;
 		for (double t = dt; t<= T; t+=dt)
 		{
 			position1 = position2;
-			position2 = (&robot)->getEndPosition(qInterpoaltor->x(t));
+			position2 = (&robot)->getEndPosition(qInterpolator->x(t));
 			_trajectoryLength.push_back(std::pair<double, double>(t, _trajectoryLength[i++].second + (position2 - position1).getLength()));
 		}
 	}

@@ -21,6 +21,7 @@
 # include "../pathplanner/LinePlanner.h"
 # include "../pathplanner/QBlend.h"
 # include "../pathplanner/CircularPlanner.h"
+# include "../simulation/IterativeSimulator.h"
 # include <math.h>
 # include <string>
 # include <vector>
@@ -43,6 +44,7 @@ using namespace robot::model;
 using namespace robot::ik;
 using namespace robot::trajectory;
 using namespace robot::pathplanner;
+using namespace robot::simulation;
 using Eigen::MatrixXd;
 
 class base{
@@ -206,30 +208,6 @@ int main(){
 //	solver->init();
 
 	SiasunSR4CSolver solver(robot);
-//	std::vector<Q> result = solver.solve(robot.getEndTransform(), Config(Config::ssame, Config::esame, Config::wsame));
-//	println("results are;");
-//	int counter = 0;
-//	for (unsigned int i=0; i<result.size(); i++)
-//	{
-//		cout << " * * * " << counter++ << " * * * "<< endl;
-//		result[i].print();
-//		if (robot.getEndTransform(result[i]) == robot.getEndTransform())
-//			println("correct");
-//		else
-//			println("wrong");
-//	}
-
-
-//	char key = '1';
-//	while(key != '0')
-//	{
-//		Jacobian J = robot.getJacobian(robot::math::Q(1, 2, 3, 4, 5, 6));
-//		J.print();
-//		J.doInverse();
-//		J.print();
-//		std::cin >> key;
-//	}
-
 
 //	ikTest();
 
@@ -243,24 +221,54 @@ int main(){
 
 //	circularplannerTest();
 
+	std::shared_ptr<SiasunSR4CSolver> solverPtr(new SiasunSR4CSolver(robot));
+	Q qMin = Q(lmin1, lmin2, lmin3, lmin4, lmin5, lmin6);
+	Q qMax = Q(lmax1, lmax2, lmax3, lmax4, lmax5, lmax6);
+	Q dqLim = Q(3, 3, 3, 3, 5, 5);
+	Q ddqLim = Q(20, 20, 20, 20, 20, 20);
+	double vMaxLine = 1.0;
+	double aMaxLine = 20.0;
+	double hLine = 50;
+	double vMaxAngle = 1.0;
+	double aMaxAngle = 10.0;
+	double hAngle = 30;
+	IterativeSimulator simulator(&robot);
+	LinePlanner planner = LinePlanner(qMin, qMax, dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle,
+			solverPtr, &robot);
+//	robot.setTool(&tool);
+//	solver->init();
+	clock_t clockStart = clock();
+	Q start = simulator.getState().getAngle();
+	Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
+	Interpolator<Q>::ptr qInterpolator = planner.query(start, end);
+	clock_t clockEnd = clock();
+	cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
+	int step = 1000;
+	double T = qInterpolator->duration();
+	double dt = T/(step - 1);
+	cout << "总时长: " << T << "s" << endl;
+	for (double t=0; t<=T; t+=dt)
+	{
+		simulator.setSpeed(qInterpolator->dx(t), dt);
+	}
 
-	Q pos(0, 0, 0, 0, 0, 0);
-	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);
-	HTransform3D<> end = robot.getEndTransform(pos);
-	double dt = 0.00000001;
-	HTransform3D<> end2 = HTransform3D<>(Vector3D<>(dt*velocity(0), dt*velocity(1), dt*velocity(2)))*end;
-	Config config = robot.getConfig(pos);
-	Q shuzhi;
-	Q jacobian;
-	clock_t start_t = clock();
-	shuzhi = (solver.solve(end2, config)[0] - solver.solve(end, config)[0])/dt; //数值求法
-	clock_t end_t = clock();
-	cout << "数值求法用时: " << end_t - start_t << "us" << endl;
-	start_t = clock();
-	jacobian = robot.getEndVelocity(velocity, pos); //雅克比算法
-	end_t = clock();
-	cout << "雅克比求法用时: " << end_t - start_t << "us" << endl;
-	(shuzhi -jacobian).print();
+//	Q pos(0, 0, 0, 0, 0, 0);
+//	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);
+//	HTransform3D<> end = robot.getEndTransform(pos);
+//	double dt = 0.00000001;
+//	HTransform3D<> end2 = HTransform3D<>(Vector3D<>(dt*velocity(0), dt*velocity(1), dt*velocity(2)))*end;
+//	Config config = robot.getConfig(pos);
+//	Q shuzhi;
+//	Q jacobian;
+//	clock_t start_t = clock();
+//	shuzhi = (solver.solve(end2, config)[0] - solver.solve(end, config)[0])/dt; //数值求法
+//	clock_t end_t = clock();
+//	cout << "数值求法用时: " << end_t - start_t << "us" << endl;
+//	start_t = clock();
+//	jacobian = robot.getEndVelocity(velocity, pos); //雅克比算法
+//	end_t = clock();
+//	cout << "雅克比求法用时: " << end_t - start_t << "us" << endl;
+//	(shuzhi -jacobian).print();
 
 
 //	std::vector<std::shared_ptr<base> > a;

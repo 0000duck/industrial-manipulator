@@ -85,6 +85,20 @@ public:
 	Q operator/(const Q& q) const;
 
 	/**
+	 * @brief 与常量相加
+	 * @param num [in] 加数
+	 * @return 分别加num, 返回得到的数组
+	 */
+	Q operator+(double num) const;
+
+	/**
+	 * @brief 与常量相乘
+	 * @param num [in] 减数
+	 * @return 分别减num, 返回得到的数组
+	 */
+	Q operator-(double num) const;
+
+	/**
 	 * @brief 与常量相乘
 	 * @param num [in] 乘数
 	 * @return 分别乘以乘数, 返回得到的数组
@@ -97,6 +111,62 @@ public:
 	 * @return 分别乘以除数, 返回得到的数组
 	 */
 	Q operator/(double num) const;
+
+	/**
+	 * @brief 数组相加
+	 * @param q [in] 被加数组
+	 * @return 对应位置相加, 得到新数组
+	 */
+	void operator+=(const Q& q);
+
+	/**
+	 * @brief 数组相减
+	 * @param q [in] 被减数组
+	 * @return 对应位置相减, 得到新数组
+	 */
+	void operator-=(const Q& q);
+
+	/**
+	 * @brief 数组相乘
+	 * @param q [in] 被乘数组
+	 * @return 对应位置相乘, 得到新数组
+	 */
+	void operator*=(const Q& q);
+
+	/**
+	 * @brief 数组相除
+	 * @param q [in] 被除数组
+	 * @return 对应位置相除, 得到新数组
+	 */
+	void operator/=(const Q& q);
+
+	/**
+	 * @brief 与常量相加
+	 * @param num [in] 加数
+	 * @return 分别加num, 得到新数组
+	 */
+	void operator+=(double num);
+
+	/**
+	 * @brief 与常量相乘
+	 * @param num [in] 减数
+	 * @return 分别减num, 得到新数组
+	 */
+	void operator-=(double num);
+
+	/**
+	 * @brief 与常量相乘
+	 * @param num [in] 乘数
+	 * @return 分别乘以乘数, 得到新数组
+	 */
+	void operator*=(double num);
+
+	/**
+	 * @brief 与常量相除
+	 * @param num [in] 除数
+	 * @return 分别乘以除数, 得到新数组
+	 */
+	void operator/=(double num);
 
 	/**
 	 * @brief 判断两个数组是否相同

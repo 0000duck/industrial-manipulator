@@ -89,6 +89,22 @@ Q Q::operator/(const Q& q1) const
 	return q;
 }
 
+Q Q::operator+(double num) const
+{
+	Q q(*this);
+	for (int i=0; i<this->size(); i++)
+		q(i) += num;
+	return q;
+}
+
+Q Q::operator-(double num) const
+{
+	Q q(*this);
+	for (int i=0; i<this->size(); i++)
+		q(i) -= num;
+	return q;
+}
+
 Q Q::operator*(double num) const
 {
 	Q q(*this);
@@ -104,6 +120,62 @@ Q Q::operator/(double num) const
 	for (int i=0; i<this->size(); i++)
 		q(i) *= factor;
 	return q;
+}
+
+void Q::operator+=(const Q& q)
+{
+	if (this->size() != q.size())
+		throw("错误: 尝试将不同大小的数组相乘!!");
+	for (int i=0; i<this->size(); i++)
+		_value[i] += q[i];
+}
+
+void Q::operator-=(const Q& q)
+{
+	if (this->size() != q.size())
+		throw("错误: 尝试将不同大小的数组相乘!!");
+	for (int i=0; i<this->size(); i++)
+		_value[i] -= q[i];
+}
+
+void Q::operator*=(const Q& q)
+{
+	if (this->size() != q.size())
+		throw("错误: 尝试将不同大小的数组相乘!!");
+	for (int i=0; i<this->size(); i++)
+		_value[i] *= q[i];
+}
+
+void Q::operator/=(const Q& q)
+{
+	if (this->size() != q.size())
+		throw("错误: 尝试将不同大小的数组相乘!!");
+	for (int i=0; i<this->size(); i++)
+		_value[i] /= q[i];
+}
+
+void Q::operator+=(double num)
+{
+	for (int i=0; i<this->size(); i++)
+		_value[i] += num;
+}
+
+void Q::operator-=(double num)
+{
+	for (int i=0; i<this->size(); i++)
+		_value[i] -= num;
+}
+
+void Q::operator*=(double num)
+{
+	for (int i=0; i<this->size(); i++)
+		_value[i] *= num;
+}
+
+void Q::operator/=(double num)
+{
+	for (int i=0; i<this->size(); i++)
+		_value[i] /= num;
 }
 
 Q Q::zero(int size)
