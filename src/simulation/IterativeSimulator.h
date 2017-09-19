@@ -24,12 +24,14 @@ public:
 	IterativeSimulator(SerialLink* robot);
 	const State getState();
 	void setSpeed(Q velocity, double duration);
+	double getDuration() const;
 	virtual ~IterativeSimulator(){}
 private:
 	SerialLink* _robot;
 	Q _position;
 	Q _velocity;
-	Q _accelaration;
+	Q _acceleration;
+	double _duration;
 };
 
 } /* namespace simulation */

@@ -27,6 +27,7 @@
 # include <vector>
 # include <memory>
 # include <string>
+# include <fstream>
 # include "test.h"
 # include "testIK.h"
 # include "testIK2.h"
@@ -246,11 +247,31 @@ int main(){
 	int step = 1000;
 	double T = qInterpolator->duration();
 	double dt = T/(step - 1);
+	vector<Q> linePosition;
+	vector<Q> realPosition;
 	cout << "总时长: " << T << "s" << endl;
 	for (double t=0; t<=T; t+=dt)
 	{
 		simulator.setSpeed(qInterpolator->dx(t), dt);
+		realPosition.push_back(simulator.getState().getAngle());
+		linePosition.push_back(qInterpolator->x(t));
 	}
+	const char* filename = "src/example/temprealx.txt";
+	std::ofstream out(filename);
+	for (int i=0; i<(int)realPosition.size(); i++)
+	{
+		out << realPosition[i][0] << ", " << realPosition[i][1] << ", " << realPosition[i][2] << ", "
+				<< realPosition[i][3] << ", " << realPosition[i][4] << ", " << realPosition[i][5] << ";" << endl;
+	}
+	out.close();
+	filename = "src/example/templinex.txt";
+	out.open(filename);
+	for (int i=0; i<(int)realPosition.size(); i++)
+	{
+		out << linePosition[i][0] << ", " << linePosition[i][1] << ", " << linePosition[i][2] << ", "
+				<< linePosition[i][3] << ", " << linePosition[i][4] << ", " << linePosition[i][5] << ";" << endl;
+	}
+	out.close();
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);
