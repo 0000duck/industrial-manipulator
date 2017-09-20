@@ -13,7 +13,7 @@
 # include "../../math/Quaternion.h"
 # include <vector>
 # include "../../trajectory/LinearInterpolator.h"
-# include "../../trajectory/ConvertedInterpolator.h"
+# include "../../trajectory/LineInterpolator.h"
 # include "../../pathplanner/PointToPointPlanner.h"
 # include "../../pathplanner/LinePlanner.h"
 # include <memory>
@@ -106,13 +106,15 @@ void lineplannerTest()
 		clock_t clockStart = clock();
 		Q start = Q::zero(6);
 		Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
-		Interpolator<Q>::ptr qInterpolator = planner.query(start, end);
+		LineInterpolator::ptr qInterpolator = planner.query(start, end);
 		clock_t clockEnd = clock();
 		cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 		int step = 1000;
-		double T = qInterpolator->duration();
+		const double T = qInterpolator->duration();
+		double L = qInterpolator->getLIpr()->x(T);
 		double dt = T/(step - 1);
 		cout << "总时长: " << T << "s" << endl;
+		cout << "总长度: " << L << "m" << endl;
 		std::vector<Q> x;
 		std::vector<Q> dx;
 		std::vector<Q> ddx;
@@ -148,22 +150,23 @@ void lineplannerTest()
 		}
 		out3.close();
 
-		clockStart = clock();
-		qInterpolator->doLengthAnalysis(&robot);
-		clockEnd = clock();
-		cout << "分析路径长度耗时: " << clockEnd - clockStart << "us" << endl;
-
-		std::vector<std::pair<double, double> > _trajectoryLength;
-		Vector3D<double> position1;
-		Vector3D<double> position2 = (&robot)->getEndPosition(qInterpolator->x(0));
-		_trajectoryLength.push_back(std::pair<double, double>(0, 0));
-		int i = 0;
-		for (double t = dt; t<= T; t+=dt)
+		/**> 长度询问测试 */
+		cout << "长度测试" << endl;
+		step = 10;
+		cout.precision(4);
+		cout << setfill('_') << setw(10) << "t"
+				<< setfill('_') << setw(10) << "l"
+				<< setfill('_') << setw(10) << "t"
+				<< setfill('_') << setw(10) << "error" << endl;
+		for (double t=0; t<=T; t+=T/(step - 1))
 		{
-			position1 = position2;
-			position2 = (&robot)->getEndPosition(qInterpolator->x(t));
-			_trajectoryLength.push_back(std::pair<double, double>(t, _trajectoryLength[i++].second + (position2 - position1).getLength()));
+			cout << setfill('_') << setw(10) << t
+					<< setfill('_') << setw(10) << qInterpolator->getLIpr()->x(t)
+					<< setfill('_') << setw(10) << qInterpolator->timeAt(qInterpolator->getLIpr()->x(t))
+					<< setfill('_') << setw(10) << qInterpolator->timeAt(qInterpolator->getLIpr()->x(t)) - t<< endl;
 		}
+
+
 	}
 	catch (char const* msg)
 	{

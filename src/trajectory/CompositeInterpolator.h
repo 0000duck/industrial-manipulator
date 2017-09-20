@@ -105,7 +105,6 @@ public:
 	{
 		_interpolator = interpolator;
 		_factor = factor;
-		_duration = interpolator->duration()/factor;
 	}
 
 	T x(double t) const
@@ -126,7 +125,7 @@ public:
 
 	double duration() const
 	{
-		return _duration;
+		return (_interpolator->duration())/_factor;;
 	}
 
 	double getFactor() const
@@ -136,7 +135,6 @@ public:
 
 	void update(double factor)
 	{
-		_duration = _duration*_factor/factor;
 		_factor = factor;
 	}
 	virtual ~LinearCompositeInterpolator(){}
@@ -146,9 +144,6 @@ private:
 
 	/** @brief 系数 */
 	double _factor;
-
-	/** @brief 时长 */
-	double _duration;
 };
 
 /** @} */

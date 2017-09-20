@@ -17,11 +17,62 @@ LineInterpolator::LineInterpolator(std::pair<Interpolator<Vector3D<double> >::pt
 		LinearCompositeInterpolator<double>::ptr mappedtt)
 :ikInterpolator(origin, iksolver, config), _lt(mappedlt), _tt(mappedtt)
 {
-
 }
 
-LineInterpolator::~LineInterpolator() {
-	// TODO Auto-generated destructor stub
+double LineInterpolator::timeAt(double length) const
+{
+	if ((int)_lengthPath.size() <= 1)
+		throw(std::string("错误<LineInterpolator>: 尚未进行过路径长度分析, 无法获取目标位置的时间!"));
+	double t;
+	const int size = _lengthPath.size();
+	if (length <= 0)
+		t = 0;
+	else if (length >= _lengthPath[size - 1].second)
+	{
+		t = _lengthPath[size - 1].first;
+	}
+	else
+	{
+		int a = 0;
+		int b = size - 1;
+		int c;
+		while((b - a) > 1)
+		{
+			c = (int)((a + b)/2);
+			if (length < _lengthPath[c].second)
+				b = c;
+			else
+				a = c;
+		}
+		double ta = _lengthPath[a].first;
+		double tb = _lengthPath[b].first;
+		double ya = _lengthPath[a].second;
+		double yb = _lengthPath[b].second;
+		if (ya == yb)
+			t = ta;
+		else
+			t = (tb - ta)*(length - ya)/(yb - ya) + ta;
+	}
+	return t;
+}
+
+void LineInterpolator::doLengthAnalysis()
+{
+	if ((int)_lengthPath.size() > 0)
+	{
+		println("警告<LineInterpolator>: 已经做过一次长度分析");
+	}
+	/**> 做距离采样 */
+	int step = 1000;
+	double T = this->duration();
+	cout << "T = " << T << endl;
+	double dt = T/(step - 1);
+	for (double t = 0; t< T; t+=dt)
+	{
+		/** 时刻, 距离 **/
+		_lengthPath.push_back(std::pair<double, double>(t, _lt->x(t)));
+	}
+	_lengthPath.push_back(std::pair<double, double>(T, _lt->x(T)));
 }
 
 } /* namespace trajectory */

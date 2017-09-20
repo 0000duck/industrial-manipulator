@@ -83,10 +83,9 @@ LineInterpolator::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 	/**> 构造复合插补器, 构造直线与角度的(位置与姿态)的平滑插补器 */
 	CompositeInterpolator<Vector3D<double> >::ptr pos_t(new CompositeInterpolator<Vector3D<double> >(posLinearInterpolator, mappedlt));
 	CompositeInterpolator<Rotation3D<double> >::ptr quat_t(new CompositeInterpolator<Rotation3D<double> >(quatLinearInterpolator, mappedtt));
-	/**> 构造ik插补器 */
+	/**> 构造line插补器 */
 	std::pair<Interpolator<Vector3D<double> >::ptr, Interpolator<Rotation3D<double> >::ptr > endInterpolator(pos_t, quat_t);
-//	ikInterpolator::ptr qInterpolator(new ikInterpolator(endInterpolator, _ikSolver, config)); /**> Q插补器 */
-	LineInterpolator::ptr qInterpolator(new LineInterpolator(endInterpolator, _ikSolver, config, mappedlt, mappedtt));
+	LineInterpolator::ptr qInterpolator(new LineInterpolator(endInterpolator, _ikSolver, config, mappedlt, mappedtt)); /**> 直线Q插补器 */
 	/**> 约束检查, 若出现无法到达的采样点, 则抛出错误 */
 	int step = 1000;
 	double T = qInterpolator->duration();
@@ -130,6 +129,7 @@ LineInterpolator::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 	}
 	mappedlt->update(mappedlt->getFactor()*k);
 	mappedtt->update(mappedtt->getFactor()*k);
+	qInterpolator->doLengthAnalysis();
 	return qInterpolator;
 }
 

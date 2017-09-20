@@ -179,7 +179,7 @@ public:
 		return ((this->x(t + 0.0002)) - (this->x(t + 0.0001))*2.0 +( this->x(t)))*100000000.0;
 	}
 
-	virtual double duration() const
+	double duration() const
 	{
 		return _posInterpolator->duration();
 	}

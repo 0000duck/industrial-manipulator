@@ -244,7 +244,7 @@ int main(){
 
 //	p2pPlannerSampler();
 
-//	lineplannerTest();
+	lineplannerTest();
 
 //	circularplannerTest();
 
