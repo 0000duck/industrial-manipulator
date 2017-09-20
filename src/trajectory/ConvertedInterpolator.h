@@ -139,7 +139,9 @@ public:
 	 * @param iksolver [in] 用于逆解的逆解器
 	 * @param config [in] 用于逆解的位姿参数
 	 */
-	ConvertedInterpolator(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin, std::shared_ptr<robot::ik::IKSolver> iksolver, robot::model::Config config)
+	ConvertedInterpolator(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
+			std::shared_ptr<robot::ik::IKSolver> iksolver,
+			robot::model::Config config)
 	{
 		_ikSolver = iksolver;
 		_posInterpolator = origin.first;
@@ -148,7 +150,7 @@ public:
 			common::println("警告<ikInterpolator>: 位置插补器与姿态插补器的周期不同!");
 	}
 
-	robot::math::Q x(double t) const
+	virtual robot::math::Q x(double t) const
 	{
 		try{
 			std::vector<robot::math::Q> result = (_ikSolver->solve(HTransform3D<double>(_posInterpolator->x(t), _rotInterpolator->x(t)), _config));
@@ -167,22 +169,22 @@ public:
 	}
 
 	/** @todo 如何处理 */
-	robot::math::Q dx(double t) const
+	virtual robot::math::Q dx(double t) const
 	{
 		return (this->x(t + 0.0001) - this->x(t))*10000.0;
 	}
 
-	robot::math::Q ddx(double t) const
+	virtual robot::math::Q ddx(double t) const
 	{
 		return ((this->x(t + 0.0002)) - (this->x(t + 0.0001))*2.0 +( this->x(t)))*100000000.0;
 	}
 
-	double duration() const
+	virtual double duration() const
 	{
 		return _posInterpolator->duration();
 	}
 	virtual ~ConvertedInterpolator(){}
-private:
+protected:
 	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
 	Interpolator<Vector3D<double> >::ptr _posInterpolator;
 	Interpolator<Rotation3D<double> >::ptr _rotInterpolator;

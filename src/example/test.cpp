@@ -40,6 +40,9 @@
 using namespace robot::math;
 using namespace robot::kinematic;
 using std::cout;
+using std::vector;
+using std::string;
+using std::shared_ptr;
 using namespace robot::common;
 using namespace robot::model;
 using namespace robot::ik;
@@ -53,6 +56,9 @@ public:
 	base(){}
 	virtual void print(){}
 	virtual ~base(){}
+	const string& getType() const{return _type;}
+protected:
+	std::string _type;
 };
 
 Q getQ(){
@@ -62,8 +68,8 @@ Q getQ(){
 }
 class class1:public base{
 public:
-	class1(){}
-	virtual void print()
+	class1(){_type = std::string("class1");}
+	virtual void print1()
 	{
 		cout << "class1 method" << endl;
 	}
@@ -77,6 +83,26 @@ public:
 		_q.print();
 	}
 	virtual ~class1(){}
+private:
+	Q _q;
+};
+class class2:public base{
+public:
+	class2(){_type = std::string("class2");}
+	virtual void print2()
+	{
+		cout << "class2 method" << endl;
+	}
+	void setQ()
+	{
+		Q q = getQ();
+		_q = q;
+	}
+	void printQ()
+	{
+		_q.print();
+	}
+	virtual ~class2(){}
 private:
 	Q _q;
 };
@@ -222,7 +248,7 @@ int main(){
 
 //	circularplannerTest();
 
-	simulationtest();
+//	simulationtest();
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

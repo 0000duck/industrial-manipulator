@@ -10,7 +10,6 @@
 # include "../model/Config.h"
 # include "../math/Quaternion.h"
 # include "../trajectory/CompositeInterpolator.h"
-# include "../trajectory/ConvertedInterpolator.h"
 # include <memory>
 
 using namespace robot::model;
@@ -38,7 +37,7 @@ LinePlanner::LinePlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
  * @param qEnd
  * @return
  */
-Interpolator<Q>::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
+LineInterpolator::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 {
 	/**> 检查config参数 */
 	Config config = _serialLink->getConfig(qStart);
@@ -60,9 +59,9 @@ Interpolator<Q>::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 	Vector3D<double> startToEndPos = startPos - endPos;
 	double Length = startToEndPos.getLength();
 //	Vector3D<double> direction = startToEndPos/Length;
-	/**> 直线平滑插补器l(t) */
+	/**> 直线平滑插补器_l(t) */
 	SequenceInterpolator<double>::ptr lt = _smPlanner.query(Length, _hLine, _aMaxLine, _vMaxLine, 0);
-	/**> 角度平滑插补器theta(t) */
+	/**> 角度平滑插补器_theta(t) */
 	SequenceInterpolator<double>::ptr tt = _smPlanner.query(rot.theta, _hAngle, _aMaxAngle, _vMaxAngle, 0);
 	/**> 统一插补器l(t)与theta(t)的时长 */
 	LinearCompositeInterpolator<double>::ptr mappedtt;
@@ -86,7 +85,8 @@ Interpolator<Q>::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 	CompositeInterpolator<Rotation3D<double> >::ptr quat_t(new CompositeInterpolator<Rotation3D<double> >(quatLinearInterpolator, mappedtt));
 	/**> 构造ik插补器 */
 	std::pair<Interpolator<Vector3D<double> >::ptr, Interpolator<Rotation3D<double> >::ptr > endInterpolator(pos_t, quat_t);
-	ikInterpolator::ptr qInterpolator(new ikInterpolator(endInterpolator, _ikSolver, config)); /**> Q插补器 */
+//	ikInterpolator::ptr qInterpolator(new ikInterpolator(endInterpolator, _ikSolver, config)); /**> Q插补器 */
+	LineInterpolator::ptr qInterpolator(new LineInterpolator(endInterpolator, _ikSolver, config, mappedlt, mappedtt));
 	/**> 约束检查, 若出现无法到达的采样点, 则抛出错误 */
 	int step = 1000;
 	double T = qInterpolator->duration();

@@ -58,9 +58,9 @@ Interpolator<Q>::ptr CircularPlanner::query(const Q qStart, const Q qIntermediat
 	LinearInterpolator<Rotation3D<double> >::ptr quatLinearInterpolator(new LinearInterpolator<Rotation3D<double> >(
 			startQuaternion.toRotation3D(), endQuaternion.toRotation3D(), rot.theta));
 	double Length = posLinearInterpolator->getLength();
-	/**> 平滑插补器l(t) */
+	/**> 平滑插补器_l(t) */
 	SequenceInterpolator<double>::ptr lt = _smPlanner.query(Length, _hLine, _aMaxLine, _vMaxLine, 0);
-	/**> 角度平滑插补器theta(t) */
+	/**> 角度平滑插补器_theta(t) */
 	SequenceInterpolator<double>::ptr tt = _smPlanner.query(rot.theta, _hAngle, _aMaxAngle, _vMaxAngle, 0);
 	/**> 统一插补器l(t)与theta(t)的时长 */
 	LinearCompositeInterpolator<double>::ptr mappedtt;

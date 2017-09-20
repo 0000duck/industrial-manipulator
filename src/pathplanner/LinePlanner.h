@@ -13,7 +13,7 @@
 # include "SmoothMotionPlanner.h"
 # include <vector>
 # include "../model/SerialLink.h"
-# include "../trajectory/CompositeInterpolator.h"
+# include "../trajectory/LineInterpolator.h"
 # include "../trajectory/LinearInterpolator.h"
 # include <memory>
 
@@ -65,7 +65,7 @@ public:
 	 * @param qEnd [in] 终点位置
 	 * @return 直线路径的Q插补器
 	 */
-	Interpolator<Q>::ptr query(const Q qStart, const Q qEnd) const;
+	LineInterpolator::ptr query(const Q qStart, const Q qEnd) const;
 	virtual ~LinePlanner();
 private:
 	/** @brief 末端预定最大直线速度 */
