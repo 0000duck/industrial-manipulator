@@ -32,10 +32,7 @@ LinePlanner::LinePlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
 }
 
 /**
- * @brief todo 尚未完成采样, 约束检查
- * @param qStart
- * @param qEnd
- * @return
+ * @todo 转角的选择, 如果选择的旋转方向导致位置不可达到怎么办
  */
 LineInterpolator::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 {
@@ -52,7 +49,7 @@ LineInterpolator::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 	Quaternion endQuaternion = _serialLink->getEndQuaternion(qEnd);
 	Quaternion startToEndQuat = startQuaternion.conjugate()*endQuaternion;
 	if (startToEndQuat.r() < 0)
-		startToEndQuat = -startToEndQuat;
+		startToEndQuat = -startToEndQuat; // 保证转角小于pi
 	Quaternion::rotVar rot = startToEndQuat.getRotationVariables();
 	Vector3D<double> startPos = (_serialLink->getEndTransform(qStart)).getPosition();
 	Vector3D<double> endPos = (_serialLink->getEndTransform(qEnd)).getPosition();

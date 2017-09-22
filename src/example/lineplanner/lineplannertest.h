@@ -8,7 +8,9 @@
 #ifndef LINEPLANNERTEST_H_
 #define LINEPLANNERTEST_H_
 
-void lineplannerTest();
+# include "../../pathplanner/LinePlanner.h"
+
+LineInterpolator::ptr lineplannerTest();
 
 
 

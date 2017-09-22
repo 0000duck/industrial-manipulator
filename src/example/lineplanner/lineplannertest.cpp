@@ -27,7 +27,7 @@ using namespace robot::ik;
 using namespace robot::trajectory;
 using namespace robot::pathplanner;
 
-void lineplannerTest()
+LineInterpolator::ptr lineplannerTest()
 {
 	SerialLink robot;
 	double alpha1 = 0;
@@ -151,22 +151,21 @@ void lineplannerTest()
 		out3.close();
 
 		/**> 长度询问测试 */
-		cout << "长度测试" << endl;
-		step = 10;
-		cout.precision(4);
-		cout << setfill('_') << setw(10) << "t"
-				<< setfill('_') << setw(10) << "l"
-				<< setfill('_') << setw(10) << "t"
-				<< setfill('_') << setw(10) << "error" << endl;
-		for (double t=0; t<=T; t+=T/(step - 1))
-		{
-			cout << setfill('_') << setw(10) << t
-					<< setfill('_') << setw(10) << qInterpolator->getLIpr()->x(t)
-					<< setfill('_') << setw(10) << qInterpolator->timeAt(qInterpolator->getLIpr()->x(t))
-					<< setfill('_') << setw(10) << qInterpolator->timeAt(qInterpolator->getLIpr()->x(t)) - t<< endl;
-		}
-
-
+//		cout << "长度测试" << endl;
+//		step = 10;
+//		cout.precision(4);
+//		cout << setfill('_') << setw(10) << "t"
+//				<< setfill('_') << setw(10) << "l"
+//				<< setfill('_') << setw(10) << "t"
+//				<< setfill('_') << setw(10) << "error" << endl;
+//		for (double t=0; t<=T; t+=T/(step - 1))
+//		{
+//			cout << setfill('_') << setw(10) << t
+//					<< setfill('_') << setw(10) << qInterpolator->getLIpr()->x(t)
+//					<< setfill('_') << setw(10) << qInterpolator->timeAt(qInterpolator->getLIpr()->x(t))
+//					<< setfill('_') << setw(10) << qInterpolator->timeAt(qInterpolator->getLIpr()->x(t)) - t<< endl;
+//		}
+		return qInterpolator;
 	}
 	catch (char const* msg)
 	{

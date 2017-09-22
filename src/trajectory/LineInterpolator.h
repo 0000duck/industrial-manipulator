@@ -18,7 +18,7 @@ namespace robot {
 namespace trajectory {
 
 /**
- * @brief 直线运动的插补器
+ * @brief 直线运动的Q插补器
  */
 class LineInterpolator : public ikInterpolator{
 public:
@@ -39,10 +39,26 @@ public:
 			LinearCompositeInterpolator<double>::ptr mappedtt);
 
 	/** @brief 获取该规划的长度-时间插补器 */
-	inline const Interpolator<double>::ptr getLIpr() const{return _lt;}
+	inline const Interpolator<double>::ptr getLIpr() const{ return _lt;}
 
 	/** @brief 获取该规划的角度-时间插补器 */
-	inline const Interpolator<double>::ptr getTIpr() const{return _lt;}
+	inline const Interpolator<double>::ptr getTIpr() const{ return _lt;}
+
+	inline const double length(double t) const{ return _lt->x(t);}
+
+	inline const double dlength(double t) const{ return _lt->dx(t);}
+
+	inline const double ddlength(double t) const{ return _lt->ddx(t);}
+
+	inline const double theta(double t) const{ return _tt->x(t);}
+
+	inline const double dtheta(double t) const{ return _tt->dx(t);}
+
+	inline const double ddtheta(double t) const{ return _tt->ddx(t);}
+
+	inline const Interpolator<Vector3D<double> >::ptr getPosTIpr() const{ return _posInterpolator;}
+
+	inline const Interpolator<Rotation3D<double> >:: ptr getRotTIpr() const{ return _rotInterpolator;}
 
 	/**
 	 * @brief 获取长度l处所对应的插补器时间

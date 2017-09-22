@@ -36,6 +36,7 @@
 # include "qblendtest/qblendtest.h"
 # include "circularplanner/circularplannertest.h"
 # include "simulation/simulationtest.h"
+# include <functional>
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -106,6 +107,13 @@ public:
 private:
 	Q _q;
 };
+
+/** 以函数作为传参 */
+typedef Vector3D<double>(*positionFunction)(double);
+void printPosition(positionFunction posFun, double t)
+{
+	posFun(t).print();
+}
 
 int main(){
 	println("*** test ***");
@@ -244,7 +252,11 @@ int main(){
 
 //	p2pPlannerSampler();
 
-	lineplannerTest();
+	LineInterpolator::ptr line = lineplannerTest();
+	Interpolator<Vector3D<double> >::ptr posIpr = line->getPosTIpr();
+	std::function<void(const Vector3D<double>&)> vPrint = &Vector3D<double>::print;
+	Vector3D<double> vec(1, 2, 3);
+	vPrint(vec);
 
 //	circularplannerTest();
 
