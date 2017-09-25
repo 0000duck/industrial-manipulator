@@ -15,6 +15,7 @@
 # include "../ik/SiasunSR4CSolver.h"
 # include "../model/Config.h"
 # include "../math/Quaternion.h"
+# include "../math/Integrator.h"
 # include "../trajectory/LinearInterpolator.h"
 # include "../trajectory/ConvertedInterpolator.h"
 # include "../pathplanner/PointToPointPlanner.h"
@@ -252,11 +253,7 @@ int main(){
 
 //	p2pPlannerSampler();
 
-	LineInterpolator::ptr line = lineplannerTest();
-	Interpolator<Vector3D<double> >::ptr posIpr = line->getPosTIpr();
-	std::function<void(const Vector3D<double>&)> vPrint = &Vector3D<double>::print;
-	Vector3D<double> vec(1, 2, 3);
-	vPrint(vec);
+	lineplannerTest();
 
 //	circularplannerTest();
 

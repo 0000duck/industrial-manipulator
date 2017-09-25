@@ -87,6 +87,8 @@ private:
 	 * 保存方式为(时刻, 对应时刻上路径长度) */
 	std::vector<std::pair<double, double> > _lengthPath;
 
+	const int _pathSize;
+
 	/* 基类包含的成员变量
 	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
 	Interpolator<Vector3D<double> >::ptr _posInterpolator;

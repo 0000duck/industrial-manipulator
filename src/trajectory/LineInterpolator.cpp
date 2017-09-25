@@ -6,6 +6,8 @@
  */
 
 #include "LineInterpolator.h"
+# include "time.h"
+# include "../math/Integrator.h"
 
 namespace robot {
 namespace trajectory {
@@ -15,8 +17,9 @@ LineInterpolator::LineInterpolator(std::pair<Interpolator<Vector3D<double> >::pt
 		robot::model::Config config,
 		LinearCompositeInterpolator<double>::ptr mappedlt,
 		LinearCompositeInterpolator<double>::ptr mappedtt)
-:ikInterpolator(origin, iksolver, config), _lt(mappedlt), _tt(mappedtt)
+:ikInterpolator(origin, iksolver, config), _lt(mappedlt), _tt(mappedtt), _pathSize(1000)
 {
+	_lengthPath.reserve(_pathSize);
 }
 
 double LineInterpolator::timeAt(double length) const
@@ -58,21 +61,22 @@ double LineInterpolator::timeAt(double length) const
 
 void LineInterpolator::doLengthAnalysis()
 {
+	clock_t start = clock();
 	if ((int)_lengthPath.size() > 0)
 	{
 		println("警告<LineInterpolator>: 已经做过一次长度分析");
 	}
 	/**> 做距离采样 */
-	int step = 1000;
 	double T = this->duration();
-	cout << "T = " << T << endl;
-	double dt = T/(step - 1);
+	double dt = T/(_pathSize - 1);
 	for (double t = 0; t< T; t+=dt)
 	{
 		/** 时刻, 距离 **/
 		_lengthPath.push_back(std::pair<double, double>(t, _lt->x(t)));
 	}
 	_lengthPath.push_back(std::pair<double, double>(T, _lt->x(T)));
+	clock_t end = clock();
+	cout << "<LineInterpolator>: 完成直线路径长度分析, 用时: " << end - start << endl;
 }
 
 } /* namespace trajectory */

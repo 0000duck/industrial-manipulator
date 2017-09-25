@@ -11,6 +11,7 @@
 # include "../../model/Link.h"
 # include "../../ik/SiasunSR4CSolver.h"
 # include "../../math/Quaternion.h"
+# include "../../math/Integrator.h"
 # include <vector>
 # include "../../trajectory/LinearInterpolator.h"
 # include "../../trajectory/LineInterpolator.h"
@@ -165,6 +166,29 @@ LineInterpolator::ptr lineplannerTest()
 //					<< setfill('_') << setw(10) << qInterpolator->timeAt(qInterpolator->getLIpr()->x(t))
 //					<< setfill('_') << setw(10) << qInterpolator->timeAt(qInterpolator->getLIpr()->x(t)) - t<< endl;
 //		}
+
+		/**> 长度积分器测试　*/
+		println("长度积分测试: ");
+		Integrator integrator;
+		LineInterpolator::ptr lineIpr = qInterpolator;
+		Interpolator<double>::ptr lt = lineIpr->getLIpr();
+		Interpolator<Vector3D<double> >::ptr post = lineIpr->getPosTIpr();
+		int checkSize = 1000;
+		dt = T/(checkSize - 1);
+		vector<double> t_vec;
+		t_vec.reserve(checkSize);
+		for (double t=0; t<=T; t_vec.push_back(t), t+=dt);
+		cout << "size of t_vec: " << t_vec.size() << endl;
+		vector<double> length = integrator.integrate(post, t_vec);
+		int wrong_num = 0;
+		for (int i=0; i<checkSize; i++)
+		{
+			if (fabs(length[i] - lt->x(t_vec[i])) > 1e-12)
+				cout << ++wrong_num << ". length not equal with lt: " << endl << " - length: " << length[i] << endl << " - lt: " << lt->x(t_vec[i]) << endl;
+		}
+		println("错误的数量:　");
+		println(wrong_num);
+
 		return qInterpolator;
 	}
 	catch (char const* msg)
