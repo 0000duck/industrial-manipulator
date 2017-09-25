@@ -12,11 +12,10 @@
 # include "../common/printAdvance.h"
 
 using namespace robot::common;
+using namespace robot::trajectory;
 
 namespace robot {
 namespace pathplanner {
-
-using namespace robot::trajectory;
 
 
 robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::query(double s, double h, double aMax, double vMax, double start) const
