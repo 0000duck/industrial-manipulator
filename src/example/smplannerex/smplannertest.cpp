@@ -20,7 +20,7 @@ void smplannertest()
 	double h = 100;
 	double aMax = 15;
 	double v1 = 2;
-	double v2 = 4;
+	double v2 = 0;
 	double s = 2;
 	clock_t clockStart = clock();
 	Interpolator<double>::ptr smEXIpr = planner.query(s, h, aMax, v1, v2);

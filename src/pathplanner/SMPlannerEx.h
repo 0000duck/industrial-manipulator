@@ -24,6 +24,8 @@ public:
 private:
 	robot::trajectory::SequenceInterpolator<double>::ptr threeLineMotion(double s, double h, double aMax, double v1, double v2) const;
 	robot::trajectory::SequenceInterpolator<double>::ptr fourLineMotion(double s, double h, double aMax, double v1, double v2) const;
+	robot::trajectory::SequenceInterpolator<double>::ptr threeLineMotion(double s, double h, double aMax, double v1) const;
+	robot::trajectory::SequenceInterpolator<double>::ptr fourLineMotion(double s, double h, double aMax, double v1) const;
 };
 
 } /* namespace pathplanner */
