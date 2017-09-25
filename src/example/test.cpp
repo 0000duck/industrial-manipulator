@@ -37,6 +37,7 @@
 # include "qblendtest/qblendtest.h"
 # include "circularplanner/circularplannertest.h"
 # include "simulation/simulationtest.h"
+# include "smplannerex/smplannertest.h"
 # include <functional>
 
 using namespace robot::math;
@@ -253,11 +254,13 @@ int main(){
 
 //	p2pPlannerSampler();
 
-	lineplannerTest();
+//	lineplannerTest();
 
 //	circularplannerTest();
 
 //	simulationtest();
+
+	smplannertest();
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

@@ -92,7 +92,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::fourLineMotion
 	double t2 = (v2 - v1)/aMax;
 	double t3 = (v2 - v1)/aMax + aMax/h;
 	double d1 = pow(t1, 3)*h/6.0 + v1*t1;
-	double d2 = d1 + h*pow(t1, 2)*t2/2.0 + aMax*pow(t2, 2)/2.0 + v1*(t2 - t1);
+	double d2 = d1 + h*pow(t1, 2)*(t2 - t1)/2.0 + aMax*pow(t2 - t1, 2)/2.0 + v1*(t2 - t1);
 	double d3 = dv*dv/(2*aMax) + dv*aMax/(2*h) + v1*t3;
 	double t4 = (s - d3)/v2 + t3;
 	if (s < d3)
@@ -103,7 +103,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::fourLineMotion
 	PolynomialInterpolator3<double>::ptr interpolator1(new PolynomialInterpolator3<double>(0, v1, 0, h/6.0, t1));
 	PolynomialInterpolator2<double>::ptr interpolator2(new PolynomialInterpolator2<double>(d1, t1*t1*h/2 + v1, aMax/2.0, t2 - t1));
 	PolynomialInterpolator3<double>::ptr interpolator3(new PolynomialInterpolator3<double>(
-			d2, (v2 - h*t3*t3/2.0), h*t3/2.0, (-h/6.0), t3 - t2));
+			d2, (v2 - h*pow(t3 - t2, 2)/2.0), h*(t3 - t2)/2.0, (-h/6.0), t3 - t2));
 	PolynomialInterpolator2<double>::ptr interpolator4(new PolynomialInterpolator2<double>(d3, v2, 0, t4 - t3));
 
 	SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
