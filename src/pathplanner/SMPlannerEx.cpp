@@ -70,6 +70,51 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query(double s
 	}
 }
 
+bool SMPlannerEx::checkDitance(double s, double h, double aMax, double v1, double v2) const
+{
+	/**> 判断参数合理性 */
+	if (s <= 0 || v1 < 0 || v2 < 0)
+		throw("错误<SMPlannerEx>: 距离必须为正数!");
+	if (v1 < 0 || v2 < 0)
+		throw("错误<SMPlannerEx>: 速度必须为非负数!");
+	/**> 如果始末速度相同, 则返回线性插补器 */
+	if (fabs(v2 - v1) < 1e-10)
+	{
+		return true;
+	}
+	/**> 三段式加速度 */
+	if (fabs(v2 - v1) <= fabs(aMax*aMax/h))
+	{
+		aMax = sqrt(fabs((v2 - v1)*h));
+		int sgn = (v2 > v1)? 1:-1;
+		h = sgn*fabs(h);
+		aMax = sgn*fabs(aMax);
+
+		double t1 = aMax/h;
+		double d2 = (v1 + v2)*t1;
+		if (s < d2)
+		{
+			return false;
+		}
+	}
+	/**> 四段式加速度 */
+	else
+	{
+		double dv = v2 - v1;
+		int sgn = (dv > 0)? 1:-1;
+		h = sgn*fabs(h);
+		aMax = sgn*fabs(aMax);
+
+		double t3 = (v2 - v1)/aMax + aMax/h;
+		double d3 = dv*dv/(2*aMax) + dv*aMax/(2*h) + v1*t3;
+		if (s < d3)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotion(double s, double h, double aMax, double v1, double v2) const
 {
 	println("过渡三段规划器");
