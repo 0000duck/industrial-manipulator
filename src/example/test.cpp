@@ -260,7 +260,7 @@ int main(){
 
 //	simulationtest();
 
-	smplannertest();
+//	smplannertest();
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

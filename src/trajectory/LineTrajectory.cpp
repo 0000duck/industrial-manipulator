@@ -1,18 +1,18 @@
 /*
- * LineInterpolator.cpp
+ * LineTrajectory.cpp
  *
  *  Created on: Sep 20, 2017
  *      Author: a1994846931931
  */
 
-#include "LineInterpolator.h"
+#include "LineTrajectory.h"
 # include "time.h"
 # include "../math/Integrator.h"
 
 namespace robot {
 namespace trajectory {
 
-LineInterpolator::LineInterpolator(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
+LineTrajectory::LineTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 		std::shared_ptr<robot::ik::IKSolver> iksolver,
 		robot::model::Config config,
 		LinearCompositeInterpolator<double>::ptr mappedlt,
@@ -22,7 +22,7 @@ LineInterpolator::LineInterpolator(std::pair<Interpolator<Vector3D<double> >::pt
 	_lengthPath.reserve(_pathSize);
 }
 
-double LineInterpolator::timeAt(double length) const
+double LineTrajectory::timeAt(double length) const
 {
 	if ((int)_lengthPath.size() <= 1)
 		throw(std::string("错误<LineInterpolator>: 尚未进行过路径长度分析, 无法获取目标位置的时间!"));
@@ -59,7 +59,7 @@ double LineInterpolator::timeAt(double length) const
 	return t;
 }
 
-void LineInterpolator::doLengthAnalysis()
+void LineTrajectory::doLengthAnalysis()
 {
 	clock_t start = clock();
 	if ((int)_lengthPath.size() > 0)

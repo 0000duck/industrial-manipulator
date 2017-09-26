@@ -9,7 +9,7 @@
 #define INTEGRATOR_H_
 
 # include <vector>
-# include "../trajectory/LineInterpolator.h"
+# include "../trajectory/LineTrajectory.h"
 
 using std::vector;
 using namespace robot::trajectory;

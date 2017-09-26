@@ -1,12 +1,12 @@
 /*
- * LineInterpolator.h
+ * LineTrajectory.h
  *
  *  Created on: Sep 20, 2017
  *      Author: a1994846931931
  */
 
-#ifndef LINEINTERPOLATOR_H_
-#define LINEINTERPOLATOR_H_
+#ifndef LINETRAJECTORY_H_
+#define LINETRAJECTORY_H_
 
 # include "ConvertedInterpolator.h"
 # include "CompositeInterpolator.h"
@@ -20,9 +20,9 @@ namespace trajectory {
 /**
  * @brief 直线运动的Q插补器
  */
-class LineInterpolator : public ikInterpolator{
+class LineTrajectory : public ikInterpolator{
 public:
-	using ptr = std::shared_ptr<LineInterpolator>;
+	using ptr = std::shared_ptr<LineTrajectory>;
 
 	/**
 	 * @brief 构造函数
@@ -32,7 +32,7 @@ public:
 	 * @param mappedlt [in] 对应的长度-时间插补器
 	 * @param mappedtt [in] 对应的角度-时间插补器
 	 */
-	LineInterpolator(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
+	LineTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 			std::shared_ptr<robot::ik::IKSolver> iksolver,
 			robot::model::Config config,
 			LinearCompositeInterpolator<double>::ptr mappedlt,
@@ -74,7 +74,7 @@ public:
 	 * 直线插补器的时长不会改变了才能调用此函数
 	 */
 	void doLengthAnalysis();
-	virtual ~LineInterpolator(){}
+	virtual ~LineTrajectory(){}
 private:
 	/** @brief 直线距离-时间插补器 */
 	Interpolator<double>::ptr _lt;
@@ -100,4 +100,4 @@ private:
 } /* namespace trajectory */
 } /* namespace robot */
 
-#endif /* LINEINTERPOLATOR_H_ */
+#endif /* LINETRAJECTORY_H_ */

@@ -34,7 +34,7 @@ LinePlanner::LinePlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
 /**
  * @todo 转角的选择, 如果选择的旋转方向导致位置不可达到怎么办
  */
-LineInterpolator::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
+LineTrajectory::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 {
 	/**> 检查config参数 */
 	Config config = _serialLink->getConfig(qStart);
@@ -82,7 +82,7 @@ LineInterpolator::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 	CompositeInterpolator<Rotation3D<double> >::ptr quat_t(new CompositeInterpolator<Rotation3D<double> >(quatLinearInterpolator, mappedtt));
 	/**> 构造line插补器 */
 	std::pair<Interpolator<Vector3D<double> >::ptr, Interpolator<Rotation3D<double> >::ptr > endInterpolator(pos_t, quat_t);
-	LineInterpolator::ptr qInterpolator(new LineInterpolator(endInterpolator, _ikSolver, config, mappedlt, mappedtt)); /**> 直线Q插补器 */
+	LineTrajectory::ptr qInterpolator(new LineTrajectory(endInterpolator, _ikSolver, config, mappedlt, mappedtt)); /**> 直线Q插补器 */
 	/**> 约束检查, 若出现无法到达的采样点, 则抛出错误 */
 	int step = 1000;
 	double T = qInterpolator->duration();

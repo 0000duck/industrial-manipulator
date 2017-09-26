@@ -14,7 +14,7 @@
 # include "../../math/Integrator.h"
 # include <vector>
 # include "../../trajectory/LinearInterpolator.h"
-# include "../../trajectory/LineInterpolator.h"
+# include "../../trajectory/LineTrajectory.h"
 # include "../../pathplanner/PointToPointPlanner.h"
 # include "../../pathplanner/LinePlanner.h"
 # include <memory>
@@ -28,7 +28,7 @@ using namespace robot::ik;
 using namespace robot::trajectory;
 using namespace robot::pathplanner;
 
-LineInterpolator::ptr lineplannerTest()
+LineTrajectory::ptr lineplannerTest()
 {
 	SerialLink robot;
 	double alpha1 = 0;
@@ -107,7 +107,7 @@ LineInterpolator::ptr lineplannerTest()
 		clock_t clockStart = clock();
 		Q start = Q::zero(6);
 		Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
-		LineInterpolator::ptr qInterpolator = planner.query(start, end);
+		LineTrajectory::ptr qInterpolator = planner.query(start, end);
 		clock_t clockEnd = clock();
 		cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 		int step = 1000;
@@ -170,7 +170,7 @@ LineInterpolator::ptr lineplannerTest()
 		/**> 长度积分器测试　*/
 		println("长度积分测试: ");
 		Integrator integrator;
-		LineInterpolator::ptr lineIpr = qInterpolator;
+		LineTrajectory::ptr lineIpr = qInterpolator;
 		Interpolator<double>::ptr lt = lineIpr->getLIpr();
 		Interpolator<Vector3D<double> >::ptr post = lineIpr->getPosTIpr();
 		int checkSize = 1000;
