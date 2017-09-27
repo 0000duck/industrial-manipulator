@@ -195,6 +195,19 @@ Quaternion Quaternion::DH(double alpha, double theta)
 	return Quaternion(ca*ct, sa*ct, -sa*st, ca*st);
 }
 
+Quaternion Quaternion::interpolate(const Quaternion& quat1, const Quaternion& quat2, double ratio)
+{
+	Quaternion startToEndQuat = quat1.conjugate()*quat2;
+	if (startToEndQuat.r() < 0)
+		startToEndQuat = -startToEndQuat; // 保证转角小于pi
+	Quaternion::rotVar rot = startToEndQuat.getRotationVariables();
+	return Quaternion(rot.theta*ratio, rot.n);
+}
+
+Rotation3D<double> Quaternion::interpolate(const Rotation3D<double>& rot1, const Rotation3D<double>& rot2, double ratio)
+{
+	return (Quaternion::interpolate(Quaternion(rot1), Quaternion(rot2), ratio)).toRotation3D();
+}
 
 Quaternion::~Quaternion() {
 	// TODO Auto-generated destructor stub

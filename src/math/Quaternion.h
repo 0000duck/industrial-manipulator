@@ -222,6 +222,28 @@ public:
 	* @param theta [in]
 	*/
 	static Quaternion DH(double alpha, double theta);
+
+	/**
+	 * @brief 差值
+	 * @param quat1 [in] @f$ Q_1 @f$
+	 * @param quat2 [in] @f$ Q_2 @f$
+	 * @param ratio [in] 比例因子 @f$ k @f$
+	 * @return @f$ Q_1 + k*(Q_2 - Q_1) @f$
+	 *
+	 * 以四元数方式平滑插补
+	 */
+	static Quaternion interpolate(const Quaternion& quat1, const Quaternion& quat2, double ratio);
+
+	/**
+	 * @brief 差值
+	 * @param rot1  [in] @f$ rot_1 @f$
+	 * @param rot2  [in] @f$ rot_2 @f$
+	 * @param ratio [in] 比例因子 @f$ k @f$
+	 * @return @f$ rot_1 + k*(rot_2 - rot_1) @f$
+	 *
+	 * 以四元数方式平滑插补
+	 */
+	static Rotation3D<double> interpolate(const Rotation3D<double>& rot1, const Rotation3D<double>& rot2, double ratio);
 	virtual ~Quaternion();
 private:
 	double _r, _i, _j, _k;

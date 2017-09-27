@@ -41,7 +41,7 @@ namespace trajectory {
 template <class T>
 class LinearInterpolator: public Interpolator<T> {
 public:
-	typedef typename std::shared_ptr<LinearInterpolator> ptr;
+	using ptr = std::shared_ptr<LinearInterpolator>;
 	/**
 	 * @brief 构造线性插补器
 	 * @param start [in] 开始位置
