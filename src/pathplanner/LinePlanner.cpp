@@ -27,7 +27,7 @@ LinePlanner::LinePlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
 	_ikSolver(ikSolver), _qMin(qMin), _qMax(qMax), _dqLim(dqLim), _ddqLim(ddqLim), _serialLink(serialLink)
 {
 	_size = qMin.size();
-	if (qMax.size() != _size || qMax.size() != _size || dqLim.size() != _size || ddqLim.size() != _size)
+	if (qMin.size() != _size || qMax.size() != _size || dqLim.size() != _size || ddqLim.size() != _size)
 		throw ("错误<直线规划器>:　构造参数中数组的长度不一致！");
 }
 

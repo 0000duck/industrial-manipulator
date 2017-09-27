@@ -25,12 +25,32 @@ namespace pathplanner {
 
 class MultiLineArcBlendPlanner {
 public:
-	MultiLineArcBlendPlanner();
-	MLABTrajectory::ptr query(const vector<Q>& path, const vector<double> arcRatio);
+	MultiLineArcBlendPlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
+			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink* serialLink);
+	MLABTrajectory::ptr query(const vector<Q>& path, const vector<double>& arcRatio);
 	virtual ~MultiLineArcBlendPlanner();
 private:
 private:
-	const SerialLink* _robot;
+	/** @brief 关节个数 */
+	int _size;
+
+	/** @brief 逆解器 */
+	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
+
+	/** @brief 关节下限 */
+	const Q _qMin;
+
+	/** @brief 关节上限 */
+	const Q _qMax;
+
+	/** @brief 关节最大速度 */
+	const Q _dqLim;
+
+	/** @brief 关节最大加速度 */
+	const Q _ddqLim;
+
+    /** @brief 机器人的模型 */
+	SerialLink* _serialLink;
 };
 
 } /* namespace pathplanner */

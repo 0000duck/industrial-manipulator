@@ -7,10 +7,12 @@
 
 #include "SMPlannerEx.h"
 # include <math.h>
+# include "SmoothMotionPlanner.h"
 # include "../trajectory/PolynomialInterpolator.h"
 # include "../trajectory/SequenceInterpolator.h"
 # include "../trajectory/LinearInterpolator.h"
 # include "../common/printAdvance.h"
+# include "../common/common.h"
 
 using namespace robot::common;
 using namespace robot::trajectory;
@@ -23,13 +25,17 @@ SMPlannerEx::SMPlannerEx()
 
 }
 
-robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query(double s, double h, double aMax, double v1, double v2) const
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query(double s, double h, double aMax, double v1, double v2, bool stop) const
 {
+	if (stop && (fixZero(v2) != 0))
+		return query_stop(s, h, aMax, v1, v2);
 	/**> 判断参数合理性 */
-	if (s <= 0 || v1 < 0 || v2 < 0)
+	if (s <= 0)
 		throw("错误<SMPlannerEx>: 距离必须为正数!");
-	if (v1 < 0 || v2 < 0)
+	if (fixZero(v1) < 0 || fixZero(v2) < 0)
 		throw("错误<SMPlannerEx>: 速度必须为非负数!");
+	if	(fixZero(v1) == 0 && fixZero(v2) == 0)
+		throw("错误<SMPlannerEx>: 速度不能同时为0");
 	/**> 如果始末速度相同, 则返回线性插补器 */
 	if (fabs(v2 - v1) < 1e-10)
 	{
@@ -72,15 +78,20 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query(double s
 
 bool SMPlannerEx::checkDitance(double s, double h, double aMax, double v1, double v2) const
 {
-	/**> 判断参数合理性 */
-	if (s <= 0 || v1 < 0 || v2 < 0)
-		throw("错误<SMPlannerEx>: 距离必须为正数!");
-	if (v1 < 0 || v2 < 0)
-		throw("错误<SMPlannerEx>: 速度必须为非负数!");
-	/**> 如果始末速度相同, 则返回线性插补器 */
-	if (fabs(v2 - v1) < 1e-10)
-	{
+	if (s >= queryMinDistance(h, aMax, v1, v2))
 		return true;
+	return false;
+}
+
+double SMPlannerEx::queryMinDistance(double h, double aMax, double v1, double v2) const
+{
+	/**> 判断参数合理性 */
+	if (fixZero(v1) < 0 || fixZero(v2) < 0)
+		throw("错误<SMPlannerEx>: 速度必须为非负数!");
+	/**> 如果始末速度相同 */
+	if (fabs(v2 - v1) < 1e-12)
+	{
+		return 0;
 	}
 	/**> 三段式加速度 */
 	if (fabs(v2 - v1) <= fabs(aMax*aMax/h))
@@ -92,10 +103,7 @@ bool SMPlannerEx::checkDitance(double s, double h, double aMax, double v1, doubl
 
 		double t1 = aMax/h;
 		double d2 = (v1 + v2)*t1;
-		if (s < d2)
-		{
-			return false;
-		}
+		return d2;
 	}
 	/**> 四段式加速度 */
 	else
@@ -107,12 +115,24 @@ bool SMPlannerEx::checkDitance(double s, double h, double aMax, double v1, doubl
 
 		double t3 = (v2 - v1)/aMax + aMax/h;
 		double d3 = dv*dv/(2*aMax) + dv*aMax/(2*h) + v1*t3;
-		if (s < d3)
-		{
-			return false;
-		}
+		return d3;
 	}
 	return true;
+}
+
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_stop(double s, double h, double aMax, double v1, double v2) const
+{
+	double s1 = queryMinDistance(h, aMax, v1, v2);
+	double s2 = queryMinDistance(h, aMax, v2, 0);
+	double ds = s - s1 - s2;
+	if (ds <= 0)
+		throw ("错误<SMPlannerEx>: 距离不够!");
+	s1 += ds/2.0;
+	s2 += ds/2.0;
+	SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
+	interpolator->addInterpolator(query(s1, h, aMax, v1, v2));
+	interpolator->addInterpolator(query(s2, h, aMax, v2, 0));
+	return interpolator;
 }
 
 robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotion(double s, double h, double aMax, double v1, double v2) const

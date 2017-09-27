@@ -19,10 +19,12 @@ class SMPlannerEx {
 public:
 	SMPlannerEx();
 
-	robot::trajectory::SequenceInterpolator<double>::ptr query(double s, double h, double aMax, double v1, double v2) const;
+	robot::trajectory::SequenceInterpolator<double>::ptr query(double s, double h, double aMax, double v1, double v2, bool stop=false) const;
 	bool checkDitance(double s, double h, double aMax, double v1, double v2) const;
+	double queryMinDistance(double h, double aMax, double v1, double v2) const;
 	virtual ~SMPlannerEx(){}
 private:
+	robot::trajectory::SequenceInterpolator<double>::ptr query_stop(double s, double h, double aMax, double v1, double v2) const;
 	robot::trajectory::SequenceInterpolator<double>::ptr threeLineMotion(double s, double h, double aMax, double v1, double v2) const;
 	robot::trajectory::SequenceInterpolator<double>::ptr fourLineMotion(double s, double h, double aMax, double v1, double v2) const;
 	robot::trajectory::SequenceInterpolator<double>::ptr threeLineMotion(double s, double h, double aMax, double v1) const;

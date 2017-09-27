@@ -217,6 +217,39 @@ public:
 	void pushBack(double num);
 
 	/**
+	 * @brief 将数组中的所有元素变成它的绝对值
+	 */
+	void abs();
+
+	/**
+	 * @brief 对于每个位置上的数据, 和min与max对应位置上的数据进行比较, 更新min
+	 * 与max中的数据
+	 * @param min [out] 比较的最小值数组
+	 * @param max [out] 比较的最大值数组
+	 * @warning 不对数组长度进行检查, 默认this数组, min和max的长度都是一样的,
+	 * 使用这个函数必须要保证这些数组的长度都是相同的. 同时, 如果元素的值小于其在min
+	 * 中对应位置上的值, 则默认它不会比max中的要大. 因此使用的时候应当要保证min比max
+	 * 对应位置上的数据要小.
+	 */
+	void doMinmax(Q&min, Q&max);
+
+	/**
+	 * @brief 把min中各个位置上的值都更新为min和this中较小的那个
+	 * @param min [out] 比较的最小值数组
+	 * @warning 不对数组长度进行检查, 默认this数组, 和min的长度都是一样的,
+	 * 使用这个函数必须要保证这些数组的长度都是相同的.
+	 */
+	void doMin(Q&min);
+
+	/**
+	 * @brief 把max中各个位置上的值都更新为max和this中较小的那个
+	 * @param max [out] 比较的最大值数组
+	 * @warning 不对数组长度进行检查, 默认this数组, 和max的长度都是一样的,
+	 * 使用这个函数必须要保证这些数组的长度都是相同的.
+	 */
+	void doMax(Q&max);
+
+	/**
 	 * @brief 格式化打印
 	 */
 	void print() const;

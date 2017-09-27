@@ -7,6 +7,7 @@
 
 #include "Q.h"
 # include "../common/printAdvance.h"
+# include <algorithm>
 
 namespace robot {
 namespace math {
@@ -248,6 +249,49 @@ void Q::pushBack(double newValue)
 {
 	_size++;
 	_value.push_back(newValue);
+}
+
+void Q::abs()
+{
+	for_each(_value.begin(), _value.end(), [](double &value){value = fabs(value);});
+}
+
+
+void Q::doMinmax(Q&min, Q&max)
+{
+	for (int i=0; i<_size; i++)
+	{
+		if (_value[i] < min[i])
+		{
+			min(i) = _value[i];
+		}
+		else if (_value[i] > max[i])
+		{
+			max(i) = _value[i];
+		}
+	}
+}
+
+void Q::doMin(Q&min)
+{
+	for (int i=0; i<_size; i++)
+	{
+		if (_value[i] < min[i])
+		{
+			min(i) = _value[i];
+		}
+	}
+}
+
+void Q::doMax(Q&max)
+{
+	for (int i=0; i<_size; i++)
+	{
+		if (_value[i] > max[i])
+		{
+			max(i) = _value[i];
+		}
+	}
 }
 
 void Q::print() const
