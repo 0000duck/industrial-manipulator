@@ -19,12 +19,94 @@ class SMPlannerEx {
 public:
 	SMPlannerEx();
 
+	/**
+	 * @brief 在v1到v2速度之间进行规划
+	 * @param s [in] 要到达的距离
+	 * @param h [in] 限制的最大加加速度
+	 * @param aMax [in] 限制的最大加速度
+	 * @param v1 [in] 初始速度
+	 * @param v2 [in] 末端速度
+	 * @param stop [in] 最后是否要停下来
+	 * @return 插补器指针
+	 *
+	 * 速度大于0. 当距离不够会报错. 若stop=false, 则先加速或减速到v2然后匀速跑完线段.
+	 * 若stop=true, 则先加速或减速到v2, 匀速一段距离, 然后再降速到0并刚好到达指定距离.
+	 * 规划的路径始末的加速度都为0.
+	 */
 	robot::trajectory::SequenceInterpolator<double>::ptr query(double s, double h, double aMax, double v1, double v2, bool stop=false) const;
-	bool checkDitance(double s, double h, double aMax, double v1, double v2) const;
+
+	robot::trajectory::SequenceInterpolator<double>::ptr query_flexible(double s, double h, double aMax, double v1, double v2, double &realV2, bool stop=false) const;
+
+	/**
+	 * @brief 判断要满足v1, v2, h, aMax条件下距离s是否足够
+	 * @param s [in] 要到达的距离
+	 * @param h [in] 限制的最大加加速度
+	 * @param aMax [in] 限制的最大加速度
+	 * @param v1 [in] 初始速度
+	 * @param v2 [in] 期望末端速度
+	 * @param stop [in] 最后是否要停下来
+	 * @param realV2 [out] 实际能到达的末端速度
+	 * @return 是否能在满足期望末端速度的情况下到达距离s
+	 */
+	bool checkDitance(double s, double h, double aMax, double v1, double v2, double &realV2, bool stop=false) const;
+
+	/**
+	 * @brief 从速度v1达到v2所需要的最短距离
+	 * @param h [in] 限制的最大加加速度
+	 * @param aMax [in] 限制的最大加速度
+	 * @param v1 [in] 初始速度
+	 * @param v2 [in] 期望末端速度
+	 * @return 从速度v1达到v2所需要的最短距离
+	 */
 	double queryMinDistance(double h, double aMax, double v1, double v2) const;
+
+	/**
+	 * 二分法求末端可以达到最大的速度
+	 * @param s [in] 要到达的距离
+	 * @param h [in] 限制的最大加加速度
+	 * @param aMax [in] 限制的最大加速度
+	 * @param v1 [in] 初始速度
+	 * @param v2 [in] 期望末端速度
+	 * @return 距离限制下可达到的最大速度
+	 */
+	double queryMaxSpeed(double s, double h, double aMax, double v1, double v2) const;
 	virtual ~SMPlannerEx(){}
 private:
 	robot::trajectory::SequenceInterpolator<double>::ptr query_stop(double s, double h, double aMax, double v1, double v2) const;
+
+	/**
+	 * @brief 停止段判断要满足v1, v2, h, aMax条件下距离s是否足够
+	 * @param s [in] 要到达的距离
+	 * @param h [in] 限制的最大加加速度
+	 * @param aMax [in] 限制的最大加速度
+	 * @param v1 [in] 初始速度
+	 * @param v2 [in] 期望中途匀速段速度
+	 * @param realV2 [out] 实际能到达的末端速度. 若结果为v1, 不表明一定能在距离范围内停止, 应当用
+	 * queryMinDistance再次排查
+	 * @return 是否能在满足期望末端速度的情况下到达距离s
+	 */
+	bool checkDitance_stop(double s, double h, double aMax, double v1, double v2, double &realV2) const;
+
+	/**
+	 * @brief 停止段先从速度v1达到v2再降到速度0所需要的最短距离
+	 * @param h [in] 限制的最大加加速度
+	 * @param aMax [in] 限制的最大加速度
+	 * @param v1 [in] 初始速度
+	 * @param v2 [in] 期望中途匀速段速度
+	 * @return 停止段先从速度v1达到v2再降到速度0所需要的最短距离
+	 */
+	double queryMinDistance_stop(double h, double aMax, double v1, double v2) const;
+	/**
+	 * @brief 二分法求结束段中途可以达到最大的速度
+	 * @param s [in] 要到达的距离
+	 * @param h [in] 限制的最大加加速度
+	 * @param aMax [in] 限制的最大加速度
+	 * @param v1 [in] 初始速度
+	 * @param v2 [in] 期望中途匀速段速度
+	 * @return 可达到的速度v2. 若结果为v1, 不表明一定能在距离范围内停止, 应当用
+	 * queryMinDistance再次排查
+	 */
+	double queryMaxSpeed_stop(double s, double h, double aMax, double v1, double v2) const;
 	robot::trajectory::SequenceInterpolator<double>::ptr threeLineMotion(double s, double h, double aMax, double v1, double v2) const;
 	robot::trajectory::SequenceInterpolator<double>::ptr fourLineMotion(double s, double h, double aMax, double v1, double v2) const;
 	robot::trajectory::SequenceInterpolator<double>::ptr threeLineMotion(double s, double h, double aMax, double v1) const;

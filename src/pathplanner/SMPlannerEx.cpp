@@ -76,11 +76,77 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query(double s
 	}
 }
 
-bool SMPlannerEx::checkDitance(double s, double h, double aMax, double v1, double v2) const
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible(double s, double h, double aMax, double v1, double v2, double &realV2, bool stop) const
 {
+	if (stop && (fixZero(v2) != 0))
+		return query_stop(s, h, aMax, v1, v2);
+	/**> 判断参数合理性 */
+	if (s <= 0)
+		throw("错误<SMPlannerEx>: 距离必须为正数!");
+	if (fixZero(v1) < 0 || fixZero(v2) < 0)
+		throw("错误<SMPlannerEx>: 速度必须为非负数!");
+	if	(fixZero(v1) == 0 && fixZero(v2) == 0)
+		throw("错误<SMPlannerEx>: 速度不能同时为0");
+	/**> 如果始末速度相同, 则返回线性插补器 */
+	if (fabs(v2 - v1) < 1e-10)
+	{
+		Interpolator<double>::ptr interpolator0(new LinearInterpolator<double>(0, s, 2*s/(v1 + v2)));
+		SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
+		interpolator->addInterpolator(interpolator0);
+		return interpolator;
+	}
+	/**> 末端速度不为0 */
+	if (v2 > 0)
+	{
+		if (checkDitance(s, h, aMax, v1, v2, realV2));
+		else
+			v2 = realV2;
+		/**> 三段式加速度 */
+		if (fabs(v2 - v1) <= fabs(aMax*aMax/h))
+		{
+			aMax = sqrt(fabs((v2 - v1)*h));
+			return threeLineMotion(s, h, aMax, v1, v2);
+		}
+		/**> 四段式加速度 */
+		else
+		{
+			return fourLineMotion(s, h, aMax, v1, v2);
+		}
+	}
+	/**> 末端速度为0 */
+	else
+	{
+		if (checkDitance_stop(s, h, aMax, v1, v2, realV2));
+		else
+			v2 = realV2;
+		/**> 三段式停止规划 */
+		if (fabs(v2 - v1) <= fabs(aMax*aMax/h))
+		{
+			aMax = sqrt(fabs((v2 - v1)*h));
+			return threeLineMotion(s, h, aMax, v1);
+		}
+		/**> 四段式停止规划 */
+		else
+		{
+			return fourLineMotion(s, h, aMax, v1);
+		}
+	}
+}
+
+bool SMPlannerEx::checkDitance(double s, double h, double aMax, double v1, double v2, double &realV2, bool stop) const
+{
+	if (stop)
+		return checkDitance_stop(s, h, aMax, v1, v2, realV2);
 	if (s >= queryMinDistance(h, aMax, v1, v2))
+	{
+		realV2 = v2;
 		return true;
-	return false;
+	}
+	else
+	{
+		realV2 = queryMaxSpeed(s, h, aMax, v1, v2);
+		return false;
+	}
 }
 
 double SMPlannerEx::queryMinDistance(double h, double aMax, double v1, double v2) const
@@ -117,7 +183,34 @@ double SMPlannerEx::queryMinDistance(double h, double aMax, double v1, double v2
 		double d3 = dv*dv/(2*aMax) + dv*aMax/(2*h) + v1*t3;
 		return d3;
 	}
-	return true;
+}
+
+double SMPlannerEx::queryMaxSpeed(double s, double h, double aMax, double v1, double v2) const
+{
+	if (s <= 0)
+		throw("错误<SMPlannerEx>: 距离s必须大于0!");
+	if (fixZero(v1) < 0 || fixZero(v2) < 0)
+		throw("错误<SMPlannerEx>: 速度必须为非负数!");
+	int sgn = (v2 > v1)? 1:-1;
+	h = sgn*fabs(h);
+	aMax = sgn*fabs(aMax);
+	if (queryMinDistance(h, aMax, v1, v2) <= s)
+		return v2;
+	double lowerSpeed = v1;
+	double upperSpeed = v2;
+	double midSpeed = (lowerSpeed + upperSpeed)/2.0;
+	double dv = upperSpeed - lowerSpeed;
+	/**> 二分法查找最接近v2且可以达到的速度, v1是一定能达到的 */
+	while(fabs(dv) >= 0.01)
+	{
+		if (queryMinDistance(h, aMax, v1, midSpeed) <= s)
+			lowerSpeed = midSpeed;
+		else
+			upperSpeed = midSpeed;
+		midSpeed = (lowerSpeed + upperSpeed)/2.0;
+		dv = upperSpeed - lowerSpeed;
+	}
+	return lowerSpeed;
 }
 
 robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_stop(double s, double h, double aMax, double v1, double v2) const
@@ -133,6 +226,52 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_stop(dou
 	interpolator->addInterpolator(query(s1, h, aMax, v1, v2));
 	interpolator->addInterpolator(query(s2, h, aMax, v2, 0));
 	return interpolator;
+}
+
+bool SMPlannerEx::checkDitance_stop(double s, double h, double aMax, double v1, double v2, double &realV2) const
+{
+	if (s >= queryMinDistance_stop(h, aMax, v1, v2))
+	{
+		realV2 = v2;
+		return true;
+	}
+	else
+	{
+		realV2 = queryMaxSpeed_stop(s, h, aMax, v1, v2);
+		return false;
+	}
+}
+
+double SMPlannerEx::queryMinDistance_stop(double h, double aMax, double v1, double v2) const
+{
+	double s1 = queryMinDistance(h, aMax, v1, v2);
+	double s2 = queryMinDistance(h, aMax, v2, 0);
+	return s1 + s2;
+}
+
+double SMPlannerEx::queryMaxSpeed_stop(double s, double h, double aMax, double v1, double v2) const
+{
+	if (s <= 0)
+		throw("错误<SMPlannerEx>: 距离s必须大于0!");
+	if (fixZero(v1) < 0 || fixZero(v2) < 0)
+		throw("错误<SMPlannerEx>: 速度必须为非负数!");
+	if (queryMinDistance(h, aMax, v1, v2) <= s)
+		return v2;
+	double lowerSpeed = v1;
+	double upperSpeed = v2;
+	double midSpeed = (lowerSpeed + upperSpeed)/2.0;
+	double dv = upperSpeed - lowerSpeed;
+	/**> 二分法查找最接近v2且可以达到的速度, 假定v1是一定能达到的 */
+	while(fabs(dv) >= 0.01)
+	{
+		if (queryMinDistance_stop(h, aMax, v1, midSpeed) <= s)
+			lowerSpeed = midSpeed;
+		else
+			upperSpeed = midSpeed;
+		midSpeed = (lowerSpeed + upperSpeed)/2.0;
+		dv = upperSpeed - lowerSpeed;
+	}
+	return lowerSpeed;
 }
 
 robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotion(double s, double h, double aMax, double v1, double v2) const

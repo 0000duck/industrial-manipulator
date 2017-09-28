@@ -214,12 +214,12 @@ public:
 		return result;
 	}
 	/**
-	 * @brief 采样分析ikInterpolator指示路径上的速度上下限
+	 * @brief 采样分析ikInterpolator指示路径上的关节速度和关节加速度上下限
 	 * @param count [in] 采样的点数
 	 * @param precision [in] 速度, 加速度数值计算的精度(dt)
 	 * @return {{dqMin, dqMax}, {ddqMin, ddqMax}}
 	 */
-	std::pair<std::pair<Q, Q>, std::pair<Q, Q> > minmax(const int count = 100, double precision=0.0001)
+	std::pair<std::pair<Q, Q>, std::pair<Q, Q> > getMinMax(const int count = 100, double precision=0.0001)
 	{
 		qVelAcc result = this->sampleVelAcc(count, precision);
 		vector<Q> dq = result.dq;
@@ -228,12 +228,31 @@ public:
 		Q dqMax = dqMin;
 		Q ddqMin = ddq[0];
 		Q ddqMax = ddqMin;
-//		for_each(dq.begin(), dq.end(), [](Q& q){q.abs()});
-//		for_each(ddq.begin(), ddq.end(), [](Q& q){q.abs()});
 		for_each(dq.begin(), dq.end(), [&](Q& q){q.doMinmax(dqMin, dqMax);});
 		for_each(ddq.begin(), ddq.end(), [&](Q& q){q.doMinmax(ddqMin, ddqMax);});
 		return std::make_pair(std::make_pair(dqMin, dqMax), std::make_pair(ddqMin, ddqMax));
 	}
+
+	/**
+	 * @brief 采样分析ikInterpolator指示路径上的关节速度和关节加速度的绝对值上限
+	 * @param count [in] 采样的点数
+	 * @param precision [in] 速度, 加速度数值计算的精度(dt)
+	 * @return {dqMaxAbs, ddqMaxAbs}
+	 */
+	std::pair<Q, Q> getMaxAbs(const int count = 100, double precision=0.0001)
+	{
+		qVelAcc result = this->sampleVelAcc(count, precision);
+		vector<Q> dq = result.dq;
+		vector<Q> ddq = result.ddq;
+		Q dqMax = dq[0];
+		Q ddqMax = ddq[0];
+		for_each(dq.begin(), dq.end(), [](Q& q){q.abs();});
+		for_each(ddq.begin(), ddq.end(), [](Q& q){q.abs();});
+		for_each(dq.begin(), dq.end(), [&](Q& q){q.doMax(dqMax);});
+		for_each(ddq.begin(), ddq.end(), [&](Q& q){q.doMax(ddqMax);});
+		return std::make_pair(dqMax, ddqMax);
+	}
+
 	virtual ~ConvertedInterpolator(){}
 protected:
 	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
