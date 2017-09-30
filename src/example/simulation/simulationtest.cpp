@@ -5,6 +5,8 @@
  *      Author: a1994846931931
  */
 
+#ifdef COMPILEALLEXAMPLES
+
 # include "simulationtest.h"
 # include <string>
 # include "../../common/printAdvance.h"
@@ -143,4 +145,4 @@ void simulationtest()
 	out.close();
 }
 
-
+#endif

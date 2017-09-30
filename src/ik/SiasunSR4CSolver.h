@@ -13,6 +13,9 @@
 # include "../model/SerialLink.h"
 # include "../model/Config.h"
 # include "IKSolver.h"
+# include "../common/printAdvance.h"
+
+using namespace robot::common;
 
 namespace robot {
 namespace ik {

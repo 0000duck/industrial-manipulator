@@ -5,6 +5,8 @@
  *      Author: a1994846931931
  */
 
+#ifdef COMPILEALLEXAMPLES
+
 # include "smplannertest.h"
 # include <time.h>
 # include "../../common/printAdvance.h"
@@ -17,13 +19,14 @@ using namespace robot::trajectory;
 void smplannertest()
 {
 	SMPlannerEx planner;
-	double h = 100;
-	double aMax = 15;
-	double v1 = 2;
-	double v2 = 0;
+	double h = 300;
+	double aMax = 20;
+	double v1 = 5;
+	double v2 = 30;
 	double s = 2;
 	clock_t clockStart = clock();
-	Interpolator<double>::ptr smEXIpr = planner.query(0, s, h, aMax, v1, v2);
+	Interpolator<double>::ptr smEXIpr = planner.query_flexible(10, s, h, aMax, v1, v2, v2, true);
+	cout << "实际速度为: " << v2 << endl;
 	clock_t clockEnd = clock();
 	cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 	int step = 1000;
@@ -67,4 +70,4 @@ void smplannertest()
 	out3.close();
 }
 
-
+#endif

@@ -62,7 +62,7 @@ Q MLABTrajectory::dx(double t) const
 	}
 	if (i == (int)_lt.size())
 		i--;
-	return _qIpr[i]->dx(t);
+	return _qIpr[i]->dx(t - maxDuration + _lt[i]->duration());
 }
 
 Q MLABTrajectory::ddx(double t) const
@@ -77,7 +77,7 @@ Q MLABTrajectory::ddx(double t) const
 	}
 	if (i == (int)_lt.size())
 		i--;
-	return _qIpr[i]->ddx(t);
+	return _qIpr[i]->ddx(t - maxDuration + _lt[i]->duration());
 }
 
 double MLABTrajectory::duration() const

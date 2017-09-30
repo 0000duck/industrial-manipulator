@@ -1,3 +1,6 @@
+
+#ifdef COMPILEALLEXAMPLES
+
 # include "smoothPlannerSampler.h"
 # include <time.h>
 # include "../../common/printAdvance.h"
@@ -57,3 +60,5 @@ void smoothPlannerSampler(){
 	out2.close();
 	out3.close();
 }
+
+#endif

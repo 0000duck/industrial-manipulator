@@ -214,8 +214,18 @@ public:
 	 * @param joint [in] 关节数值
 	 * @retval true 关节数值在各个关节设定范围内
 	 * @retval false 关节数值不在关节设定范围内
+	 * @deprecated fixJoint instead.
 	 */
 	bool isJointValid(const Q& joint) const;
+
+	/**
+	 * @brief 关节范围判断与处理
+	 * @param joint [in] 要处理的关节, 范围是-180~180
+	 * @return 范围内的关节解. 例如范围是-360 - 360, 判断的角度是30, 则将30和-330都添加到结果中
+	 *
+	 * only for dof=6
+	 */
+	std::vector<Q> fixJoint(Q& joint) const;
 
 	/** @brief 格式化打印
 	 * @todo 未定义功能

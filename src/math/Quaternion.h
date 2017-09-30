@@ -68,13 +68,13 @@ public:
 	* @brief 从旋转矩阵变换到四元数
 	* @param rot [in]
 	*/
-	Quaternion(const Rotation3D<double>&);
+	Quaternion( const Rotation3D<double>&);
 
 	/**
 	 * @brief 从变换矩阵变换到四元数
 	 * @param tran [in]
 	 */
-	Quaternion(const HTransform3D<double>&);
+	Quaternion( const HTransform3D<double>&);
 
 	/**
 	 * @brief 从三角函数四元数转化到复数形式

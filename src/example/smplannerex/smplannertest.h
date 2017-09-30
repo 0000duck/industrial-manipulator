@@ -5,6 +5,8 @@
  *      Author: a1994846931931
  */
 
+#ifdef COMPILEALLEXAMPLES
+
 #ifndef SMPLANNERTEST_H_
 #define SMPLANNERTEST_H_
 
@@ -13,3 +15,5 @@
 void smplannertest();
 
 #endif /* SMPLANNERTEST_H_ */
+
+#endif

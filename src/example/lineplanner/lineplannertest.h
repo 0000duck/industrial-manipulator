@@ -5,6 +5,8 @@
  *      Author: a1994846931931
  */
 
+#ifdef COMPILEALLEXAMPLES
+
 #ifndef LINEPLANNERTEST_H_
 #define LINEPLANNERTEST_H_
 
@@ -15,3 +17,5 @@ LineTrajectory::ptr lineplannerTest();
 
 
 #endif /* LINEPLANNER_H_ */
+
+#endif

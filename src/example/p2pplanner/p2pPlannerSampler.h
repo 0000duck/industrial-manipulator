@@ -5,6 +5,8 @@
  *      Author: a1994846931931
  */
 
+#ifdef COMPILEALLEXAMPLES
+
 #ifndef P2PPLANNERSAMPLER_H_
 #define P2PPLANNERSAMPLER_H_
 
@@ -13,3 +15,5 @@ void p2pPlannerSampler();
 
 
 #endif /* P2PPLANNERSAMPLER_H_ */
+
+#endif

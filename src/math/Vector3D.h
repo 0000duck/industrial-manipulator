@@ -310,6 +310,17 @@ public:
 	}
 
 	/**
+	 * @brief 向量规范化
+	 */
+	void doNormalize()
+	{
+		T len = getLength();
+		_v[0] = _v[0]/len;
+		_v[1] = _v[1]/len;
+		_v[2] = _v[2]/len;
+	}
+
+	/**
 	 * @brief 格式化打印
 	 */
 	void print() const

@@ -5,6 +5,8 @@
  *      Author: a1994846931931
  */
 
+#ifdef COMPILEALLEXAMPLES
+
 # include "p2pPlannerSampler.h"
 # include "../../pathplanner/PointToPointPlanner.h"
 # include "../../math/Q.h"
@@ -59,3 +61,4 @@ void p2pPlannerSampler()
 	out1.close();
 }
 
+#endif

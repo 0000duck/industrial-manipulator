@@ -5,6 +5,8 @@
  *      Author: a1994846931931
  */
 
+#ifdef COMPILEALLEXAMPLES
+
 # include "lineplannertest.h"
 # include <string>
 # include "../../common/printAdvance.h"
@@ -196,3 +198,5 @@ LineTrajectory::ptr lineplannerTest()
 		std::cerr << msg;
 	}
 }
+
+#endif

@@ -5,6 +5,8 @@
  *      Author: a1994846931931
  */
 
+#ifdef COMPILEALLEXAMPLES
+
 # include "../math/Rotation3D.h"
 # include "../math/HTransform3D.h"
 # include "../kinematics/Trsf.h"
@@ -152,3 +154,5 @@ void ik2Test()
 	println("time: ");
 	println(end - start);
 }
+
+#endif

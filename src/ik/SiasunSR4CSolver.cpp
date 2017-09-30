@@ -119,7 +119,7 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend, const mod
     	{
     	    continue;
     	}
-    	// theta1
+    	// theta1 -180~180的唯一解
     	double theta1 = atan2(sgn*y, sgn*x);
     	double R = (pow((sgn*r -_a2), 2) + pow(z, 2) - pow(_a3, 2) - pow(_a4, 2) - pow(_d4, 2))/(2.0*_a3);
     	double a = -R - _a4;
@@ -139,7 +139,11 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend, const mod
     	}
     	else
     	{
-    		// TODO
+    		cout << "theta3 no result\n";
+    		cout << "d=" << d << "\n";
+    		cout << "r = " << r << "\tz = " << z << "\ta2 = " << _a2 << "\ta3 = " << _a3 << "\td4 = " << _d4 << '\n';
+    		cout << "x = " << x << "\ty = " << y << '\n';
+    		baseTend.print();
     	}
     	// theta2
     	for (std::vector<double>::iterator it2=theta3s.begin(); it2<theta3s.end(); it2++)
@@ -171,23 +175,34 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend, const mod
             (*it)(i) -= _dHTable[i].theta();
     }
     if ((int)result.size() <= 0)
-    	throw (std::string("错误<SiasunSR4CSolver>: 没有符合config的解"));
+    {
+    	throw (std::string("错误<SiasunSR4CSolver>: 没有解!"));
+    }
     /**> 根据关节范围去除不符合的结果 */
+    std::vector<Q> rangeResult;
     if ((int)result.size() > 0)
     {
-		for (int i=0;;)
-		{
-			if (i >= (int)result.size())
-				break;
-			if (_serialLink->isJointValid(result[i]))
-				i++;
-			else
-				result.erase(result.begin() + i);
-		}
-	    if ((int)result.size() == 0)
-	    	throw(std::string("错误<SiasunSR4CSolver>: 结果超出关节范围"));
+//		for (int i=0;;)
+//		{
+//			if (i >= (int)result.size())
+//				break;
+//			if (_serialLink->isJointValid(result[i]))
+//				i++;
+//			else
+//				result.erase(result.begin() + i);
+//		}
+//	    if ((int)result.size() == 0)
+//	    	throw(std::string("错误<SiasunSR4CSolver>: 根据关节范围筛选后没有解!"));
+    	for (int i=0; i<(int)result.size(); i++)
+    	{
+    		std::vector<Q> temp = _serialLink->fixJoint(result[i]);
+    		for (int k=0; k<(int)temp.size(); k++)
+    		{
+    			rangeResult.push_back(temp[k]);
+    		}
+    	}
     }
-    return result;
+    return rangeResult;
 }
 
 void SiasunSR4CSolver::solveTheta456(

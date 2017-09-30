@@ -30,15 +30,15 @@
 # include <vector>
 # include <memory>
 # include <fstream>
-# include "test.h"
-# include "testIK.h"
-# include "testIK2.h"
-# include "smoothplanner/smoothPlannerSampler.h"
-# include "p2pplanner/p2pPlannerSampler.h"
-# include "lineplanner/lineplannertest.h"
-# include "qblendtest/qblendtest.h"
-# include "circularplanner/circularplannertest.h"
-# include "simulation/simulationtest.h"
+//# include "test.h"
+//# include "testIK.h"
+//# include "testIK2.h"
+//# include "smoothplanner/smoothPlannerSampler.h"
+//# include "p2pplanner/p2pPlannerSampler.h"
+//# include "lineplanner/lineplannertest.h"
+//# include "qblendtest/qblendtest.h"
+//# include "circularplanner/circularplannertest.h"
+//# include "simulation/simulationtest.h"
 # include "smplannerex/smplannertest.h"
 # include <functional>
 
@@ -214,18 +214,18 @@ int main(){
 	double theta5 = M_PI/2;
 	double theta6 = 0;
 	// ***
-	double lmin1 = M_PI/180.0*-180;
-	double lmin2 = M_PI/180.0*-130;
-	double lmin3 = M_PI/180.0*-70;
-	double lmin4 = M_PI/180.0*-240;
-	double lmin5 = M_PI/180.0*-200;
-	double lmin6 = M_PI/180.0*-360;
-	double lmax1 = M_PI/180.0*180;
-	double lmax2 = M_PI/180.0*80;
-	double lmax3 = M_PI/180.0*160;
-	double lmax4 = M_PI/180.0*240;
-	double lmax5 = M_PI/180.0*30;
-	double lmax6 = M_PI/180.0*360;
+	double lmin1 = M_PI/180.0*-180; //-180
+	double lmin2 = M_PI/180.0*-130; //-210
+	double lmin3 = M_PI/180.0*-70; //-70
+	double lmin4 = M_PI/180.0*-240; //-240
+	double lmin5 = M_PI/180.0*-200; //-110
+	double lmin6 = M_PI/180.0*-360; //-360
+	double lmax1 = M_PI/180.0*180; //180
+	double lmax2 = M_PI/180.0*80; //-10
+	double lmax3 = M_PI/180.0*160; //160
+	double lmax4 = M_PI/180.0*240; //240
+	double lmax5 = M_PI/180.0*30; //120
+	double lmax6 = M_PI/180.0*360; //360
 
 //	Link(alpha, a, d, theta, min, max, sigma=0)
 	Link l1(alpha1, a1, d1, theta1, lmin1, lmax1);
@@ -274,7 +274,7 @@ int main(){
 
 	vector<Q> path;
 	path.push_back( Q::zero(6));
-	path.push_back( Q(0.7, -0.2, 0, 0, 0, 0));
+	path.push_back( Q(0.7, 0, 0, 0, 0, 0));
 	path.push_back( Q(1.4, 0, 0, 0, 0, 0));
 
 	vector<double> arcRatio;
@@ -332,7 +332,7 @@ int main(){
 	out1.close();
 	**************************/
 
-	int step = 100;
+	int step = 500;
 	const double T = mlabTrajectory->duration();
 	double dt = T/(step - 1);
 	cout << "总时长: " << T << "s" << endl;

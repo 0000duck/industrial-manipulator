@@ -5,6 +5,8 @@
  *      Author: a1994846931931
  */
 
+#ifdef COMPILEALLEXAMPLES
+
 # include "qblendtest.h"
 # include <string>
 # include "../../common/printAdvance.h"
@@ -183,3 +185,5 @@ void qblendtest()
 		std::cerr << msg;
 	}
 }
+
+#endif

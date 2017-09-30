@@ -39,6 +39,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query(double s
 	/**> 如果始末速度相同, 则返回线性插补器 */
 	if (fabs(v2 - v1) < 1e-10)
 	{
+		cout << "线性规划" << endl;
 		Interpolator<double>::ptr interpolator0(new LinearInterpolator<double>(0, s, 2*s/(v1 + v2)));
 		SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
 		interpolator->addInterpolator(interpolator0);
@@ -91,6 +92,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible
 	/**> 如果始末速度相同, 则返回线性插补器 */
 	if (fabs(v2 - v1) < 1e-10)
 	{
+		cout << "线性规划" << endl;
 		Interpolator<double>::ptr interpolator0(new LinearInterpolator<double>(0, s, 2*s/(v1 + v2)));
 		SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
 		interpolator->addInterpolator(interpolator0);

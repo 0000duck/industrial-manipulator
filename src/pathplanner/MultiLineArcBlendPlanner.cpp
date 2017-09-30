@@ -237,6 +237,7 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 	{
 		qIpr.push_back(CompositeInterpolator<Q>::ptr(new CompositeInterpolator<Q>(trajectoryIpr[i], lt[i])));
 	}
+
 //	println("MultiLine: 测试");
 //	/**** 测试用 ****/
 //	double duration = 0;
@@ -245,6 +246,10 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 //		duration=trajectoryIpr[i]->duration();
 //		cout << "length = " << duration << endl;
 //		lt.push_back(Interpolator<double>::ptr(new LinearInterpolator<double>(0, duration, duration)));
+//	}
+//	for (int i=0; i<arcSize + lineSize; i++)
+//	{
+//		qIpr.push_back(CompositeInterpolator<Q>::ptr(new CompositeInterpolator<Q>(trajectoryIpr[i], lt[i])));
 //	}
 
 	MLABTrajectory::ptr mlabTrajectory(new MLABTrajectory(arcPosIpr, linePosIpr, arcRotIpr, lineRotIpr, length, qIpr, trajectoryIpr, lt));

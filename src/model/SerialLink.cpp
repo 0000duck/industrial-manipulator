@@ -312,6 +312,47 @@ bool SerialLink::isJointValid(const Q& joint) const
 	return false;
 }
 
+vector<Q> SerialLink::fixJoint(Q& joint) const
+{
+	vector<Q> result;
+	vector<vector<double> > jointList;
+	for (int i=0; i<getDOF(); i++)
+	{
+		vector<double> valueList;
+		double original = joint[i];
+		double jointMin = _linkList[i]->lmin();
+		double jointMax = _linkList[i]->lmax();
+		int kmin = ceil((jointMin - original)/360.0);
+		int kmax = floor((jointMax - original)/360.0);
+		if (kmin > kmax)
+			return result; //zero result
+		for (int k=kmin; k<=kmax; k++)
+			valueList.push_back(360.0*((double)k) + original);
+		jointList.push_back(valueList);
+	}
+	///only for dof = 6
+	for (int i0=0; i0<(int)jointList[0].size(); i0++)
+	{
+		for (int i1=0; i1<(int)jointList[1].size(); i1++)
+		{
+			for (int i2=0; i2<(int)jointList[2].size(); i2++)
+			{
+				for (int i3=0; i3<(int)jointList[3].size(); i3++)
+				{
+					for (int i4=0; i4<(int)jointList[4].size(); i4++)
+					{
+						for (int i5=0; i5<(int)jointList[5].size(); i5++)
+						{
+							result.push_back(Q(jointList[0][i0], jointList[1][i1], jointList[2][i2], jointList[3][i3], jointList[4][i4], jointList[5][i5]));
+						}
+					}
+				}
+			}
+		}
+	}
+	return result;
+}
+
 SerialLink::~SerialLink()
 {
 }

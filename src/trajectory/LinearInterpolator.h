@@ -174,11 +174,11 @@ public:
 		return _duration;
 	}
 private:
-	Rotation3D<T> _start;
-	Rotation3D<T> _end;
-	Quaternion _quartStart;
-	Quaternion _quartEnd;
-	double _duration;
+	const Rotation3D<T> _start;
+	const Rotation3D<T> _end;
+	const Quaternion _quartStart;
+	const Quaternion _quartEnd;
+	const double _duration;
 	double _theta;
 	Vector3D<T> _n;
 	double _vel;

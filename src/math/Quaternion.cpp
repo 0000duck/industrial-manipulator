@@ -21,7 +21,7 @@ Quaternion::Quaternion():_r(1),_i(0),_j(0),_k(0)
 
 Quaternion::Quaternion(double r,double i,double j,double k):_r(r),_i(i),_j(j),_k(k)
 {
-
+	normalize();
 }
 
 Quaternion::Quaternion(const Quaternion& QuatA)
@@ -30,13 +30,14 @@ Quaternion::Quaternion(const Quaternion& QuatA)
 	_i=QuatA._i;
 	_j=QuatA._j;
 	_k=QuatA._k;
+	normalize();
 }
 
 Quaternion::Quaternion(const Rotation3D<double>& rot)
 {
 	_r = 0.5*sqrt(fixZero(1 + rot(0, 0) + rot(1, 1) + rot(2, 2)));
 	double _r4 = _r*4;
-	if (fabs(_r4) > 1e-12)
+	if (fabs(_r*_r) > 1e-12)
 	{
 		_i = (rot(1, 2) - rot(2, 1))/_r4;
 		_j = (rot(2, 0) - rot(0, 2))/_r4;
@@ -49,6 +50,7 @@ Quaternion::Quaternion(const Rotation3D<double>& rot)
 		_j = sqrt(fixZero((rot(1, 1) + 1.0)/2.0))*(rot(0, 1) >= 0 ? 1:-1);
 		_k = sqrt(fixZero((rot(2, 2) + 1.0)/2.0))*(rot(0, 2) >= 0 ? 1:-1);
 	}
+	normalize();
 }
 
 Quaternion::Quaternion(const HTransform3D<double>& tran)
@@ -58,6 +60,7 @@ Quaternion::Quaternion(const HTransform3D<double>& tran)
 	_i = (tran(2, 1) - tran(1, 2))/_r4;
 	_j = (tran(0, 2) - tran(2, 0))/_r4;
 	_k = (tran(1, 0) - tran(0, 1))/_r4;
+	normalize();
 }
 
 Quaternion::Quaternion(double theta, const Vector3D<double>& n)
@@ -67,6 +70,7 @@ Quaternion::Quaternion(double theta, const Vector3D<double>& n)
 	_i = n(0)*st;
 	_j = n(1)*st;
 	_k = n(2)*st;
+	normalize();
 }
 
 Quaternion Quaternion::operator+(const Quaternion& QuatA) const
@@ -176,10 +180,11 @@ Quaternion::rotVar Quaternion::getRotationVariables() const
 	double st = sin(theta/2);
 	Quaternion::rotVar var;
 	var.theta = theta;
-	if (fabs(st) > 1e-12)
+	if (fabs(st) > 1e-16)
 		var.n = Vector3D<double>(_i/st, _j/st, _k/st);
 	else
-		var.n = Vector3D<double>(0, 0, 0);
+		throw("转向有多义性");
+	var.n.doNormalize();
 	return var;
 }
 
