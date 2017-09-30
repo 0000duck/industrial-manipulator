@@ -27,7 +27,7 @@ class MultiLineArcBlendPlanner {
 public:
 	MultiLineArcBlendPlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
 			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink* serialLink);
-	MLABTrajectory::ptr query(const vector<Q>& path, const vector<double>& arcRatio);
+	MLABTrajectory::ptr query(const vector<Q>& path, const vector<double>& arcRatio, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk);
 	virtual ~MultiLineArcBlendPlanner();
 private:
 private:

@@ -135,11 +135,6 @@ private:
 template<>
 class ConvertedInterpolator<std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr > , robot::math::Q>: public Interpolator<robot::math::Q> {
 public:
-	struct qVelAcc{
-		vector<Q> dq;
-		vector<Q> ddq;
-	};
-public:
 	using ptr = std::shared_ptr<ConvertedInterpolator<std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr > , robot::math::Q> >;
 	/**
 	 * @brief 构造函数
@@ -190,67 +185,6 @@ public:
 	double duration() const
 	{
 		return _posInterpolator->duration();
-	}
-	qVelAcc sampleVelAcc(const int count, double precision=0.0001)
-	{
-		vector<Q> dq;
-		vector<Q> ddq;
-		double L = this->duration();
-		double dl = L/(double)(count - 1);
-		Q tempQ1 = _ikSolver->solve(HTransform3D<double>(_posInterpolator->x(0), _rotInterpolator->x(0)), _config)[0];
-		Q tempQ2 = Q::zero(tempQ1.size());
-		Q tempQ3 = Q::zero(tempQ1.size());
-		for (double l=0; l<=L; l+=dl)
-		{
-			Q tempQ1 = _ikSolver->solve(HTransform3D<double>(_posInterpolator->x(l), _rotInterpolator->x(l)), _config)[0];
-			Q tempQ2 = _ikSolver->solve(HTransform3D<double>(_posInterpolator->x(l + precision), _rotInterpolator->x(l + precision)), _config)[0];
-			Q tempQ3 = _ikSolver->solve(HTransform3D<double>(_posInterpolator->x(l + precision*2), _rotInterpolator->x(l + precision*2)), _config)[0];
-			dq.push_back((tempQ2 - tempQ1)/precision);
-			ddq.push_back((tempQ3 - tempQ2*2 + tempQ1)/(precision*precision));
-		}
-		qVelAcc result;
-		result.dq = dq;
-		result.ddq = ddq;
-		return result;
-	}
-	/**
-	 * @brief 采样分析ikInterpolator指示路径上的关节速度和关节加速度上下限
-	 * @param count [in] 采样的点数
-	 * @param precision [in] 速度, 加速度数值计算的精度(dt)
-	 * @return {{dqMin, dqMax}, {ddqMin, ddqMax}}
-	 */
-	std::pair<std::pair<Q, Q>, std::pair<Q, Q> > getMinMax(const int count = 100, double precision=0.0001)
-	{
-		qVelAcc result = this->sampleVelAcc(count, precision);
-		vector<Q> dq = result.dq;
-		vector<Q> ddq = result.ddq;
-		Q dqMin = dq[0];
-		Q dqMax = dqMin;
-		Q ddqMin = ddq[0];
-		Q ddqMax = ddqMin;
-		for_each(dq.begin(), dq.end(), [&](Q& q){q.doMinmax(dqMin, dqMax);});
-		for_each(ddq.begin(), ddq.end(), [&](Q& q){q.doMinmax(ddqMin, ddqMax);});
-		return std::make_pair(std::make_pair(dqMin, dqMax), std::make_pair(ddqMin, ddqMax));
-	}
-
-	/**
-	 * @brief 采样分析ikInterpolator指示路径上的关节速度和关节加速度的绝对值上限
-	 * @param count [in] 采样的点数
-	 * @param precision [in] 速度, 加速度数值计算的精度(dt)
-	 * @return {dqMaxAbs, ddqMaxAbs}
-	 */
-	std::pair<Q, Q> getMaxAbs(const int count = 100, double precision=0.0001)
-	{
-		qVelAcc result = this->sampleVelAcc(count, precision);
-		vector<Q> dq = result.dq;
-		vector<Q> ddq = result.ddq;
-		Q dqMax = dq[0];
-		Q ddqMax = ddq[0];
-		for_each(dq.begin(), dq.end(), [](Q& q){q.abs();});
-		for_each(ddq.begin(), ddq.end(), [](Q& q){q.abs();});
-		for_each(dq.begin(), dq.end(), [&](Q& q){q.doMax(dqMax);});
-		for_each(ddq.begin(), ddq.end(), [&](Q& q){q.doMax(ddqMax);});
-		return std::make_pair(dqMax, ddqMax);
 	}
 
 	virtual ~ConvertedInterpolator(){}

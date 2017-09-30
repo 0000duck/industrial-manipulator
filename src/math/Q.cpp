@@ -294,6 +294,16 @@ void Q::doMax(Q&max)
 	}
 }
 
+double Q::getMin() const
+{
+	return *(min_element(_value.begin(), _value.end()));
+}
+
+double Q::getMax() const
+{
+	return *(max_element(_value.begin(), _value.end()));
+}
+
 void Q::print() const
 {
 	cout.precision(4);

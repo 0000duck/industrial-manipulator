@@ -15,6 +15,7 @@ using std::cout;
 using std::setfill;
 using std::setw;
 using std::endl;
+using std::string;
 
 namespace robot{
 namespace common{

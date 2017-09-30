@@ -23,7 +23,7 @@ void smplannertest()
 	double v2 = 0;
 	double s = 2;
 	clock_t clockStart = clock();
-	Interpolator<double>::ptr smEXIpr = planner.query(s, h, aMax, v1, v2);
+	Interpolator<double>::ptr smEXIpr = planner.query(0, s, h, aMax, v1, v2);
 	clock_t clockEnd = clock();
 	cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 	int step = 1000;

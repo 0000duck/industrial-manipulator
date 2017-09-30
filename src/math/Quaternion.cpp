@@ -38,15 +38,16 @@ Quaternion::Quaternion(const Rotation3D<double>& rot)
 	double _r4 = _r*4;
 	if (fabs(_r4) > 1e-12)
 	{
-		_i = (rot(2, 1) - rot(1, 2))/_r4;
-		_j = (rot(0, 2) - rot(2, 0))/_r4;
-		_k = (rot(1, 0) - rot(0, 1))/_r4;
+		_i = (rot(1, 2) - rot(2, 1))/_r4;
+		_j = (rot(2, 0) - rot(0, 2))/_r4;
+		_k = (rot(0, 1) - rot(1, 0))/_r4;
 	}
 	else
 	{
+		// 有两种表达, 无意义, 默认i >= 0
 		_i = sqrt(fixZero((rot(0, 0) + 1.0)/2.0));
-		_j = sqrt(fixZero((rot(1, 1) + 1.0)/2.0));
-		_k = sqrt(fixZero((rot(2, 2) + 1.0)/2.0));
+		_j = sqrt(fixZero((rot(1, 1) + 1.0)/2.0))*(rot(0, 1) >= 0 ? 1:-1);
+		_k = sqrt(fixZero((rot(2, 2) + 1.0)/2.0))*(rot(0, 2) >= 0 ? 1:-1);
 	}
 }
 
@@ -201,7 +202,7 @@ Quaternion Quaternion::interpolate(const Quaternion& quat1, const Quaternion& qu
 	if (startToEndQuat.r() < 0)
 		startToEndQuat = -startToEndQuat; // 保证转角小于pi
 	Quaternion::rotVar rot = startToEndQuat.getRotationVariables();
-	return Quaternion(rot.theta*ratio, rot.n);
+	return quat1*Quaternion(rot.theta*ratio, rot.n);
 }
 
 Rotation3D<double> Quaternion::interpolate(const Rotation3D<double>& rot1, const Rotation3D<double>& rot2, double ratio)

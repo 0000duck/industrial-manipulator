@@ -13,6 +13,7 @@
 
 using robot::kinematic::Frame;
 using std::vector;
+using namespace robot::common;
 
 namespace robot {
 namespace model {
@@ -54,6 +55,7 @@ void SerialLink::append(Link* link)
 
 void SerialLink::setTool(Frame* tool)
 {
+	println("tool changed");
 	_endToTool = tool;
 //	_endToTool.getTransform().print();
 }

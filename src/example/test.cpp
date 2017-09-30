@@ -18,10 +18,12 @@
 # include "../math/Integrator.h"
 # include "../trajectory/LinearInterpolator.h"
 # include "../trajectory/ConvertedInterpolator.h"
+# include "../trajectory/MLABTrajectory.h"
 # include "../pathplanner/PointToPointPlanner.h"
 # include "../pathplanner/LinePlanner.h"
 # include "../pathplanner/QBlend.h"
 # include "../pathplanner/CircularPlanner.h"
+# include "../pathplanner/MultiLineArcBlendPlanner.h"
 # include "../simulation/IterativeSimulator.h"
 # include <math.h>
 # include <string>
@@ -241,10 +243,14 @@ int main(){
 
 	HTransform3D<double> tran = HTransform3D<double>(Vector3D<double>(0, 0, 0.2), Rotation3D<double>());
 	Frame tool = Frame(tran);
-	robot.setTool(&tool);
+//	robot.setTool(&tool);
 //	solver->init();
 
-	SiasunSR4CSolver solver(robot);
+	std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robot));
+	Q qMin = Q(lmin1, lmin2, lmin3, lmin4, lmin5, lmin6);
+	Q qMax = Q(lmax1, lmax2, lmax3, lmax4, lmax5, lmax6);
+	Q dqLim = Q(3, 3, 3, 3, 5, 5);
+	Q ddqLim = Q(20, 20, 20, 20, 20, 20);
 
 //	ikTest();
 
@@ -261,6 +267,104 @@ int main(){
 //	simulationtest();
 
 //	smplannertest();
+
+
+
+	MultiLineArcBlendPlanner mlabplanner(qMin, qMax, dqLim, ddqLim, solver, &robot);
+
+	vector<Q> path;
+	path.push_back( Q::zero(6));
+	path.push_back( Q(0.7, -0.2, 0, 0, 0, 0));
+	path.push_back( Q(1.4, 0, 0, 0, 0, 0));
+
+	vector<double> arcRatio;
+	arcRatio.push_back(0.1);
+
+	vector<double> velocity;
+	velocity.push_back(1.0);
+	velocity.push_back(1.0);
+
+	vector<double> acceleration;
+	acceleration.push_back(15.0);
+	acceleration.push_back(15.0);
+
+	vector<double> jerk(2, 100);
+
+	MLABTrajectory::ptr mlabTrajectory;
+
+	clock_t clockStart = clock();
+	try{
+		mlabTrajectory = mlabplanner.query(path, arcRatio, velocity, acceleration, jerk);
+	}
+	catch(char const* msg)
+	{
+		println(msg);
+	}
+	catch(string& msg)
+	{
+		println(msg);
+	}
+	clock_t clockEnd = clock();
+	cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
+
+	/**************** 路径测试
+	vector<Interpolator<Vector3D<double> >::ptr> posIpr = mlabTrajectory->getPosIpr();
+	println("get pos Ipr");
+	std::vector<Vector3D<double> > position;
+	for (int i=0; i< (int)posIpr.size(); i++)
+	{
+		double L = posIpr[i]->duration();
+		int step = 100;
+		double dl = L/(step - 1);
+		for (double l=0; l<=L; l+=dl)
+		{
+			Vector3D<double> tempPosition = posIpr[i]->x(l);
+			position.push_back(tempPosition);
+		}
+	}
+	// 保存文件
+	const char* filename1 = "src/example/tempx.csv";
+	std::ofstream out1(filename1);
+	for (int i=0; i<(int)position.size(); i++)
+	{
+		out1 << position[i](0) << "," << position[i](1) << "," << position[i](2) << endl;
+	}
+	out1.close();
+	**************************/
+
+	int step = 100;
+	const double T = mlabTrajectory->duration();
+	double dt = T/(step - 1);
+	cout << "总时长: " << T << "s" << endl;
+	std::vector<Q> x;
+	std::vector<Q> dx;
+	std::vector<Q> ddx;
+	clockStart = clock();
+	try{
+		for (double t=0; t<=T; t+=dt)
+		{
+			x.push_back(mlabTrajectory->x(t));
+			dx.push_back(mlabTrajectory->dx(t));
+			ddx.push_back(mlabTrajectory->ddx(t));
+		}
+	}
+	catch(char const* msg)
+	{
+		println(msg);
+	}
+	catch(string& msg)
+	{
+		println(msg);
+	}
+	const char* filename1 = "src/example/tempx.csv";
+	std::ofstream out1(filename1);
+	for (int i=0; i<(int)x.size(); i++)
+	{
+		out1 << x[i][0] << ", " << x[i][1] << ", " << x[i][2] << ", " << x[i][3] << ", " << x[i][4] << ", " << x[i][5] << ";" << endl;
+	}
+	out1.close();
+//	clockEnd = clock();
+//	cout << "每次插补用时: " << (clockEnd - clockStart)/(double)step << "us" << endl;
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);
@@ -279,6 +383,31 @@ int main(){
 //	end_t = clock();
 //	cout << "雅克比求法用时: " << end_t - start_t << "us" << endl;
 //	(shuzhi -jacobian).print();
+
+
+//	Vector3D<double> p1(0, 0, 0);
+//	Vector3D<double> p2(1, 1, 0);
+//	Vector3D<double> p3(0.5, 0.6, 0);
+//	Interpolator<Vector3D<double> >::ptr circle(new CircularInterpolator<Vector3D<double> >(p1, p2, p3));
+//
+//	vector<Vector3D<double> > position;
+//	double L = circle->duration();
+//	int step = 100;
+//	double dl = L/(step - 1);
+//	for (double l=0; l<=L; l+=dl)
+//	{
+//		Vector3D<double> tempPosition = circle->x(l);
+//		position.push_back(tempPosition);
+//	}
+//
+//	/**> 保存文件 */
+//	const char* filename1 = "src/example/tempx.csv";
+//	std::ofstream out1(filename1);
+//	for (int i=0; i<(int)position.size(); i++)
+//	{
+//		out1 << position[i](0) << "," << position[i](1) << "," << position[i](2) << endl;
+//	}
+//	out1.close();
 
 
 //	std::vector<std::shared_ptr<base> > a;

@@ -10,7 +10,9 @@
 # include "../model/Config.h"
 # include "../trajectory/CircularInterpolator.h"
 # include "../trajectory/LinearInterpolator.h"
+# include "../trajectory/CompositeInterpolator.h"
 # include "../common/printAdvance.h"
+# include "../pathplanner/SMPlannerEx.h"
 
 using robot::math::Quaternion;
 using robot::model::Config;
@@ -28,7 +30,7 @@ MultiLineArcBlendPlanner::MultiLineArcBlendPlanner(Q qMin, Q qMax, Q dqLim, Q dd
 		throw ("错误<多线段圆弧混合规划器>:　构造参数中数组的长度不一致！");
 }
 
-MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, const vector<double>& arcRatio)
+MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, const vector<double>& arcRatio, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk)
 {
 	using cIpr = CircularInterpolator<Vector3D<double> >;
 	using lIpr = LinearInterpolator<Vector3D<double> >;
@@ -51,6 +53,12 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 	vector<rIpr::ptr> lineRotIpr;
 	/** 各段的长度 2n-3 */
 	vector<double> length;
+	/** @brief 各段的ikInterpolator 2n-1 长度为索引*/
+	vector<Trajectory::ptr> trajectoryIpr;
+	/** @brief 各段的qInterpolator 2n-1 时间为索引*/
+	vector<Interpolator<Q>::ptr > qIpr;
+	/** @brief 各段的lt 2n-1 */
+	vector<Interpolator<double>::ptr> lt;
 
 	/** n */
 	int pathSize = (int)Qpath.size();
@@ -83,24 +91,26 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 	{
 		double l1 = lineLength[i];
 		double l2 = lineLength[i+1];
+//		cout << "l1 = " << l1 << " l2 = " << l2 << endl;
 		double ratiol = arcRatio[i];
 		double ratior = ratiol;
 		if (l1 < l2)
 			ratior = ratiol*l1/l2;
 		else if(l1 > l2)
 			ratiol = ratior*l2/l1;
-		modifiedRatio.push_back(std::pair<double, double>(1 - ratiol, ratior));
+		modifiedRatio.push_back(std::pair<double, double>(1.0 - ratiol, ratior));
 	}
 
 	/**> 记录线段的始末位姿 */
 	lineRotation.push_back(std::pair<Rotation3D<double>, Rotation3D<double> >(
 			path[0].getRotation(),
 			Quaternion::interpolate(path[0].getRotation(), path[1].getRotation(), modifiedRatio[0].first)));
-	int k1 = 0;
-	int k2 = modifiedRatio[0].first;
+	double k1 = 0;
+	double k2 = modifiedRatio[0].first;
+//	cout << "k2 = " << k2 << endl;
 	linePosition.push_back(std::pair<Vector3D<double>, Vector3D<double> >(
 			path[0].getPosition(),
-			path[0].getPosition()*(1 - k2) + path[1].getPosition()*k2));
+			path[0].getPosition()*(1.0 - k2) + path[1].getPosition()*k2));
 	int i = 1;
 	for (; i<arcSize; i++)
 	{
@@ -110,17 +120,18 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 		k1 = modifiedRatio[i - 1].second;
 		k2 = modifiedRatio[i].first;
 		linePosition.push_back(std::pair<Vector3D<double>, Vector3D<double> >(
-				path[i].getPosition()*(1 - k1) + path[i + 1].getPosition()*k1,
-				path[i].getPosition()*(1 - k2) + path[i + 1].getPosition()*k2));
+				path[i].getPosition()*(1.0 - k1) + path[i + 1].getPosition()*k1,
+				path[i].getPosition()*(1.0 - k2) + path[i + 1].getPosition()*k2));
 	}
 	lineRotation.push_back(std::pair<const Rotation3D<double>, const Rotation3D<double> >(
 			Quaternion::interpolate(path[i].getRotation(), path[i+1].getRotation(), modifiedRatio[i-1].second),
 			path[i+1].getRotation()));
 	k1 = modifiedRatio[i - 1].second;
+//	cout << "k1 = " << k1 << endl;
 	k2 = 1;
 	linePosition.push_back(std::pair<Vector3D<double>, Vector3D<double> >(
-			path[i].getPosition()*(1 - k1) + path[i + 1].getPosition()*k1,
-			path[i].getPosition()*(1 - k2) + path[i + 1].getPosition()*k2));
+			path[i].getPosition()*(1.0 - k1) + path[i + 1].getPosition()*k1,
+			path[i].getPosition()*(1.0 - k2) + path[i + 1].getPosition()*k2));
 	/**> 记录圆弧中间点位置 n-2 */
 	for (int i=0; i<arcSize; i++)
 	{
@@ -133,7 +144,11 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 		Vector3D<double> OC = C - O;
 		double ct = OC.getLength()/OA.getLength();
 		double theta = acos(ct);
-		int k = (1 - sin(theta))/(ct*ct);
+		////////////////////////////////////////////////////////////////////////
+		cout<<"theta = " << theta << endl;
+
+
+		double k = (1.0 - sin(theta))/(ct*ct);
 		/** 记录圆弧中点 */
 		arcMidPosition.push_back(OC*k + O);
 	}
@@ -154,21 +169,86 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 		lineRotIpr.push_back(lRotIpr);
 	}
 	/**> 记录长度 */
+	println("MultiLine: 记录长度");
 	bool indexOnLine = true;
 	for (int i=0; i<arcSize + lineSize; i++)
 	{
 		if (indexOnLine)
 		{
 			length.push_back(linePosIpr[i/2]->duration());
-			indexOnLine = !indexOnLine;
 		}
 		else
 		{
 			length.push_back(arcPosIpr[(i - 1)/2]->duration());
-			indexOnLine = !indexOnLine;
 		}
+		indexOnLine = !indexOnLine;
+	}
+	println("MultiLine: 生成ikInterpolator");
+	/**> 生成trajectory */
+	indexOnLine = true;
+	for (int i=0; i<arcSize + lineSize; i++)
+	{
+		if (indexOnLine)
+		{
+			trajectoryIpr.push_back(Trajectory::ptr(new Trajectory(std::make_pair(linePosIpr[i/2], lineRotIpr[i/2]), _ikSolver, config)));
+		}
+		else
+		{
+			trajectoryIpr.push_back(Trajectory::ptr(new Trajectory(std::make_pair(arcPosIpr[(i - 1)/2], arcRotIpr[(i - 1)/2]), _ikSolver, config)));
+		}
+		indexOnLine = !indexOnLine;
 	}
 
+	/**> 生成lt */
+	double sampledl = 0.01;
+	SMPlannerEx smPlanner;
+	double v1 = 0;
+	double v2 = 0;
+	for (int i=0; i<arcSize + lineSize; i++)
+	{
+		double L = trajectoryIpr[i]->duration();
+		int count = L/sampledl + 1;
+		bool stop = i < (arcSize + lineSize - 1) ? false:true;
+		/**************** 策略 ****************************/
+		double vWanted = trajectoryIpr[i]->getMaxSpeed(count, _dqLim, velocity[i/2]);
+		/*************************************************/
+		v1 = v2;
+		try{
+			lt.push_back(smPlanner.query_flexible(0, L, jerk[i/2], acceleration[i/2], v1, vWanted, v2, stop));
+		}
+		catch(const char* msg)
+		{
+			println(msg);
+			throw(string("错误<MulriLineArcBlendPlanner>: 第") + to_string(i + 1) + string("段距离不够, 无法规划! 长度: ") + to_string(L) +
+					string(" 初始速度: ") + to_string(v1) + string(" 期望速度: ") + to_string(vWanted));
+		}
+		catch(std::string& msg)
+		{
+			println(msg);
+			throw(string("错误<MulriLineArcBlendPlanner>: 第") + to_string(i + 1) + string("段距离不够, 无法规划! 长度: ") + to_string(L) +
+					string(" 初始速度: ") + to_string(v1) + string(" 期望速度: ") + to_string(vWanted));
+		}
+		if (fabs(v2 - vWanted) > 1e-12)
+			cout << "MulriLineArcBlendPlanner: 第" << i + 1 << "段速度无法达到. 期望速度 = " << vWanted << " -> 实际速度 = " << v2 << endl;
+	}
+
+	/**> 生成qIpr */
+	for (int i=0; i<arcSize + lineSize; i++)
+	{
+		qIpr.push_back(CompositeInterpolator<Q>::ptr(new CompositeInterpolator<Q>(trajectoryIpr[i], lt[i])));
+	}
+//	println("MultiLine: 测试");
+//	/**** 测试用 ****/
+//	double duration = 0;
+//	for (int i=0; i<arcSize + lineSize; i++)
+//	{
+//		duration=trajectoryIpr[i]->duration();
+//		cout << "length = " << duration << endl;
+//		lt.push_back(Interpolator<double>::ptr(new LinearInterpolator<double>(0, duration, duration)));
+//	}
+
+	MLABTrajectory::ptr mlabTrajectory(new MLABTrajectory(arcPosIpr, linePosIpr, arcRotIpr, lineRotIpr, length, qIpr, trajectoryIpr, lt));
+	return mlabTrajectory;
 }
 
 MultiLineArcBlendPlanner::~MultiLineArcBlendPlanner() {

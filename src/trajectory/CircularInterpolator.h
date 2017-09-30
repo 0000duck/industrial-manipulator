@@ -61,9 +61,7 @@ public:
         const double p12Xp13Length = p12Xp13.getLengh();
 
         if (fabs(p12Xp13Length) < 1e-15)
-            throw(
-                "Unable to make circular interpolator "
-                "based on three points on a straight line");
+            throw("错误<CircularInterpolator>: 无法通过一条直线上的三个点来构造圆弧");
 
         Vector3D<T> nz = p12Xp13 / p12Xp13Length;
         Vector3D<T> nx = Vector3D<T>::normalize(p2-p1);
@@ -73,16 +71,29 @@ public:
         const double x2 = (p2-p1).getLengh();
         const double p3p1Length = (p3-p1).getLengh();
         const double theta = asin(p12Xp13Length/(x2 * p3p1Length));
+
         const double x3 = cos(theta)*p3p1Length;
         const double y3 = sin(theta)*p3p1Length;
+//
+//        _r = sqrt((x2*x2 + (-(x2*x3) + x3*x3 + y3*y3)*(-(x2*x3) + x3*x3 + y3*y3) / y3*y3)) / 2;
+//        _cx = x2 / 2.0;
+//        _cy = (-x2 * x3 + x3*x3 + y3*y3) / (2. * y3);
 
-        _r = sqrt((x2*x2 + (-(x2*x3) + x3*x3 + y3*y3)*(-(x2*x3) + x3*x3 + y3*y3) / y3*y3)) / 2;
-        _cx = x2 / 2.0;
-        _cy = (-x2 * x3 + x3*x3 + y3*y3) / (2. * y3);
+       double l12 = x2;
+       double l23 = (p2 - p3).getLength();
+       double l13 = (p1 - p3).getLength();
+       double theta2 = acos((l23*l23 + l13*l13 - l12*l12)/(2*l13*l23));
+       _r = l12/(2. * sin(theta2));
+       _cx = x2/2.0;
+       _cy = _r*cos(theta2);
+
+
         _tstart = atan2(-_cy/_r, -_cx/_r);
         _tend = atan2((y3-_cy)/_r, (x3-_cx)/_r);
+//        if (_tend <= _tstart)
+//        	_tend += 2*M_PI;
         if (_tend <= _tstart)
-        	_tend += 2*M_PI;
+        	throw("错误<CircularInterpolator>: 不正确的初始点位置, 无法规划");
 	}
 
 	CircularInterpolator(
@@ -97,9 +108,7 @@ public:
         const double p12Xp13Length = p12Xp13.getLength();
 
         if (fabs(p12Xp13Length) < 1e-15)
-            throw(
-                "Unable to make circular interpolator "
-                "based on three points on a straight line");
+            throw("错误<CircularInterpolator>: 无法通过一条直线上的三个点来构造圆弧");
 
         Vector3D<T> nz = p12Xp13 / p12Xp13Length;
         Vector3D<T> nx = Vector3D<T>::normalize(p2-p1);
@@ -112,13 +121,25 @@ public:
         const double x3 = cos(theta)*p3p1Length;
         const double y3 = sin(theta)*p3p1Length;
 
-        _r = sqrt((x2*x2 + (-(x2*x3) + x3*x3 + y3*y3)*(-(x2*x3) + x3*x3 + y3*y3) / y3*y3)) / 2;
-        _cx = x2 / 2.0;
-        _cy = (-x2 * x3 + x3*x3 + y3*y3) / (2. * y3);
+//        _r = sqrt((x2*x2 + (-(x2*x3) + x3*x3 + y3*y3)*(-(x2*x3) + x3*x3 + y3*y3) / y3*y3)) / 2;
+//        _cx = x2 / 2.0;
+//        _cy = (-x2 * x3 + x3*x3 + y3*y3) / (2. * y3);
+
+        double l12 = x2;
+        double l23 = (p2 - p3).getLength();
+        double l13 = (p1 - p3).getLength();
+        double theta2 = acos((l23*l23 + l13*l13 - l12*l12)/(2*l13*l23));
+        _r = l12/(2. * sin(theta2));
+        _cx = x2/2.0;
+        _cy = _r*cos(theta2);
+
+
         _tstart = atan2(-_cy/_r, -_cx/_r);
         _tend = atan2((y3-_cy)/_r, (x3-_cx)/_r);
+//        if (_tend <= _tstart)
+//        	_tend += 2*M_PI;
         if (_tend <= _tstart)
-        	_tend += 2*M_PI;
+        	throw("错误<CircularInterpolator>: 不正确的初始点位置, 无法规划");
         _duration =  getLength();
 	}
 

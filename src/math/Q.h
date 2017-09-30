@@ -250,6 +250,18 @@ public:
 	void doMax(Q&max);
 
 	/**
+	 * @brief 获取最小的数值
+	 * @return 最小的数值
+	 */
+	double getMin() const;
+
+	/**
+	 * @brief 获取最大的数值
+	 * @return 最大的数值
+	 */
+	double getMax() const;
+
+	/**
 	 * @brief 格式化打印
 	 */
 	void print() const;

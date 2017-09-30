@@ -25,10 +25,10 @@ SMPlannerEx::SMPlannerEx()
 
 }
 
-robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query(double s, double h, double aMax, double v1, double v2, bool stop) const
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query(double start, double s, double h, double aMax, double v1, double v2, bool stop) const
 {
 	if (stop && (fixZero(v2) != 0))
-		return query_stop(s, h, aMax, v1, v2);
+		return query_stop(start, s, h, aMax, v1, v2);
 	/**> 判断参数合理性 */
 	if (s <= 0)
 		throw("错误<SMPlannerEx>: 距离必须为正数!");
@@ -51,12 +51,12 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query(double s
 		if (fabs(v2 - v1) <= fabs(aMax*aMax/h))
 		{
 			aMax = sqrt(fabs((v2 - v1)*h));
-			return threeLineMotion(s, h, aMax, v1, v2);
+			return threeLineMotion(start, s, h, aMax, v1, v2);
 		}
 		/**> 四段式加速度 */
 		else
 		{
-			return fourLineMotion(s, h, aMax, v1, v2);
+			return fourLineMotion(start, s, h, aMax, v1, v2);
 		}
 	}
 	/**> 末端速度为0 */
@@ -66,20 +66,21 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query(double s
 		if (fabs(v2 - v1) <= fabs(aMax*aMax/h))
 		{
 			aMax = sqrt(fabs((v2 - v1)*h));
-			return threeLineMotion(s, h, aMax, v1);
+			return threeLineMotion(start, s, h, aMax, v1);
 		}
 		/**> 四段式停止规划 */
 		else
 		{
-			return fourLineMotion(s, h, aMax, v1);
+			return fourLineMotion(start, s, h, aMax, v1);
 		}
 	}
 }
 
-robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible(double s, double h, double aMax, double v1, double v2, double &realV2, bool stop) const
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible(double start, double s, double h, double aMax, double v1, double v2, double &realV2, bool stop) const
 {
 	if (stop && (fixZero(v2) != 0))
-		return query_stop(s, h, aMax, v1, v2);
+		return query_flexible_stop(start, s, h, aMax, v1, v2, realV2);
+	println("SMPlannerEx: 柔性规划过渡段.");
 	/**> 判断参数合理性 */
 	if (s <= 0)
 		throw("错误<SMPlannerEx>: 距离必须为正数!");
@@ -105,12 +106,12 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible
 		if (fabs(v2 - v1) <= fabs(aMax*aMax/h))
 		{
 			aMax = sqrt(fabs((v2 - v1)*h));
-			return threeLineMotion(s, h, aMax, v1, v2);
+			return threeLineMotion(start, s, h, aMax, v1, v2);
 		}
 		/**> 四段式加速度 */
 		else
 		{
-			return fourLineMotion(s, h, aMax, v1, v2);
+			return fourLineMotion(start, s, h, aMax, v1, v2);
 		}
 	}
 	/**> 末端速度为0 */
@@ -123,12 +124,12 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible
 		if (fabs(v2 - v1) <= fabs(aMax*aMax/h))
 		{
 			aMax = sqrt(fabs((v2 - v1)*h));
-			return threeLineMotion(s, h, aMax, v1);
+			return threeLineMotion(start, s, h, aMax, v1);
 		}
 		/**> 四段式停止规划 */
 		else
 		{
-			return fourLineMotion(s, h, aMax, v1);
+			return fourLineMotion(start, s, h, aMax, v1);
 		}
 	}
 }
@@ -213,18 +214,51 @@ double SMPlannerEx::queryMaxSpeed(double s, double h, double aMax, double v1, do
 	return lowerSpeed;
 }
 
-robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_stop(double s, double h, double aMax, double v1, double v2) const
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_stop(double start, double s, double h, double aMax, double v1, double v2) const
 {
 	double s1 = queryMinDistance(h, aMax, v1, v2);
 	double s2 = queryMinDistance(h, aMax, v2, 0);
 	double ds = s - s1 - s2;
 	if (ds <= 0)
-		throw ("错误<SMPlannerEx>: 距离不够!");
+		throw ("错误<SMPlannerEx>: 停止段距离不够!");
 	s1 += ds/2.0;
 	s2 += ds/2.0;
 	SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
-	interpolator->addInterpolator(query(s1, h, aMax, v1, v2));
-	interpolator->addInterpolator(query(s2, h, aMax, v2, 0));
+	interpolator->addInterpolator(query(start, s1, h, aMax, v1, v2));
+	interpolator->addInterpolator(query(start + s1, s2, h, aMax, v2, 0));
+	return interpolator;
+}
+
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible_stop(double start, double s, double h, double aMax, double v1, double v2, double &realV2) const
+{
+	println("SMPlannerEx: 柔性规划停止段.");
+	if (checkDitance_stop(s, h, aMax, v1, v2, realV2));
+	else
+		v2 = realV2;
+	double s1 = queryMinDistance(h, aMax, v1, v2);
+	double s2 = queryMinDistance(h, aMax, v2, 0);
+	double ds = s - s1 - s2;
+	/** 最后一段的realV2可能也无法达到 */
+	if (ds <= 0)
+	{
+		cout << "SMPlannerEx: 柔性规划: 停止段距离不够, 尝试直接减速" << endl;
+		cout << " h = " << h << " aMax = " << aMax << " v1 = " << v1 << endl;
+		cout << "最小距离: " << queryMinDistance(h, aMax, v1, 0) << endl;
+		if (queryMinDistance(h, aMax, v1, 0) <= s)
+		{
+			return query(start, s, h, aMax, v1, 0);
+		}
+		else
+			throw("错误<SMPlannerEx>: 柔性规划: 停止段距离不够!");
+	}
+	cout << "分成两部分进行规划" << endl;
+	s1 += ds/2.0;
+	s2 += ds/2.0;
+	cout << "s1 = " << s1 << endl;
+	cout << "s2 = " << s2 << endl;
+	SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
+	interpolator->addInterpolator(query(start, s1, h, aMax, v1, v2));
+	interpolator->addInterpolator(query(start + s1, s2, h, aMax, v2, 0));
 	return interpolator;
 }
 
@@ -274,7 +308,7 @@ double SMPlannerEx::queryMaxSpeed_stop(double s, double h, double aMax, double v
 	return lowerSpeed;
 }
 
-robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotion(double s, double h, double aMax, double v1, double v2) const
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotion(double start, double s, double h, double aMax, double v1, double v2) const
 {
 	println("过渡三段规划器");
 
@@ -292,9 +326,9 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotio
 		throw("错误<SMPlannerEx>: 距离不够!");
 	}
 
-	PolynomialInterpolator3<double>::ptr interpolator1(new PolynomialInterpolator3<double>(0, v1, 0, h/6.0, t1));
-	PolynomialInterpolator3<double>::ptr interpolator2(new PolynomialInterpolator3<double>(d1, h*t1*t1/2.0 + v1, h*t1/2.0, -h/6, t2 - t1));
-	PolynomialInterpolator2<double>::ptr interpolator3(new PolynomialInterpolator2<double>(d2, v2, 0, t3 - t2));
+	PolynomialInterpolator3<double>::ptr interpolator1(new PolynomialInterpolator3<double>(0 + start, v1, 0, h/6.0, t1));
+	PolynomialInterpolator3<double>::ptr interpolator2(new PolynomialInterpolator3<double>(d1 + start, h*t1*t1/2.0 + v1, h*t1/2.0, -h/6, t2 - t1));
+	PolynomialInterpolator2<double>::ptr interpolator3(new PolynomialInterpolator2<double>(d2 + start, v2, 0, t3 - t2));
 
 	SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
 	interpolator->addInterpolator(interpolator1);
@@ -304,7 +338,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotio
 	return interpolator;
 }
 
-robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::fourLineMotion(double s, double h, double aMax, double v1, double v2) const
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::fourLineMotion(double start, double s, double h, double aMax, double v1, double v2) const
 {
 	println("过渡四段规划器");
 
@@ -325,11 +359,11 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::fourLineMotion
 		throw("错误<SMPlannerEx>: 距离不够!");
 	}
 
-	PolynomialInterpolator3<double>::ptr interpolator1(new PolynomialInterpolator3<double>(0, v1, 0, h/6.0, t1));
-	PolynomialInterpolator2<double>::ptr interpolator2(new PolynomialInterpolator2<double>(d1, t1*t1*h/2 + v1, aMax/2.0, t2 - t1));
+	PolynomialInterpolator3<double>::ptr interpolator1(new PolynomialInterpolator3<double>(0 + start, v1, 0, h/6.0, t1));
+	PolynomialInterpolator2<double>::ptr interpolator2(new PolynomialInterpolator2<double>(d1 + start, t1*t1*h/2 + v1, aMax/2.0, t2 - t1));
 	PolynomialInterpolator3<double>::ptr interpolator3(new PolynomialInterpolator3<double>(
-			d2, (v2 - h*pow(t3 - t2, 2)/2.0), h*(t3 - t2)/2.0, (-h/6.0), t3 - t2));
-	PolynomialInterpolator2<double>::ptr interpolator4(new PolynomialInterpolator2<double>(d3, v2, 0, t4 - t3));
+			d2 + start, (v2 - h*pow(t3 - t2, 2)/2.0), h*(t3 - t2)/2.0, (-h/6.0), t3 - t2));
+	PolynomialInterpolator2<double>::ptr interpolator4(new PolynomialInterpolator2<double>(d3 + start, v2, 0, t4 - t3));
 
 	SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
 	interpolator->addInterpolator(interpolator1);
@@ -340,7 +374,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::fourLineMotion
 	return interpolator;
 }
 
-robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotion(double s, double h, double aMax, double v1) const
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotion(double start, double s, double h, double aMax, double v1) const
 {
 	println("过渡停止三段规划器");
 
@@ -362,9 +396,9 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotio
 	double t0 = d0/v1;
 	d1 += d0;
 
-	PolynomialInterpolator2<double>::ptr interpolator0(new PolynomialInterpolator2<double>(0, v1, 0, t0));
-	PolynomialInterpolator3<double>::ptr interpolator1(new PolynomialInterpolator3<double>(d0, v1, 0, h/6.0, t1));
-	PolynomialInterpolator3<double>::ptr interpolator2(new PolynomialInterpolator3<double>(d1, h*t1*t1/2.0 + v1, h*t1/2.0, -h/6, t2 - t1));
+	PolynomialInterpolator2<double>::ptr interpolator0(new PolynomialInterpolator2<double>(0 + start, v1, 0, t0));
+	PolynomialInterpolator3<double>::ptr interpolator1(new PolynomialInterpolator3<double>(d0 + start, v1, 0, h/6.0, t1));
+	PolynomialInterpolator3<double>::ptr interpolator2(new PolynomialInterpolator3<double>(d1 + start, h*t1*t1/2.0 + v1, h*t1/2.0, -h/6, t2 - t1));
 
 	SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
 	interpolator->addInterpolator(interpolator0);
@@ -374,7 +408,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotio
 	return interpolator;
 }
 
-robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::fourLineMotion(double s, double h, double aMax, double v1) const
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::fourLineMotion(double start, double s, double h, double aMax, double v1) const
 {
 	println("过渡停止四段规划器");
 
@@ -400,11 +434,11 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::fourLineMotion
 	d1 += d0;
 	d2 += d0;
 
-	PolynomialInterpolator2<double>::ptr interpolator0(new PolynomialInterpolator2<double>(0, v1, 0, t0));
-	PolynomialInterpolator3<double>::ptr interpolator1(new PolynomialInterpolator3<double>(d0, v1, 0, h/6.0, t1));
-	PolynomialInterpolator2<double>::ptr interpolator2(new PolynomialInterpolator2<double>(d1, t1*t1*h/2 + v1, aMax/2.0, t2 - t1));
+	PolynomialInterpolator2<double>::ptr interpolator0(new PolynomialInterpolator2<double>(0 + start, v1, 0, t0));
+	PolynomialInterpolator3<double>::ptr interpolator1(new PolynomialInterpolator3<double>(d0 + start, v1, 0, h/6.0, t1));
+	PolynomialInterpolator2<double>::ptr interpolator2(new PolynomialInterpolator2<double>(d1 + start, t1*t1*h/2 + v1, aMax/2.0, t2 - t1));
 	PolynomialInterpolator3<double>::ptr interpolator3(new PolynomialInterpolator3<double>(
-			d2, (v2 - h*pow(t3 - t2, 2)/2.0), h*(t3 - t2)/2.0, (-h/6.0), t3 - t2));
+			d2 + start, (v2 - h*pow(t3 - t2, 2)/2.0), h*(t3 - t2)/2.0, (-h/6.0), t3 - t2));
 
 	SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
 	interpolator->addInterpolator(interpolator0);

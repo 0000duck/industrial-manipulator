@@ -33,9 +33,9 @@ public:
 	 * 若stop=true, 则先加速或减速到v2, 匀速一段距离, 然后再降速到0并刚好到达指定距离.
 	 * 规划的路径始末的加速度都为0.
 	 */
-	robot::trajectory::SequenceInterpolator<double>::ptr query(double s, double h, double aMax, double v1, double v2, bool stop=false) const;
+	robot::trajectory::SequenceInterpolator<double>::ptr query(double start, double s, double h, double aMax, double v1, double v2, bool stop=false) const;
 
-	robot::trajectory::SequenceInterpolator<double>::ptr query_flexible(double s, double h, double aMax, double v1, double v2, double &realV2, bool stop=false) const;
+	robot::trajectory::SequenceInterpolator<double>::ptr query_flexible(double start, double s, double h, double aMax, double v1, double v2, double &realV2, bool stop=false) const;
 
 	/**
 	 * @brief 判断要满足v1, v2, h, aMax条件下距离s是否足够
@@ -72,7 +72,8 @@ public:
 	double queryMaxSpeed(double s, double h, double aMax, double v1, double v2) const;
 	virtual ~SMPlannerEx(){}
 private:
-	robot::trajectory::SequenceInterpolator<double>::ptr query_stop(double s, double h, double aMax, double v1, double v2) const;
+	robot::trajectory::SequenceInterpolator<double>::ptr query_stop(double start, double s, double h, double aMax, double v1, double v2) const;
+	robot::trajectory::SequenceInterpolator<double>::ptr query_flexible_stop(double start, double s, double h, double aMax, double v1, double v2, double &realV2) const;
 
 	/**
 	 * @brief 停止段判断要满足v1, v2, h, aMax条件下距离s是否足够
@@ -107,10 +108,10 @@ private:
 	 * queryMinDistance再次排查
 	 */
 	double queryMaxSpeed_stop(double s, double h, double aMax, double v1, double v2) const;
-	robot::trajectory::SequenceInterpolator<double>::ptr threeLineMotion(double s, double h, double aMax, double v1, double v2) const;
-	robot::trajectory::SequenceInterpolator<double>::ptr fourLineMotion(double s, double h, double aMax, double v1, double v2) const;
-	robot::trajectory::SequenceInterpolator<double>::ptr threeLineMotion(double s, double h, double aMax, double v1) const;
-	robot::trajectory::SequenceInterpolator<double>::ptr fourLineMotion(double s, double h, double aMax, double v1) const;
+	robot::trajectory::SequenceInterpolator<double>::ptr threeLineMotion(double start, double s, double h, double aMax, double v1, double v2) const;
+	robot::trajectory::SequenceInterpolator<double>::ptr fourLineMotion(double start, double s, double h, double aMax, double v1, double v2) const;
+	robot::trajectory::SequenceInterpolator<double>::ptr threeLineMotion(double start, double s, double h, double aMax, double v1) const;
+	robot::trajectory::SequenceInterpolator<double>::ptr fourLineMotion(double start, double s, double h, double aMax, double v1) const;
 };
 
 } /* namespace pathplanner */
