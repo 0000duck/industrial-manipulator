@@ -23,6 +23,9 @@ using robot::math::HTransform3D;
 namespace robot {
 namespace pathplanner {
 
+/**
+ * @brief 连续规划-多直线圆弧混合路径规划器
+ */
 class MultiLineArcBlendPlanner {
 public:
 	MultiLineArcBlendPlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,

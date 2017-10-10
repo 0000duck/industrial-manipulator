@@ -12,7 +12,7 @@ namespace trajectory {
 
 Trajectory::Trajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 		std::shared_ptr<robot::ik::IKSolver> iksolver,
-		robot::model::Config config): ikInterpolator(origin, iksolver, config), _lt(new SequenceInterpolator<double>())
+		robot::model::Config config): ikInterpolator(origin, iksolver, config)
 {
 
 }

@@ -80,7 +80,6 @@ public:
 	double getMaxSpeed(const int count, Q dqMax, Q ddqMax, double v, double precision=0.00001);
 	virtual ~Trajectory(){}
 protected:
-	SequenceInterpolator<double>::ptr _lt;
 };
 
 } /* namespace trajectory */

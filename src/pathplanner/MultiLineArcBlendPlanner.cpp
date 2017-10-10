@@ -249,6 +249,8 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 		indexOnLine = !indexOnLine;
 	}
 
+	/**> 统一的lt由MLABTrajecoty自动生成 */
+
 //	println("MultiLine: 测试");
 //	/**** 测试用 ****/
 //	double duration = 0;
