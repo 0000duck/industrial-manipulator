@@ -136,6 +136,50 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible
 	}
 }
 
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible(
+		double start,
+		double s,
+		double h,
+		double aMax,
+		double v1,
+		double v2,
+		double v3,
+		double &realV2,
+		double &realV3) const
+{
+	println("SMPlannerEx: 三速度柔性规划.");
+	/**> 判断参数合理性 */
+	if (s <= 0)
+		throw("错误<SMPlannerEx>: 距离必须为正数!");
+	if (fixZero(v1) < 0 || fixZero(v2) < 0 || fixZero(v3) < 0)
+		throw("错误<SMPlannerEx>: 速度必须为非负数!");
+	if	(fixZero(v1) == 0 && fixZero(v2) == 0)
+		throw("错误<SMPlannerEx>: v1 v2 速度不能同时为0");
+	if	(fixZero(v2) == 0 && fixZero(v3) == 0)
+		throw("错误<SMPlannerEx>: v2 v3 速度不能同时为0");
+	if (checkDitance(s, h, aMax, v1, v2, v3, realV2, realV3))
+	{
+		double s1 = queryMinDistance(h, aMax, v1, v2);
+		double s2 = queryMinDistance(h, aMax, v2, v3);
+		double ds = s - s1 - s2;
+		cout << "分成两部分进行规划" << endl;
+		s1 += ds*1.0;
+		s2 += ds*0.0;
+		cout << "s1 = " << s1 << endl;
+		cout << "s2 = " << s2 << endl;
+		SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
+		interpolator->addInterpolator(query(start, s1, h, aMax, v1, v2));
+		interpolator->addInterpolator(query(start + s1, s2, h, aMax, v2, v3));
+		return interpolator;
+	}
+	else
+	{
+		robot::trajectory::SequenceInterpolator<double>::ptr result = query_flexible(start, s, h, aMax, v1, v3, realV3);
+		realV2 = realV3;
+		return result;
+	}
+}
+
 bool SMPlannerEx::checkDitance(double s, double h, double aMax, double v1, double v2, double &realV2, bool stop) const
 {
 	if (stop)
@@ -274,6 +318,20 @@ bool SMPlannerEx::checkDitance_stop(double s, double h, double aMax, double v1, 
 	else
 	{
 		realV2 = queryMaxSpeed_stop(s, h, aMax, v1, v2);
+		return false;
+	}
+}
+
+bool SMPlannerEx::checkDitance(double s, double h, double aMax, double v1, double v2, double v3, double &realV2, double &realV3) const
+{
+	if (s >= (queryMinDistance(h, aMax, v1, v2) + queryMinDistance(h, aMax, v2, v3)))
+	{
+		realV2 = v2;
+		realV3 = v3;
+		return true;
+	}
+	else
+	{
 		return false;
 	}
 }

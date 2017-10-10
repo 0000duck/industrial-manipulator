@@ -9,6 +9,7 @@
 #define TRAJECTORY_H_
 
 # include "ConvertedInterpolator.h"
+# include "SequenceInterpolator.h"
 # include <memory>
 
 using namespace robot::trajectory;
@@ -66,7 +67,20 @@ public:
 	 * @return 在dqMax的约束下, 在整条路径上沿着路径允许的最大速度
 	 */
 	double getMaxSpeed(const int count, Q dqMax, double v, double precision=0.00001);
+
+	/**
+	 * @brief dqMax约束下获取沿路径的最大速度
+	 * @param count [in] 采样的点数
+	 * @param dqMax [in] 各关节的限制最大速度
+	 * @param ddqMax [in] 各关节的限制最大加速度
+	 * @param v [in] 限制沿路径的最大速度
+	 * @param precision [in] 速度, 加速度数值计算的精度(dt)
+	 * @return 在dqMax和ddqMax的约束下, 在整条路径上沿着路径允许的最大速度
+	 */
+	double getMaxSpeed(const int count, Q dqMax, Q ddqMax, double v, double precision=0.00001);
 	virtual ~Trajectory(){}
+protected:
+	SequenceInterpolator<double>::ptr _lt;
 };
 
 } /* namespace trajectory */

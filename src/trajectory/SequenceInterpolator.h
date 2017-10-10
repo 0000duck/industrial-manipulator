@@ -8,8 +8,10 @@
 #define SEQUENCEINTERPOLATOR_H_
 
 # include "Interpolator.h"
+# include "ConvertedInterpolator.h"
 # include <vector>
 # include "../common/printAdvance.h"
+# include <functional>
 # include <memory>
 
 using namespace robot::trajectory;
@@ -43,11 +45,43 @@ public:
 	{
 		_interpolatorSequence.push_back(interpolator);
 		if (_timeSequence.size() == 0)
+		{
+			_timeSequence.push_back(interpolator->duration());
+		}
+		else
+		{
+			_timeSequence.push_back(interpolator->duration() + *(_timeSequence.end() - 1));
+		}
+	}
+
+	/**
+	 * @brief 拼接插补器
+	 * @param interpolator [in] 拼接的插补器
+	 *
+	 * 用于拼接插补器. 下一个插补器要加上上一个插补器的结束值.
+	 */
+	void appendInterpolator(std::shared_ptr<Interpolator<double> > interpolator)
+	{
+		if (_timeSequence.size() == 0)
+		{
+			_interpolatorSequence.push_back(interpolator);
+		}
+		else
+		{
+			int index = (int)_interpolatorSequence.size() - 1;
+			double duration = _interpolatorSequence[index]->duration();
+			double end = _interpolatorSequence[index]->x(duration);
+			ConvertedInterpolator<double, double>::ptr movedIpr(new ConvertedInterpolator<double, double>(
+					interpolator, [=](double x){return x + end;}, [](double x){return x;}, [](double x){return x;}));
+			_interpolatorSequence.push_back(movedIpr);
+		}
+		if (_timeSequence.size() == 0)
 			_timeSequence.push_back(interpolator->duration());
 		else
 		{
 			_timeSequence.push_back(interpolator->duration() + *(_timeSequence.end() - 1));
 		}
+
 	}
 
 	T x(double t) const

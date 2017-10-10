@@ -21,6 +21,7 @@ public:
 
 	/**
 	 * @brief 在v1到v2速度之间进行规划
+	 * @param start [in] 初始位置
 	 * @param s [in] 要到达的距离
 	 * @param h [in] 限制的最大加加速度
 	 * @param aMax [in] 限制的最大加速度
@@ -35,7 +36,49 @@ public:
 	 */
 	robot::trajectory::SequenceInterpolator<double>::ptr query(double start, double s, double h, double aMax, double v1, double v2, bool stop=false) const;
 
+	/**
+	 * @brief 柔性速度规划(enhanced query)
+	 * @param start [in] 初始位置
+	 * @param s [in] 要到达的距离
+	 * @param h [in] 限制的最大加加速度
+	 * @param aMax [in] 限制的最大加速度
+	 * @param v1 [in] 初始速度
+	 * @param v2 [in] 期望到达的末端速度
+	 * @param realV2 [out] 实际到达的末端速度
+	 * @param stop [in] 是否为停止段
+	 * @return 插补器指针
+	 *
+	 * 规划器尝试v1到v2的规划, 如果在有限距离内无法达到速度v2, 不报错而是做尽量到达v2速度
+	 * 的规划, 实际达到的速度realV2通过参数返回.
+	 */
 	robot::trajectory::SequenceInterpolator<double>::ptr query_flexible(double start, double s, double h, double aMax, double v1, double v2, double &realV2, bool stop=false) const;
+
+	/**
+	 * @brief 柔性三速度规划
+	 * @param start [in] 初始位置
+	 * @param s [in] 要到达的距离
+	 * @param h [in] 限制的最大加加速度
+	 * @param aMax [in] 限制的最大加速度
+	 * @param v1 [in] 初始速度
+	 * @param v2 [in] 期望到达的中段速度
+	 * @param v3 [in] 期望到达的末端速度
+	 * @param realV2 [out] 实际到达的中段速度
+	 * @param realV3 [out] 实际到达的末端速度
+	 * @return 插补器指针
+	 *
+	 * 规划器尝试规划从v1到v2, 匀速, 最后从v2到v3的速度规划, 如果有限距离不够, 则用柔性规划做v1到v3的规划(
+	 * 无视v2条件), 此时返回的realV2 = realV3
+	 */
+	robot::trajectory::SequenceInterpolator<double>::ptr query_flexible(
+			double start,
+			double s,
+			double h,
+			double aMax,
+			double v1,
+			double v2,
+			double v3,
+			double &realV2,
+			double &realV3) const;
 
 	/**
 	 * @brief 判断要满足v1, v2, h, aMax条件下距离s是否足够
@@ -87,6 +130,8 @@ private:
 	 * @return 是否能在满足期望末端速度的情况下到达距离s
 	 */
 	bool checkDitance_stop(double s, double h, double aMax, double v1, double v2, double &realV2) const;
+
+	bool checkDitance(double s, double h, double aMax, double v1, double v2, double v3, double &realV2, double &realV3) const;
 
 	/**
 	 * @brief 停止段先从速度v1达到v2再降到速度0所需要的最短距离

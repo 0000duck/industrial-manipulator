@@ -23,6 +23,41 @@ namespace trajectory {
  * @{
  */
 template <class T>
+class PolynomialInterpolator1: public Interpolator<T> {
+public:
+	using ptr = std::shared_ptr<PolynomialInterpolator1>;
+	PolynomialInterpolator1(const T& a,const T& b,double duration):
+		_a(a),_b(b),_vel(b),_acc(b*0),_duration(duration)
+{
+}
+
+	virtual ~PolynomialInterpolator1(){}
+	T x(double t) const
+	{
+		return _a+_b*t;
+	}
+	T dx(double t)const
+	{
+		return _vel;
+	}
+	T ddx(double t)const
+	{
+		return _acc;
+	}
+
+	double duration() const
+	{
+		return _duration;
+	}
+private:
+	T _a;
+	T _b;
+	T _vel;
+	T _acc;
+	double _duration;
+};
+
+template <class T>
 class PolynomialInterpolator2: public Interpolator<T> {
 public:
 	using ptr = std::shared_ptr<PolynomialInterpolator2>;

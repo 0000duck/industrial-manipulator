@@ -145,6 +145,11 @@ public:
 	 * @retval false 四个参数都相同
 	 */
 	bool operator!=(const Config& config) const;
+
+	/**
+	 * @brief 格式化打印输出
+	 */
+	void print() const;
 	virtual ~Config();
 private:
 	/** @brief 肩部配置 */

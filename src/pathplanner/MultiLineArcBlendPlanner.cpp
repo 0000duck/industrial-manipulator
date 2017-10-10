@@ -58,7 +58,11 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 	/** @brief 各段的qInterpolator 2n-1 时间为索引*/
 	vector<Interpolator<Q>::ptr > qIpr;
 	/** @brief 各段的lt 2n-1 */
-	vector<Interpolator<double>::ptr> lt;
+//	vector<Interpolator<double>::ptr> lt;
+	/**> 统一的位置插补器 */
+	SequenceInterpolator<Vector3D<double> >::ptr posIpr(new SequenceInterpolator<Vector3D<double> >());
+	/**> 统一的姿态插补器 */
+	SequenceInterpolator<Rotation3D<double> >::ptr rotIpr(new SequenceInterpolator<Rotation3D<double> >);
 
 	/** n */
 	int pathSize = (int)Qpath.size();
@@ -76,7 +80,13 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 	Config config = _serialLink->getConfig(Qpath[0]);
 	for (int i=1; i<pathSize; i++)
 		if (config != _serialLink->getConfig(Qpath[i]))
+		{
+			cout << "初始Config: \n" ;
+			config.print();
+			cout << "该关节Config: \n" ;
+			(_serialLink->getConfig(Qpath[i])).print();
 			throw (std::string("错误<MultiLineArcBlendPlanner>: 第 ") + to_string(i + 1) + std::string(" 个关节的的Config和初始点不同!"));
+		}
 
 	/**> 保存路径点 */
 	for (int i=0; i<pathSize; i++)
@@ -200,42 +210,43 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 	}
 
 	/**> 生成lt */
-	double sampledl = 0.01;
-	SMPlannerEx smPlanner;
-	double v1 = 0;
-	double v2 = 0;
-	for (int i=0; i<arcSize + lineSize; i++)
-	{
-		double L = trajectoryIpr[i]->duration();
-		int count = L/sampledl + 1;
-		bool stop = i < (arcSize + lineSize - 1) ? false:true;
-		/**************** 策略 ****************************/
-		double vWanted = trajectoryIpr[i]->getMaxSpeed(count, _dqLim, velocity[i/2]);
-		/*************************************************/
-		v1 = v2;
-		try{
-			lt.push_back(smPlanner.query_flexible(0, L, jerk[i/2], acceleration[i/2], v1, vWanted, v2, stop));
-		}
-		catch(const char* msg)
-		{
-			println(msg);
-			throw(string("错误<MulriLineArcBlendPlanner>: 第") + to_string(i + 1) + string("段距离不够, 无法规划! 长度: ") + to_string(L) +
-					string(" 初始速度: ") + to_string(v1) + string(" 期望速度: ") + to_string(vWanted));
-		}
-		catch(std::string& msg)
-		{
-			println(msg);
-			throw(string("错误<MulriLineArcBlendPlanner>: 第") + to_string(i + 1) + string("段距离不够, 无法规划! 长度: ") + to_string(L) +
-					string(" 初始速度: ") + to_string(v1) + string(" 期望速度: ") + to_string(vWanted));
-		}
-		if (fabs(v2 - vWanted) > 1e-12)
-			cout << "MulriLineArcBlendPlanner: 第" << i + 1 << "段速度无法达到. 期望速度 = " << vWanted << " -> 实际速度 = " << v2 << endl;
-	}
+	vector<SequenceInterpolator<double>::ptr> lt = getLt(arcSize, lineSize, trajectoryIpr, velocity, acceleration, jerk);
 
 	/**> 生成qIpr */
 	for (int i=0; i<arcSize + lineSize; i++)
 	{
 		qIpr.push_back(CompositeInterpolator<Q>::ptr(new CompositeInterpolator<Q>(trajectoryIpr[i], lt[i])));
+	}
+
+	/**> 生成统一的位置插补器 */
+	indexOnLine = true;
+	for (int i=0; i<arcSize + lineSize; i++)
+	{
+		if (indexOnLine)
+		{
+			Interpolator<Vector3D<double> >::ptr temp = linePosIpr[i/2];
+			posIpr->addInterpolator(temp);
+		}
+		else
+		{
+			posIpr->addInterpolator(arcPosIpr[(i - 1)/2]);
+		}
+		indexOnLine = !indexOnLine;
+	}
+
+	/**> 生成统一的姿态插补器 */
+	indexOnLine = true;
+	for (int i=0; i<arcSize + lineSize; i++)
+	{
+		if (indexOnLine)
+		{
+			rotIpr->addInterpolator(lineRotIpr[i/2]);
+		}
+		else
+		{
+			rotIpr->addInterpolator(arcRotIpr[(i - 1)/2]);
+		}
+		indexOnLine = !indexOnLine;
 	}
 
 //	println("MultiLine: 测试");
@@ -252,8 +263,112 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 //		qIpr.push_back(CompositeInterpolator<Q>::ptr(new CompositeInterpolator<Q>(trajectoryIpr[i], lt[i])));
 //	}
 
-	MLABTrajectory::ptr mlabTrajectory(new MLABTrajectory(arcPosIpr, linePosIpr, arcRotIpr, lineRotIpr, length, qIpr, trajectoryIpr, lt));
+	MLABTrajectory::ptr mlabTrajectory(new MLABTrajectory(arcPosIpr, linePosIpr, arcRotIpr, lineRotIpr, length, qIpr, trajectoryIpr, lt,
+			std::make_pair(posIpr, rotIpr), _ikSolver, config));
 	return mlabTrajectory;
+}
+
+vector<SequenceInterpolator<double>::ptr> MultiLineArcBlendPlanner::getLt(double arcSize, double lineSize, vector<Trajectory::ptr>& trajectoryIpr, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk)
+{
+	/** 策略 1 **/
+//	vector<Interpolator<double>::ptr> lt;
+//	double sampledl = 0.01;
+//	SMPlannerEx smPlanner;
+//	double v1 = 0;
+//	double v2 = 0;
+//	for (int i=0; i<arcSize + lineSize; i++)
+//	{
+//		double L = trajectoryIpr[i]->duration();
+//		int count = L/sampledl + 1;
+//		bool stop = i < (arcSize + lineSize - 1) ? false:true;
+//		/**************** 策略 ****************************/
+////		double vWanted = trajectoryIpr[i]->getMaxSpeed(count, _dqLim, velocity[i/2]); // 仅受关节速度约束
+//		double vWanted = trajectoryIpr[i]->getMaxSpeed(count, _dqLim, _ddqLim, velocity[i/2]); // 受解耦的关节速度, 加速度约束
+//		/*************************************************/
+//		v1 = v2;
+//		try{
+//			lt.push_back(smPlanner.query_flexible(0, L, jerk[i/2], acceleration[i/2], v1, vWanted, v2, stop));
+//		}
+//		catch(const char* msg)
+//		{
+//			println(msg);
+//			throw(string("错误<MulriLineArcBlendPlanner>: 第") + to_string(i + 1) + string("段距离不够, 无法规划! 长度: ") + to_string(L) +
+//					string(" 初始速度: ") + to_string(v1) + string(" 期望速度: ") + to_string(vWanted));
+//		}
+//		catch(std::string& msg)
+//		{
+//			println(msg);
+//			throw(string("错误<MulriLineArcBlendPlanner>: 第") + to_string(i + 1) + string("段距离不够, 无法规划! 长度: ") + to_string(L) +
+//					string(" 初始速度: ") + to_string(v1) + string(" 期望速度: ") + to_string(vWanted));
+//		}
+//		if (fabs(v2 - vWanted) > 1e-12)
+//			cout << "MulriLineArcBlendPlanner: 第" << i + 1 << "段速度无法达到. 期望速度 = " << vWanted << " -> 实际速度 = " << v2 << endl;
+//	}
+
+	/** 策略2 三速度规划 关节速度与加速度限制的线速度 线加速度不约束**/
+	vector<SequenceInterpolator<double>::ptr> lt;
+	double sampledl = 0.01;
+	SMPlannerEx smPlanner;
+	vector<double> maxSpeed;
+	for (int i=0; i<arcSize + lineSize; i++)
+	{
+		double L = trajectoryIpr[i]->duration();
+		int count = L/sampledl + 1;
+		double tempMaxSpeed = trajectoryIpr[i]->getMaxSpeed(count, _dqLim, _ddqLim, velocity[i/2]);
+		if (tempMaxSpeed <= 0)
+			throw(string("错误<MulriLineArcBlendPlanner>: 第") + to_string(i + 1) + string("段限制速度为0"));
+		maxSpeed.push_back(tempMaxSpeed);// 受解耦的关节速度, 加速度约束
+	}
+	double v1 = 0;
+	double v2 = 0;
+	double v3 = 0;
+	for (int i=0; i<arcSize + lineSize; i++)
+	{
+		double L = trajectoryIpr[i]->duration();
+		try{
+			/**> 终止段规划 */
+			if (i == arcSize + lineSize - 1)
+			{
+				v1 = v3;
+				v3 = maxSpeed[i];
+				lt.push_back(smPlanner.query_flexible(0, L, jerk[i/2], acceleration[i/2], v1, v3, v3, true));
+				if (fabs(v3 - maxSpeed[i]) > 1e-12)
+					cout << "MulriLineArcBlendPlanner: 第" << i + 1 << "段速度无法达到. 期望速度 = " << maxSpeed[i] << " -> 实际速度 = " << v3 << endl;
+			}
+			/**> 除终止段外的线段 */
+			else if (i%2 == 0)
+			{
+				v1 = v3;
+				v2 = maxSpeed[i];
+				v3 = maxSpeed[i + 1];
+				lt.push_back(smPlanner.query_flexible(0, L, jerk[i/2], acceleration[i/2], v1, v2, v3, v2, v3));
+				if (fabs(v2 - maxSpeed[i]) > 1e-12)
+					cout << "MulriLineArcBlendPlanner: 第" << i + 1 << "段速度无法达到. 期望速度 = " << maxSpeed[i] << " -> 实际速度 = " << v2 << endl;
+			}
+			/**> 圆弧段 */
+			else
+			{
+				v1 = v3;
+				v3 = maxSpeed[i];
+				lt.push_back(smPlanner.query_flexible(0, L, jerk[i/2], acceleration[i/2], v1, v3, v3, false));
+				if (fabs(v3 - maxSpeed[i]) > 1e-12)
+					cout << "MulriLineArcBlendPlanner: 第" << i + 1 << "段速度无法达到. 期望速度 = " << maxSpeed[i] << " -> 实际速度 = " << v3 << endl;
+			}
+		}
+		catch(const char* msg)
+		{
+			println(msg);
+			throw(string("错误<MulriLineArcBlendPlanner>: 第") + to_string(i + 1) + string("段距离不够, 无法规划! 长度: ") + to_string(L) +
+					string(" 初始速度: ") + to_string(v1) + string(" 期望速度: ") + to_string(v3));
+		}
+		catch(std::string& msg)
+		{
+			println(msg);
+			throw(string("错误<MulriLineArcBlendPlanner>: 第") + to_string(i + 1) + string("段距离不够, 无法规划! 长度: ") + to_string(L) +
+					string(" 初始速度: ") + to_string(v1) + string(" 期望速度: ") + to_string(v3));
+		}
+	}
+	return lt;
 }
 
 MultiLineArcBlendPlanner::~MultiLineArcBlendPlanner() {

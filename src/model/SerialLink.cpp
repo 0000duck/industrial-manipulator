@@ -265,6 +265,7 @@ Config SerialLink::getConfig(const robot::math::Q& q) const
 	double a4 = dHTable[3].a();
 	double d4 = dHTable[3].d();
 	double config_r = a2 + a3*cos(j2) + a4*cos(j2 + j3) - d4*sin(j2 + j3);
+	j3 -= M_PI/2.0; //// 新松4kg机器人
 	double wrist = (j5 >= 0)? Config::wpositive:Config::wnegative;
 	double elbow = (j3 >= 0)? Config::epositive:Config::enegative;
 	double shoulder =(config_r < 0)? Config::righty:Config::lefty;

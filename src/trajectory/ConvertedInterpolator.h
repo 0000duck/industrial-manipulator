@@ -15,6 +15,7 @@
 # include "../ik/IKSolver.h"
 # include "../model/Config.h"
 # include "../common/printAdvance.h"
+# include <functional>
 # include <algorithm>
 
 using std::vector;
@@ -44,24 +45,25 @@ public:
 	 * 记录源插补器的指针
 	 * @param origin [in] 源插补器
 	 */
-	ConvertedInterpolator(std::shared_ptr<Interpolator<B> > origin)
+	ConvertedInterpolator(std::shared_ptr<Interpolator<B> > origin, std::function<T(B)> transformx, std::function<T(B)> transformdx, std::function<T(B)> transformddx)
+	:_transformx(transformx), _transformdx(transformdx), _transformddx(transformddx)
 	{
 		_OriginalInterpolator = origin;
 	}
 
 	T x(double t) const
 	{
-		return T(_OriginalInterpolator->x(t));
+		return _transformx(_OriginalInterpolator->x(t));
 	}
 
 	T dx(double t) const
 	{
-		return T(_OriginalInterpolator->dx(t));
+		return _transformdx(_OriginalInterpolator->dx(t));
 	}
 
 	T ddx(double t) const
 	{
-		return T(_OriginalInterpolator->ddx(t));
+		return _transformddx(_OriginalInterpolator->ddx(t));
 	}
 
 	double duration() const
@@ -72,6 +74,9 @@ public:
 private:
 	/** @brief 源插补器 */
 	std::shared_ptr<Interpolator<B> > _OriginalInterpolator;
+	std::function<T(B)> _transformx;
+	std::function<T(B)> _transformdx;
+	std::function<T(B)> _transformddx;
 };
 
 /**

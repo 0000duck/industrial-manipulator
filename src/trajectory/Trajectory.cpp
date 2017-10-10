@@ -12,7 +12,7 @@ namespace trajectory {
 
 Trajectory::Trajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 		std::shared_ptr<robot::ik::IKSolver> iksolver,
-		robot::model::Config config): ikInterpolator(origin, iksolver, config)
+		robot::model::Config config): ikInterpolator(origin, iksolver, config), _lt(new SequenceInterpolator<double>())
 {
 
 }
@@ -57,12 +57,6 @@ vector<Q> Trajectory::sampleVel(const int count, double precision)
 	return dq;
 }
 
-/**
- * @brief 采样分析ikInterpolator指示路径上的关节速度和关节加速度上下限
- * @param count [in] 采样的点数
- * @param precision [in] 速度, 加速度数值计算的精度(dt)
- * @return {{dqMin, dqMax}, {ddqMin, ddqMax}}
- */
 std::pair<std::pair<Q, Q>, std::pair<Q, Q> > Trajectory::getMinMax(const int count, double precision)
 {
 	qVelAcc result = this->sampleVelAcc(count, precision);
@@ -77,12 +71,6 @@ std::pair<std::pair<Q, Q>, std::pair<Q, Q> > Trajectory::getMinMax(const int cou
 	return std::make_pair(std::make_pair(dqMin, dqMax), std::make_pair(ddqMin, ddqMax));
 }
 
-/**
- * @brief 采样分析ikInterpolator指示路径上的关节速度和关节加速度的绝对值上限
- * @param count [in] 采样的点数
- * @param precision [in] 速度, 加速度数值计算的精度(dt)
- * @return {dqMaxAbs, ddqMaxAbs}
- */
 std::pair<Q, Q> Trajectory::getMaxAbs(const int count, double precision)
 {
 	qVelAcc result = this->sampleVelAcc(count, precision);
@@ -97,13 +85,6 @@ std::pair<Q, Q> Trajectory::getMaxAbs(const int count, double precision)
 	return std::make_pair(dqMax, ddqMax);
 }
 
-/**
- * @brief dqMax约束下采样沿路径的最大速度
- * @param count [in] 采样的点数
- * @param dqMax [in] 各关节的限制最大速度
- * @param precision [in] 速度, 加速度数值计算的精度(dt)
- * @return 在dqMax的约束下, 在采样点上沿着路径允许的最大速度
- */
 vector<double> Trajectory::sampleMaxSpeed(const int count, Q dqMax, double precision)
 {
 	vector<Q> dq = sampleVel(count, precision);
@@ -116,14 +97,6 @@ vector<double> Trajectory::sampleMaxSpeed(const int count, Q dqMax, double preci
 	return maxSpeed;
 }
 
-/**
- * @brief dqMax约束下获取沿路径的最大速度
- * @param count [in] 采样的点数
- * @param dqMax [in] 各关节的限制最大速度
- * @param v [in] 限制沿路径的最大速度
- * @param precision [in] 速度, 加速度数值计算的精度(dt)
- * @return 在dqMax的约束下, 在整条路径上沿着路径允许的最大速度
- */
 double Trajectory::getMaxSpeed(const int count, Q dqMax, double v, double precision)
 {
 	vector<Q> dq = sampleVel(count, precision);
@@ -133,6 +106,25 @@ double Trajectory::getMaxSpeed(const int count, Q dqMax, double v, double precis
 	for (int i=0; i<(int)dq.size(); i++)
 	{
 		tempSpeed = (dqMax/dq[i]).getMin();
+		maxSpeed = tempSpeed < maxSpeed ? tempSpeed:maxSpeed;
+	}
+	return maxSpeed;
+}
+
+double Trajectory::getMaxSpeed(const int count, Q dqMax, Q ddqMax, double v, double precision)
+{
+	Trajectory::qVelAcc velAcc = sampleVelAcc(count, precision);
+	vector<Q> dq = velAcc.dq;
+	vector<Q> ddq = velAcc.ddq;
+	for_each(dq.begin(), dq.end(), [](Q& q){q.abs();});
+	for_each(ddq.begin(), ddq.end(), [](Q& q){q.abs();});
+	double maxSpeed = v;
+	double tempSpeed = 0;
+	for (int i=0; i<(int)dq.size(); i++)
+	{
+		tempSpeed = (dqMax/dq[i]).getMin();
+		maxSpeed = tempSpeed < maxSpeed ? tempSpeed:maxSpeed;
+		tempSpeed = sqrt((ddqMax/ddq[i]).getMin());
 		maxSpeed = tempSpeed < maxSpeed ? tempSpeed:maxSpeed;
 	}
 	return maxSpeed;

@@ -22,7 +22,7 @@ using std::vector;
 namespace robot {
 namespace trajectory {
 
-class MLABTrajectory: public Interpolator<Q> {
+class MLABTrajectory: public Trajectory {
 public:
 	using ptr = std::shared_ptr<MLABTrajectory>;
 
@@ -34,11 +34,17 @@ public:
 			vector<double> length,
 			vector<Interpolator<Q>::ptr> qIpr,
 			vector<Trajectory::ptr> trajectoryIpr,
-			vector<Interpolator<double>::ptr > lt);
+			vector<SequenceInterpolator<double>::ptr > lt,
+			std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
+			std::shared_ptr<robot::ik::IKSolver> iksolver,
+			robot::model::Config config);
 
 	Q x(double t) const;
 	Q dx(double t) const;
 	Q ddx(double t) const;
+	double l(double t) const;
+	double dl(double t) const;
+	double ddl(double t) const;
 	double duration() const;
 	vector<Interpolator<Vector3D<double> >::ptr> getPosIpr() const;
 	virtual ~MLABTrajectory(){}
@@ -64,7 +70,11 @@ private:
 	vector<Interpolator<Q>::ptr > _qIpr;
 
 	/** @brief l(t) 2n-1 */
-	vector<Interpolator<double>::ptr > _lt;
+	vector<SequenceInterpolator<double>::ptr > _vlt;
+	/** @brief 时间索引 */
+	vector<double> _t;
+	/** @brief 长度索引 */
+	vector<double> _l;
 	/** @brief t(l) 2n-1 */
 //	Interpolator<double>::ptr _tl;
 

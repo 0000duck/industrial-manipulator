@@ -6,6 +6,9 @@
  */
 
 #include "Config.h"
+# include "../common/printAdvance.h"
+
+using namespace robot::common;
 
 namespace robot {
 namespace model {
@@ -67,6 +70,56 @@ bool Config::operator==(const Config& config) const
 bool Config::operator!=(const Config& config) const
 {
 	return !(this->operator ==(config));
+}
+
+void Config::print() const
+{
+	switch(_shoulder)
+	{
+	case Config::righty:
+		cout << "righty\t";
+		break;
+	case Config::lefty:
+		cout << "lefty\t";
+		break;
+	case Config::ssame:
+		cout << "ssame\t";
+		break;
+	case Config::sfree:
+		cout << "sfree\t";
+		break;
+	}
+	switch(_elbow)
+	{
+	case Config::epositive:
+		cout << "epositive\t";
+		break;
+	case Config::enegative:
+		cout << "enegative\t";
+		break;
+	case Config::esame:
+		cout << "esame\t";
+		break;
+	case Config::efree:
+		cout << "efree\t";
+		break;
+	}
+	switch(_wrist)
+	{
+	case Config::wpositive:
+		cout << "wpositive\t";
+		break;
+	case Config::wnegative:
+		cout << "wnegative\t";
+		break;
+	case Config::wsame:
+		cout << "wsame\t";
+		break;
+	case Config::wfree:
+		cout << "wfree\t";
+		break;
+	}
+	println();
 }
 
 Config::~Config() {
