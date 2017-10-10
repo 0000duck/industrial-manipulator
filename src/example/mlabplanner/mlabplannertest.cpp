@@ -154,19 +154,24 @@ void mlabplannertest()
 	const double T = mlabTrajectory->duration();
 	double dt = T/(step - 1);
 	cout << "总时长: " << T << "s" << endl;
+	std::vector<double> time;
 	std::vector<Q> x;
 	std::vector<Q> dx;
 	std::vector<Q> ddx;
 	std::vector<double> l;
 	std::vector<double> dl;
+	std::vector<double> ddl;
 	clockStart = clock();
 	try{
 		for (double t=0; t<=T; t+=dt)
 		{
+			time.push_back(t);
 			x.push_back(mlabTrajectory->x(t));
 			dx.push_back(mlabTrajectory->dx(t));
 			ddx.push_back(mlabTrajectory->ddx(t));
+			l.push_back(mlabTrajectory->l(t));
 			dl.push_back(mlabTrajectory->dl(t));
+			ddl.push_back(mlabTrajectory->ddl(t));
 		}
 	}
 	catch(char const* msg)
@@ -198,13 +203,27 @@ void mlabplannertest()
 		out3 << ddx[i][0] << ", " << ddx[i][1] << ", " << ddx[i][2] << ", " << ddx[i][3] << ", " << ddx[i][4] << ", " << ddx[i][5] << ";" << endl;
 	}
 	out3.close();
-	const char* filename4 = "src/example/mlabplanner/tempdl.csv";
+	const char* filename4 = "src/example/mlabplanner/templ.csv";
 	std::ofstream out4(filename4);
 	for (int i=0; i<(int)x.size(); i++)
 	{
-		out4 << dl[i] << endl;
+		out4 << l[i] << "," << time[i] << endl;
 	}
 	out4.close();
+	const char* filename5 = "src/example/mlabplanner/tempdl.csv";
+	std::ofstream out5(filename5);
+	for (int i=0; i<(int)x.size(); i++)
+	{
+		out5 << dl[i] << "," << time[i] << endl;
+	}
+	out5.close();
+	const char* filename6 = "src/example/mlabplanner/tempddl.csv";
+	std::ofstream out6(filename6);
+	for (int i=0; i<(int)x.size(); i++)
+	{
+		out6 << ddl[i] << "," << time[i] << endl;
+	}
+	out6.close();
 	clockEnd = clock();
 	cout << "每次插补用时: " << (clockEnd - clockStart)/(double)step << "us" << endl;
 }
