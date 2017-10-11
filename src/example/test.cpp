@@ -247,7 +247,7 @@ int main(){
 //	robot.setTool(&tool);
 //	solver->init();
 
-	std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robot));
+//	std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robot));
 	Q qMin = Q(lmin1, lmin2, lmin3, lmin4, lmin5, lmin6);
 	Q qMax = Q(lmax1, lmax2, lmax3, lmax4, lmax5, lmax6);
 	Q dqLim = Q(3, 3, 3, 3, 5, 5);
@@ -269,7 +269,13 @@ int main(){
 
 //	smplannertest();
 
+	try{
 	mlabplannertest();
+	}
+	catch(string &msg)
+	{
+		cout << msg << endl;
+	}
 
 
 //	Q pos(0, 0, 0, 0, 0, 0);

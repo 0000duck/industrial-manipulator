@@ -101,7 +101,7 @@ public:
 	T dx(double t) const
 	{
 		int i=0;
-		for (; i<_interpolatorSequence.size(); i++)
+		for (; i<(int)_interpolatorSequence.size(); i++)
 		{
 			if (_timeSequence[i] > t)
 				break;
@@ -115,7 +115,7 @@ public:
 	T ddx(double t) const
 	{
 		int i=0;
-		for (; i<_interpolatorSequence.size(); i++)
+		for (; i<(int)_interpolatorSequence.size(); i++)
 		{
 			if (_timeSequence[i] > t)
 				break;

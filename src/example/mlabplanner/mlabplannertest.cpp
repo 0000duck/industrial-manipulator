@@ -5,6 +5,7 @@
 # include <fstream>
 # include "../../pathplanner/MultiLineArcBlendPlanner.h"
 # include "../../ik/SiasunSR4CSolver.h"
+# include "../../parse/RobotXMLParser.h"
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -23,72 +24,26 @@ using namespace robot::pathplanner;
 void mlabplannertest()
 {
 	println("*** test ***");
-	SerialLink robot;
-	// *** siasun 6kg
-	double alpha1 = 0;
-	double alpha2 = -M_PI/2;
-	double alpha3 = 0;
-	double alpha4 = -M_PI/2;
-	double alpha5 = M_PI/2;
-	double alpha6 = -M_PI/2;
-	double a1 = 0;
-	double a2 = 0.16;
-	double a3 = 0.575;
-	double a4 = 0.13;
-	double a5 = 0;
-	double a6 = 0;
-	double d1 = 0.439;
-	double d2 = 0;
-	double d3 = 0;
-	double d4 = 0.644;
-	double d5 = 0;
-	double d6 = 0.1095;
-	double theta1 = 0;
-	double theta2 = -M_PI/2;
-	double theta3 = 0;
-	double theta4 = 0;
-	double theta5 = M_PI/2;
-	double theta6 = 0;
-	// ***
-	double lmin1 = M_PI/180.0*-180; //-180
-	double lmin2 = M_PI/180.0*-130; //-210
-	double lmin3 = M_PI/180.0*-70; //-70
-	double lmin4 = M_PI/180.0*-240; //-240
-	double lmin5 = M_PI/180.0*-200; //-110
-	double lmin6 = M_PI/180.0*-360; //-360
-	double lmax1 = M_PI/180.0*180; //180
-	double lmax2 = M_PI/180.0*80; //-10
-	double lmax3 = M_PI/180.0*160; //160
-	double lmax4 = M_PI/180.0*240; //240
-	double lmax5 = M_PI/180.0*30; //120
-	double lmax6 = M_PI/180.0*360; //360
 
-//	Link(alpha, a, d, theta, min, max, sigma=0)
-	Link l1(alpha1, a1, d1, theta1, lmin1, lmax1);
-	Link l2(alpha2, a2, d2, theta2, lmin2, lmax2);
-	Link l3(alpha3, a3, d3, theta3, lmin3, lmax3);
-	Link l4(alpha4, a4, d4, theta4, lmin4, lmax4);
-	Link l5(alpha5, a5, d5, theta5, lmin5, lmax5);
-	Link l6(alpha6, a6, d6, theta6, lmin6, lmax6);
-	robot.append(&l1);
-	robot.append(&l2);
-	robot.append(&l3);
-	robot.append(&l4);
-	robot.append(&l5);
-	robot.append(&l6);
+	/**> 读取模型文件 */
+	robot::parse::RobotXMLParser modelParser;
+	SerialLink::ptr robot = modelParser.parse("src/example/modelData/siasun6.xml");
 
+	/**> 设置工具(可选) */
 	HTransform3D<double> tran = HTransform3D<double>(Vector3D<double>(0, 0, 0.2), Rotation3D<double>());
 	Frame tool = Frame(tran);
 //	robot.setTool(&tool);
 //	solver->init();
 
+	/**> 逆解器 */
 	std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robot));
-	Q qMin = Q(lmin1, lmin2, lmin3, lmin4, lmin5, lmin6);
-	Q qMax = Q(lmax1, lmax2, lmax3, lmax4, lmax5, lmax6);
+
+	Q qMin = Q(robot->getLink(0)->lmin(), robot->getLink(1)->lmin(), robot->getLink(2)->lmin(), robot->getLink(3)->lmin(), robot->getLink(4)->lmin(), robot->getLink(5)->lmin());
+	Q qMax = Q(robot->getLink(0)->lmax(), robot->getLink(1)->lmax(), robot->getLink(2)->lmax(), robot->getLink(3)->lmax(), robot->getLink(4)->lmax(), robot->getLink(5)->lmax());
 	Q dqLim = Q(3, 3, 3, 3, 5, 5);
 	Q ddqLim = Q(20, 20, 20, 20, 20, 20);
 
-	MultiLineArcBlendPlanner mlabplanner(qMin, qMax, dqLim, ddqLim, solver, &robot);
+	MultiLineArcBlendPlanner mlabplanner(qMin, qMax, dqLim, ddqLim, solver, robot);
 
 	vector<Q> path;
 	path.push_back( Q::zero(6));
@@ -106,7 +61,7 @@ void mlabplannertest()
 	acceleration.push_back(15.0);
 	acceleration.push_back(15.0);
 
-	vector<double> jerk(2, 50);
+	vector<double> jerk(2, 50.0);
 
 	MLABTrajectory::ptr mlabTrajectory;
 

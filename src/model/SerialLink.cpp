@@ -26,7 +26,7 @@ SerialLink::SerialLink(Frame* tool)
 		_endToTool = &_defaultTool;
 }
 
-SerialLink::SerialLink(std::vector<Link*> linkList,Frame* tool)
+SerialLink::SerialLink(std::vector<Link::ptr> linkList,Frame* tool)
 {
 	static Frame worldFrame;
 	if (tool != NULL)
@@ -42,7 +42,7 @@ SerialLink::SerialLink(std::vector<Link*> linkList,Frame* tool)
 	}
 }
 
-void SerialLink::append(Link* link)
+void SerialLink::append(Link::ptr link)
 {
 	Frame* parent = NULL;
 	if (_linkList.size() < 1)
@@ -51,6 +51,12 @@ void SerialLink::append(Link* link)
 		parent = _linkList[_linkList.size() - 1]->getFrame();
 	_linkList.push_back(link);
 	parent->addChild(link->getFrame());
+}
+
+void SerialLink::append(Link* link)
+{
+	Link::ptr linkPtr(new Link(*link));
+	append(linkPtr);
 }
 
 void SerialLink::setTool(Frame* tool)
@@ -65,9 +71,9 @@ void SerialLink::setDefaultTool()
 	_endToTool = &_defaultTool;
 }
 
-Link* SerialLink::pop()
+Link::ptr SerialLink::pop()
 {
-	Link* link = *_linkList.end();
+	Link::ptr link = *_linkList.end();
 	_linkList.pop_back();
 	link->getFrame()->removeParent();
 	return link;
@@ -187,7 +193,7 @@ Jacobian SerialLink::getJacobian(const robot::math::Q& q) const
 	std::vector< Rotation3D<double> > dTi_1i; // i=1~n
 	for (int i=0; i<dof; i++)
 	{
-		Link* link = _linkList[i];
+		Link::ptr link = _linkList[i];
 //		dTi_1i.push_back(Rotation3D<double>::dDH(link->alpha(), link->a(), link->d(), link->theta() + q[i]));
 		dTi_1i.push_back(Rotation3D<double>::dDHFast(link->sa(), link->ca(), link->a(), link->d(), sin(link->theta() + q[i]), cos(link->theta() + q[i])));
 	}
@@ -248,29 +254,29 @@ const robot::math::Q SerialLink::getQ() const
 void SerialLink::setQ(robot::math::Q q)
 {
 	int i=0;
-	for (std::vector<Link*>::iterator it=_linkList.begin(); it<_linkList.end(); it++)
+	for (std::vector<Link::ptr>::iterator it=_linkList.begin(); it<_linkList.end(); it++)
 		(*it)->change(q[i++]);
 }
 
-Config SerialLink::getConfig(const robot::math::Q& q) const
-{
-	DHTable dHTable = getDHTable();
-	double j2 = q[1] + dHTable[1].theta();
-	double j3 = q[2] + dHTable[2].theta();
-	double j5 = q[4] + dHTable[4].theta();
-	j3 = common::fixAngle(j3);
-	j5 = common::fixAngle(j5);
-	double a2 = dHTable[1].a();
-	double a3 = dHTable[2].a();
-	double a4 = dHTable[3].a();
-	double d4 = dHTable[3].d();
-	double config_r = a2 + a3*cos(j2) + a4*cos(j2 + j3) - d4*sin(j2 + j3);
-	j3 -= M_PI/2.0; //// 新松4kg机器人
-	double wrist = (j5 >= 0)? Config::wpositive:Config::wnegative;
-	double elbow = (j3 >= 0)? Config::epositive:Config::enegative;
-	double shoulder =(config_r < 0)? Config::righty:Config::lefty;
-	return Config(shoulder, elbow, wrist);
-}
+//Config SerialLink::getConfig(const robot::math::Q& q) const
+//{
+//	DHTable dHTable = getDHTable();
+//	double j2 = q[1] + dHTable[1].theta();
+//	double j3 = q[2] + dHTable[2].theta();
+//	double j5 = q[4] + dHTable[4].theta();
+//	j3 -= M_PI/2.0; //// 新松4kg机器人
+//	j3 = common::fixAngle(j3);
+//	j5 = common::fixAngle(j5);
+//	double a2 = dHTable[1].a();
+//	double a3 = dHTable[2].a();
+//	double a4 = dHTable[3].a();
+//	double d4 = dHTable[3].d();
+//	double config_r = a2 + a3*cos(j2) + a4*cos(j2 + j3) - d4*sin(j2 + j3);
+//	double wrist = (j5 >= 0)? Config::wpositive:Config::wnegative;
+//	double elbow = (j3 >= 0)? Config::epositive:Config::enegative;
+//	double shoulder =(config_r < 0)? Config::righty:Config::lefty;
+//	return Config(shoulder, elbow, wrist);
+//}
 
 const robot::math::Q SerialLink::getEndVelocity(const robot::kinematic::State& state) const
 {

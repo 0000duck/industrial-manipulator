@@ -22,7 +22,7 @@ namespace robot {
 namespace pathplanner {
 
 MultiLineArcBlendPlanner::MultiLineArcBlendPlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
-		std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink* serialLink) :
+		std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink) :
 	_ikSolver(ikSolver), _qMin(qMin), _qMax(qMax), _dqLim(dqLim), _ddqLim(ddqLim), _serialLink(serialLink)
 {
 	_size = _serialLink->getDOF();
@@ -77,14 +77,14 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 		throw("错误<MultiLineArcBlendPlanner>: 圆弧比例参数数量不足!");
 
 	/**> 检查config参数 */
-	Config config = _serialLink->getConfig(Qpath[0]);
+	Config config = _ikSolver->getConfig(Qpath[0]);
 	for (int i=1; i<pathSize; i++)
-		if (config != _serialLink->getConfig(Qpath[i]))
+		if (config != _ikSolver->getConfig(Qpath[i]))
 		{
 			cout << "初始Config: \n" ;
 			config.print();
 			cout << "该关节Config: \n" ;
-			(_serialLink->getConfig(Qpath[i])).print();
+			(_ikSolver->getConfig(Qpath[i])).print();
 			throw (std::string("错误<MultiLineArcBlendPlanner>: 第 ") + to_string(i + 1) + std::string(" 个关节的的Config和初始点不同!"));
 		}
 
@@ -154,10 +154,6 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 		Vector3D<double> OC = C - O;
 		double ct = OC.getLength()/OA.getLength();
 		double theta = acos(ct);
-		////////////////////////////////////////////////////////////////////////
-		cout<<"theta = " << theta << endl;
-
-
 		double k = (1.0 - sin(theta))/(ct*ct);
 		/** 记录圆弧中点 */
 		arcMidPosition.push_back(OC*k + O);
@@ -208,8 +204,8 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 		}
 		indexOnLine = !indexOnLine;
 	}
-
 	/**> 生成lt */
+	println("MultiLine: 生成lt");
 	vector<SequenceInterpolator<double>::ptr> lt = getLt(arcSize, lineSize, trajectoryIpr, velocity, acceleration, jerk);
 
 	/**> 生成qIpr */
@@ -265,6 +261,7 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 //		qIpr.push_back(CompositeInterpolator<Q>::ptr(new CompositeInterpolator<Q>(trajectoryIpr[i], lt[i])));
 //	}
 
+	println("MultiLine: 生成结果");
 	MLABTrajectory::ptr mlabTrajectory(new MLABTrajectory(arcPosIpr, linePosIpr, arcRotIpr, lineRotIpr, length, qIpr, trajectoryIpr, lt,
 			std::make_pair(posIpr, rotIpr), _ikSolver, config));
 	return mlabTrajectory;

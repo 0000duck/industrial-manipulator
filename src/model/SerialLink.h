@@ -18,6 +18,7 @@
 # include "Config.h"
 # include "../kinematics/State.h"
 # include "../math/Quaternion.h"
+# include <memory>
 
 using robot::kinematic::Frame;
 
@@ -43,6 +44,8 @@ namespace model {
  */
 class SerialLink {
 public:
+	using ptr = std::shared_ptr<SerialLink>;
+
 	/**
 	 * @brief 默认构造函数
 	 * @param tool [in] 工具指定的Frame偏置, 若不指定, 则按照Frame的默认构造函数构造
@@ -54,13 +57,20 @@ public:
 	 * @param linkList [in] Link的指针数组
 	 * @param tool [in] 工具指定的Frame偏置, 若不指定, 则按照Frame的默认构造函数构造
 	 */
-	SerialLink(std::vector<Link*>, Frame* tool=NULL);
+	SerialLink(std::vector<Link::ptr>, Frame* tool=NULL);
 
 	/**
 	 * @brief 添加关节
 	 * @param link [in] 在末端添加一个关节
 	 */
-	void append(Link*);
+	void append(Link::ptr link);
+
+	/**
+	 * @brief 添加关节
+	 * @param link [in] 在末端添加一个关节指针
+	 * @deprecated 推荐使用shared_ptr的方法
+	 */
+	void append(Link* link);
 
 	/**
 	 * @brief 设置末端工具
@@ -77,10 +87,10 @@ public:
 	 * @brief 移除关节
 	 * @return 将移除的最后一个关节的地址返回
 	 */
-	Link* pop();
+	Link::ptr pop();
 
 	/** @brief 获取关节 */
-	inline Link* getLink(int index) const
+	inline Link::ptr getLink(int index) const
 	{
 		return _linkList[index];
 	}
@@ -174,7 +184,7 @@ public:
 	 * @param q [in] 关节数值
 	 * @return 关节数值为Q时机器人的姿态配置
 	 */
-	Config getConfig(const Q&) const;
+//	Config getConfig(const Q&) const;
 
 	/**
 	 * @brief 获取末端执行器速度
@@ -233,8 +243,11 @@ public:
 	void print();
 	virtual ~SerialLink();
 private:
+	/** @brief 模型名字 */
+	const std::string _name;
+
 	/** @brief 关节地址列表 */
-	std::vector<Link*> _linkList;
+	std::vector<Link::ptr> _linkList;
 
 	/** @brief 基坐标系 */
 	Frame _worldFrame;

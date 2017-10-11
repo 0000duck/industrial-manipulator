@@ -36,8 +36,8 @@ CircularPlanner::CircularPlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
 Interpolator<Q>::ptr CircularPlanner::query(const Q qStart, const Q qIntermediate, const Q qEnd) const
 {
 	/**> 检查config参数 */
-	Config config = _serialLink->getConfig(qStart);
-	if (config != _serialLink->getConfig(qEnd) || config != _serialLink->getConfig(qIntermediate))
+	Config config = _ikSolver->getConfig(qStart);
+	if (config != _ikSolver->getConfig(qEnd) || config != _ikSolver->getConfig(qIntermediate))
 		throw ("错误<圆弧规划>: 初始, 中间点和结束的Config不同!");
 	/**> 检查dof */
 	double dof = _serialLink->getDOF();

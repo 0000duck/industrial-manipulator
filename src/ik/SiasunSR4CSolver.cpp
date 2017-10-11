@@ -6,15 +6,16 @@
  */
 
 #include "SiasunSR4CSolver.h"
+# include "../common/common.h"
 
 using namespace robot::model;
 
 namespace robot {
 namespace ik {
 
-SiasunSR4CSolver::SiasunSR4CSolver(robot::model::SerialLink& serialRobot) {
-	_serialLink = &serialRobot;
-	_dHTable = serialRobot.getDHTable();
+SiasunSR4CSolver::SiasunSR4CSolver(robot::model::SerialLink::ptr serialRobot) {
+	_serialLink = serialRobot;
+	_dHTable = serialRobot->getDHTable();
     _alpha1 = _dHTable[0].alpha();
     _a1 = _dHTable[0].a();
     _calpha1 = _serialLink->getLink(0)->ca();
@@ -52,7 +53,7 @@ SiasunSR4CSolver::SiasunSR4CSolver(robot::model::SerialLink& serialRobot) {
     _d6 = _dHTable[5].d();
 
     _0Tbase = (HTransform3D<>::DH(_alpha1, _a1, _d1, 0)).inverse();
-    _endTjoint6 = ((HTransform3D<>::DH(0, 0, _d6, 0))*serialRobot.getTool()->getTransform()).inverse();
+    _endTjoint6 = ((HTransform3D<>::DH(0, 0, _d6, 0))*serialRobot->getTool()->getTransform()).inverse();
 }
 
 void SiasunSR4CSolver::init()
@@ -170,6 +171,7 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend, const mod
     		solveTheta456(theta1, theta2, theta3, T06, result, config);
     	}
     }
+
     for (std::vector<Q>::iterator it = result.begin(); it != result.end(); ++it) {
         for (size_t i = 0; i<(size_t)(*it).size(); i++)
             (*it)(i) -= _dHTable[i].theta();
@@ -202,6 +204,8 @@ std::vector<Q> SiasunSR4CSolver::solve(const HTransform3D<>& baseTend, const mod
     		}
     	}
     }
+    if ((int)rangeResult.empty())
+    	throw (std::string("错误<SiasunSR4CSolver>: 没有符合范围的解!"));
     return rangeResult;
 }
 
@@ -331,6 +335,7 @@ bool SiasunSR4CSolver::isElbowValid(const robot::math::Q& q, const model::Config
 bool SiasunSR4CSolver::isElbowValid(const double j3, const model::Config& config) const
 {
 	double fixedJ3 = j3 + atan(_d4/_a4);
+	fixedJ3 = common::fixAngle(fixedJ3);
 	if (fixedJ3 > M_PI)
 		fixedJ3 -= 2*M_PI;
 	double configJ = (_serialLink->getQ())[2] + atan(_d4/_a4);
@@ -358,14 +363,15 @@ bool SiasunSR4CSolver::isWristValid(const robot::math::Q& q, const model::Config
 
 bool SiasunSR4CSolver::isWristValid(const double j5, const model::Config& config) const
 {
+	double fixedJ5 = common::fixAngle(j5);
 	switch (config.getWrist())
 	{
 	case Config::wpositive:
-		return (j5 >= 0);
+		return (fixedJ5 >= 0);
 	case Config::wnegative:
-		return (j5 < 0);
+		return (fixedJ5 < 0);
 	case Config::wsame:
-		return ((j5 >= 0) == ((_serialLink->getQ())[4] >= 0));
+		return ((fixedJ5 >= 0) == ((_serialLink->getQ())[4] >= 0));
 	case Config::wfree:
 		return true;
 	default:
@@ -378,7 +384,11 @@ Config SiasunSR4CSolver::getConfig(const robot::math::Q& q) const
 	double j2 = q[1] + _dHTable[1].theta();
 	double j3 = q[2] + _dHTable[2].theta();
 	double j5 = q[4] + _dHTable[4].theta();
+	j3 = common::fixAngle(j3);
+	j5 = common::fixAngle(j5);
 	double config_r = _a2 + _a3*cos(j2) + _a4*cos(j2 + j3) - _d4*sin(j2 + j3);
+	j3 += atan(_d4/_a4);
+	j3 = common::fixAngle(j3);
 	double wrist = (j5 >= 0)? Config::wpositive:Config::wnegative;
 	double elbow = (j3 >= 0)? Config::epositive:Config::enegative;
 	double shoulder =(config_r < 0)? Config::righty:Config::lefty;

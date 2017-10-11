@@ -40,7 +40,7 @@ public:
 	 * @brief 构造新松4kg机器人的逆解器
 	 * @param serialRobot [in] 机器人模型
 	 */
-	SiasunSR4CSolver(robot::model::SerialLink& serialRobot);
+	SiasunSR4CSolver(robot::model::SerialLink::ptr serialRobot);
 
 	/**
 	 * @brief 初始化
@@ -159,7 +159,7 @@ private:
     /**
      * @brief 机器人的模型
      */
-    robot::model::SerialLink* _serialLink;
+    robot::model::SerialLink::ptr _serialLink;
 };
 
 /** @} */

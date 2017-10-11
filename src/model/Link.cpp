@@ -22,7 +22,8 @@ Frame* Link::getFrame()
 	 return _frame;
 }
 
-Link::Link(double alpha, double a, double d, double theta, double min, double max, bool sigma):
+Link::Link(double alpha, double a, double d, double theta, double min, double max, std::string name, bool sigma):
+		_name(name),
 		_theta(theta),_d(d),_a(a),_alpha(alpha),
 		_sigma(sigma),_offset(0),_lmin(min),_lmax(max),
 		_dHParam(_alpha, _a, _d, _theta),
@@ -42,6 +43,29 @@ Link::Link(double alpha, double a, double d, double theta, double min, double ma
 
 	_frame = new Frame(tran);
 }
+
+Link::Link(const Link& link):
+		_name(link._name),
+		_theta(link._theta),_d(link._d),_a(link._a),_alpha(link._alpha),
+		_sigma(link._sigma),_offset(0),_lmin(link._lmin),_lmax(link._lmax),
+		_dHParam(_alpha, _a, _d, _theta),
+		_sa(sin(_alpha)), _ca(cos(_alpha)),
+		_st(sin(link._theta)), _ct(cos(link._theta))
+{
+	double a11=_ct;double a12=-_st;double a13=0;double a14=_a;
+	double a21=_st*_ca;double a22=_ct*_ca;double a23=-_sa;double a24=-_d*_sa;
+	double a31=_st*_sa;double a32=_ct*_sa;double a33=_ca;double a34=_d*_ca;
+
+	robot::math::Rotation3D<double> rot(
+												a11, a12, a13,
+												a21, a22, a23,
+												a31, a32, a33);
+	robot::math::Vector3D<double> vec(a14, a24, a34);
+	robot::math::HTransform3D<double> tran(vec, rot);
+
+	_frame = new Frame(tran);
+}
+
 void Link::change(double offset)  //改变link增量
 {
 	_offset=offset;

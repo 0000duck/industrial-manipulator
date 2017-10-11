@@ -29,6 +29,7 @@ class IKSolver {
 public:
 	IKSolver(){}
 	virtual std::vector<Q> solve(const HTransform3D<>& baseTend, const model::Config& config) const = 0;
+	virtual robot::model::Config getConfig(const robot::math::Q& q) const {return robot::model::Config();};
 	virtual ~IKSolver();
 };
 

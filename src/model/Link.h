@@ -9,6 +9,7 @@
 # include "../math/HTransform3D.h"
 # include "../kinematics/Frame.h"
 # include "DHParameters.h"
+# include <memory>
 
 using namespace robot::kinematic;
 
@@ -27,6 +28,7 @@ namespace model {
 
 class Link {
 public:
+	using ptr = std::shared_ptr<Link>;
 	/**
 	 * @brief 连杆构造函数定义，生成初始DH变换阵
 	 * @param alpha [in]
@@ -39,7 +41,13 @@ public:
 	 * @warning sigma为连杆类型，当sigma为0：转动副；sigma为1：移动副
 	 * min、max 为转动最小最大角度或伸缩长度
 	 */
-	Link(double alpha, double a, double d, double theta, double min, double max, bool sigma=0);
+	Link(double alpha, double a, double d, double theta, double min, double max, std::string name="", bool sigma=0);
+
+	/**
+	 * @brief 复制构造函数
+	 * @param link [in] 复制的关节
+	 */
+	Link(const Link &link);
 
 	/**
 	* @brief 连杆增量变化阵
@@ -129,6 +137,7 @@ public:
 	virtual ~Link();
 
 private:
+	std::string _name;
 	double _theta;
 	double _d;
 	double _a;

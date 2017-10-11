@@ -149,7 +149,7 @@ public:
 	 */
 	ConvertedInterpolator(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 			std::shared_ptr<robot::ik::IKSolver> iksolver,
-			robot::model::Config config)
+			robot::model::Config config):_config(config)
 	{
 		_ikSolver = iksolver;
 		_posInterpolator = origin.first;

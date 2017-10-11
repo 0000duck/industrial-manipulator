@@ -5,6 +5,8 @@
  *      Author: zrf
  */
 
+# ifdef COMPILEEXCESS
+
 # include "ExcessMotionPlanner.h"
 # include "math.h"
 # include "../trajectory/PolynomialInterpolator.h"
@@ -344,3 +346,7 @@ double ExcessMotionPlanner::ss2(double j, double vMax, double ve, double aMax) c
 
 }
 }
+
+# endif
+
+

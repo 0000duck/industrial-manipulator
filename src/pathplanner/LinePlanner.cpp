@@ -37,8 +37,8 @@ LinePlanner::LinePlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
 LineTrajectory::ptr LinePlanner::query(const Q qStart, const Q qEnd) const
 {
 	/**> 检查config参数 */
-	Config config = _serialLink->getConfig(qStart);
-	if (config != _serialLink->getConfig(qEnd))
+	Config config = _ikSolver->getConfig(qStart);
+	if (config != _ikSolver->getConfig(qEnd))
 		throw ("错误<直线规划>: 初始和结束的Config不同!");
 	/**> 检查dof */
 	double dof = _serialLink->getDOF();
