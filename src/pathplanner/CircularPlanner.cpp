@@ -35,7 +35,7 @@ CircularPlanner::CircularPlanner(Q dqLim, Q ddqLim,
 		throw ("错误<圆弧规划>:　构造参数中数组的长度不一致！");
 }
 
-Interpolator<Q>::ptr CircularPlanner::query(const Q qStart, const Q qIntermediate, const Q qEnd, double speedRatio, double accRatio) const
+CircularTrajectory::ptr CircularPlanner::query(const Q qStart, const Q qIntermediate, const Q qEnd, double speedRatio, double accRatio) const
 {
 	/**> 检查config参数 */
 	Config config = _ikSolver->getConfig(qStart);
@@ -65,8 +65,8 @@ Interpolator<Q>::ptr CircularPlanner::query(const Q qStart, const Q qIntermediat
 	double acceleration = assignedAcceleration;
 	SequenceInterpolator<double>::ptr lt = _smPlanner.query(Length, _hLine, acceleration, velocity, 0);
 	/**> 返回 */
-	auto origin = std::make_pair(posIpr, rotIpr);
-
+	auto origin = std::make_pair(CompositeInterpolator<Vector3D<double> >::ptr(new CompositeInterpolator<Vector3D<double> >(posIpr, lt)),
+			CompositeInterpolator<Rotation3D<double> >::ptr(new CompositeInterpolator<Rotation3D<double> >(rotIpr, lt)));
 	CircularTrajectory::ptr cirlularTrajectory(new CircularTrajectory(origin, _ikSolver, config, lt, trajectory));
 	return cirlularTrajectory;
 }

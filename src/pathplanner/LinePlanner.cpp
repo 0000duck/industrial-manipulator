@@ -61,7 +61,8 @@ LineTrajectory::ptr LinePlanner::query(const Q qStart, const Q qEnd, double spee
 	double acceleration = assignedAcceleration;
 	SequenceInterpolator<double>::ptr lt = _smPlanner.query(Length, _hLine, acceleration, velocity, 0);
 	/**> 返回 */
-	auto origin = std::make_pair(posIpr, rotIpr);
+	auto origin = std::make_pair(CompositeInterpolator<Vector3D<double> >::ptr(new CompositeInterpolator<Vector3D<double> >(posIpr, lt)),
+			CompositeInterpolator<Rotation3D<double> >::ptr(new CompositeInterpolator<Rotation3D<double> >(rotIpr, lt)));
 	LineTrajectory::ptr lineTrajectory(new LineTrajectory(origin, _ikSolver, config, lt, trajectory));
 	return lineTrajectory;
 }

@@ -135,6 +135,8 @@ void mlabplannertest()
 	{
 		println(msg);
 	}
+	clockEnd = clock();
+	cout << "每次插补用时: " << (clockEnd - clockStart)/(double)step << "us" << endl;
 	const char* filename1 = "src/example/mlabplanner/tempx.csv";
 	std::ofstream out1(filename1);
 	for (int i=0; i<(int)x.size(); i++)
@@ -177,6 +179,4 @@ void mlabplannertest()
 		out6 << ddl[i] << "," << time[i] << endl;
 	}
 	out6.close();
-	clockEnd = clock();
-	cout << "每次插补用时: " << (clockEnd - clockStart)/(double)step << "us" << endl;
 }

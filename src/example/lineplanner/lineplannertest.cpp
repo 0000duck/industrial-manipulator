@@ -56,35 +56,45 @@ LineTrajectory::ptr lineplannerTest()
 	double vMaxAngle = 1.0;
 	double aMaxAngle = 10.0;
 	double hAngle = 30;
-	LineTrajectory::ptr qInterpolator;
+	LineTrajectory::ptr lineIpr;
 	try{
-		LinePlanner planner = LinePlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle,
-				solver, robot);
-
-	//	robot.setTool(&tool);
-	//	solver->init();
+		LinePlanner planner = LinePlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle, solver, robot);
 
 		clock_t clockStart = clock();
 		Q start = Q::zero(6);
 		Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
-		qInterpolator = planner.query(start, end, 1.0, 1.0);
+		lineIpr = planner.query(start, end, 1.0, 1.0);
 		clock_t clockEnd = clock();
 		cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
-		int step = 1000;
-		const double T = qInterpolator->duration();
-		double L = qInterpolator->getLIpr()->x(T);
+		int step = 300;
+		const double T = lineIpr->duration();
+		double L = lineIpr->getLIpr()->x(T);
 		double dt = T/(step - 1);
 		cout << "总时长: " << T << "s" << endl;
 		cout << "总长度: " << L << "m" << endl;
+		std::vector<double> time;
 		std::vector<Q> x;
 		std::vector<Q> dx;
 		std::vector<Q> ddx;
+		std::vector<double> l;
+		std::vector<double> dl;
+		std::vector<double> ddl;
 		clockStart = clock();
-		for (double t=0; t<=T; t+=dt)
+		try{
+			for (double t=0; t<=T; t+=dt)
+			{
+				time.push_back(t);
+				x.push_back(lineIpr->x(t));
+				dx.push_back(lineIpr->dx(t));
+				ddx.push_back(lineIpr->ddx(t));
+				l.push_back(lineIpr->l(t));
+				dl.push_back(lineIpr->dl(t));
+				ddl.push_back(lineIpr->ddl(t));
+			}
+		}
+		catch(std::string& msg)
 		{
-			x.push_back(qInterpolator->x(t));
-			dx.push_back(qInterpolator->dx(t));
-			ddx.push_back(qInterpolator->ddx(t));
+			cout << msg << endl;;
 		}
 		clockEnd = clock();
 		cout << "每次插补用时: " << (clockEnd - clockStart)/(double)step << "us" << endl;
@@ -110,7 +120,27 @@ LineTrajectory::ptr lineplannerTest()
 			out3 << ddx[i][0] << ", " << ddx[i][1] << ", " << ddx[i][2] << ", " << ddx[i][3] << ", " << ddx[i][4] << ", " << ddx[i][5] << ";" << endl;
 		}
 		out3.close();
-
+		const char* filename4 = "src/example/lineplanner/templ.csv";
+		std::ofstream out4(filename4);
+		for (int i=0; i<(int)x.size(); i++)
+		{
+			out4 << l[i] << "," << time[i] << endl;
+		}
+		out4.close();
+		const char* filename5 = "src/example/lineplanner/tempdl.csv";
+		std::ofstream out5(filename5);
+		for (int i=0; i<(int)x.size(); i++)
+		{
+			out5 << dl[i] << "," << time[i] << endl;
+		}
+		out5.close();
+		const char* filename6 = "src/example/lineplanner/tempddl.csv";
+		std::ofstream out6(filename6);
+		for (int i=0; i<(int)x.size(); i++)
+		{
+			out6 << ddl[i] << "," << time[i] << endl;
+		}
+		out6.close();
 		/**> 长度询问测试 */
 //		cout << "长度测试" << endl;
 //		step = 10;
@@ -122,9 +152,9 @@ LineTrajectory::ptr lineplannerTest()
 //		for (double t=0; t<=T; t+=T/(step - 1))
 //		{
 //			cout << setfill('_') << setw(10) << t
-//					<< setfill('_') << setw(10) << qInterpolator->getLIpr()->x(t)
-//					<< setfill('_') << setw(10) << qInterpolator->timeAt(qInterpolator->getLIpr()->x(t))
-//					<< setfill('_') << setw(10) << qInterpolator->timeAt(qInterpolator->getLIpr()->x(t)) - t<< endl;
+//					<< setfill('_') << setw(10) << lineIpr->getLIpr()->x(t)
+//					<< setfill('_') << setw(10) << lineIpr->timeAt(lineIpr->getLIpr()->x(t))
+//					<< setfill('_') << setw(10) << lineIpr->timeAt(lineIpr->getLIpr()->x(t)) - t<< endl;
 //		}
 
 		/**> 长度积分器测试　deleted */
@@ -134,7 +164,7 @@ LineTrajectory::ptr lineplannerTest()
 	{
 		std::cerr << msg;
 	}
-	return qInterpolator;
+	return lineIpr;
 }
 
 #endif

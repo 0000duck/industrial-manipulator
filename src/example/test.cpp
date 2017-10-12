@@ -35,9 +35,9 @@
 //# include "testIK2.h"
 //# include "smoothplanner/smoothPlannerSampler.h"
 //# include "p2pplanner/p2pPlannerSampler.h"
-//# include "lineplanner/lineplannertest.h"
+# include "lineplanner/lineplannertest.h"
 //# include "qblendtest/qblendtest.h"
-//# include "circularplanner/circularplannertest.h"
+# include "circularplanner/circularplannertest.h"
 //# include "simulation/simulationtest.h"
 //# include "smplannerex/smplannertest.h"
 # include "mlabplanner/mlabplannertest.h"
@@ -263,19 +263,13 @@ int main(){
 
 //	lineplannerTest();
 
-//	circularplannerTest();
+	circularplannerTest();
 
 //	simulationtest();
 
 //	smplannertest();
 
-	try{
-	mlabplannertest();
-	}
-	catch(string &msg)
-	{
-		cout << msg << endl;
-	}
+//	mlabplannertest();
 
 
 //	Q pos(0, 0, 0, 0, 0, 0);

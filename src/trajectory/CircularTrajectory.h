@@ -20,6 +20,7 @@ namespace trajectory {
 
 class CircularTrajectory : public Interpolator<Q>{
 public:
+	using ptr = std::shared_ptr<CircularTrajectory>;
 	CircularTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 			std::shared_ptr<robot::ik::IKSolver> iksolver,
 			robot::model::Config config,
