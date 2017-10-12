@@ -1,21 +1,21 @@
 /*
- * BezierTrajectory.cpp
+ * BezierPath.cpp
  *
  *  Created on: Oct 12, 2017
  *      Author: a1994846931931
  */
 
-#include "BezierTrajectory.h"
+#include "BezierPath.h"
 
 namespace robot {
 namespace trajectory {
 
-BezierTrajectory::BezierTrajectory() {
+BezierPath::BezierPath() {
 	// TODO Auto-generated constructor stub
 
 }
 
-BezierTrajectory::~BezierTrajectory() {
+BezierPath::~BezierPath() {
 	// TODO Auto-generated destructor stub
 }
 
