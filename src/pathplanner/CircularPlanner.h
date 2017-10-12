@@ -27,9 +27,9 @@ namespace pathplanner {
 
 class CircularPlanner {
 public:
-	CircularPlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
+	CircularPlanner(Q dqLim, Q ddqLim,
 			double vMaxLine, double aMaxLine, double hLine, double vMaxAngle, double aMaxAngle, double hAngle,
-			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink* serialLink);
+			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink);
 	Interpolator<Q>::ptr query(const Q qStart, const Q intermediate, const Q qEnd) const;
 	virtual ~CircularPlanner(){}
 private:
@@ -70,7 +70,7 @@ private:
 	int _size;
 
     /** @brief 机器人的模型 */
-    robot::model::SerialLink* _serialLink;
+    robot::model::SerialLink::ptr _serialLink;
 
     /** @brief 平滑路径规划器 */
     SmoothMotionPlanner _smPlanner;

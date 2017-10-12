@@ -28,7 +28,7 @@ namespace pathplanner {
  */
 class MultiLineArcBlendPlanner {
 public:
-	MultiLineArcBlendPlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
+	MultiLineArcBlendPlanner(Q dqLim, Q ddqLim,
 			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink);
 	MLABTrajectory::ptr query(const vector<Q>& path, const vector<double>& arcRatio, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk);
 	vector<SequenceInterpolator<double>::ptr> getLt(double arcSize, double lineSize, vector<Trajectory::ptr>& trajectoryIpr, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk);

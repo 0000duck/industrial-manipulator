@@ -21,12 +21,12 @@ using namespace robot::common;
 namespace robot {
 namespace pathplanner {
 
-MultiLineArcBlendPlanner::MultiLineArcBlendPlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
+MultiLineArcBlendPlanner::MultiLineArcBlendPlanner(Q dqLim, Q ddqLim,
 		std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink) :
-	_ikSolver(ikSolver), _qMin(qMin), _qMax(qMax), _dqLim(dqLim), _ddqLim(ddqLim), _serialLink(serialLink)
+	_ikSolver(ikSolver), _qMin(serialLink->getJointMin()), _qMax(serialLink->getJointMax()), _dqLim(dqLim), _ddqLim(ddqLim), _serialLink(serialLink)
 {
 	_size = _serialLink->getDOF();
-	if (qMin.size() != _size || qMax.size() != _size || dqLim.size() != _size || ddqLim.size() != _size)
+	if (_qMin.size() != _size || _qMax.size() != _size || dqLim.size() != _size || ddqLim.size() != _size)
 		throw ("错误<多线段圆弧混合规划器>:　构造参数中数组的长度不一致！");
 }
 

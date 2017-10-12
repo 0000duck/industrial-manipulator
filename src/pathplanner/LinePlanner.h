@@ -55,17 +55,32 @@ public:
 	 * @param ikSolver [in] 逆解器
 	 * @param serialLink [in] 机器人模型
 	 */
-	LinePlanner(Q qMin, Q qMax, Q dqLim, Q ddqLim,
+	LinePlanner(Q dqLim, Q ddqLim,
 			double vMaxLine, double aMaxLine, double hLine, double vMaxAngle, double aMaxAngle, double hAngle,
-			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink* serialLink);
+			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink);
 
 	/**
-	 * @brief 询问路径
+	 * @brief 询问路径(方法1)
 	 * @param qStart [in] 起始位置
 	 * @param qEnd [in] 终点位置
 	 * @return 直线路径的Q插补器
+	 *
+	 * 不考虑直径的旋转约束, 这样做的好处是可以把位姿以路径长度为索引. 方法2中直线
+	 * 和旋转的速度规划是不统一的, 可能会造成"不同速度配置下, 路径不同"的结果;
 	 */
-	LineTrajectory::ptr query(const Q qStart, const Q qEnd) const;
+	LineTrajectory::ptr query(const Q qStart, const Q qEnd, double speedRatio, double accRatio) const;
+
+	/**
+	 * @brief 询问路径(方法2)
+	 * @param qStart [in] 起始位置
+	 * @param qEnd [in] 终点位置
+	 * @return 直线路径的Q插补器
+	 * @deprecated
+	 *
+	 * 考虑路径的直线和旋转约束. 优点是可以考虑旋转约束. 但是在不同速度配置下, 会
+	 * 出现不同的路径.
+	 */
+	LineTrajectory::ptr query2(const Q qStart, const Q qEnd) const;
 	virtual ~LinePlanner();
 private:
 	/** @brief 末端预定最大直线速度 */
@@ -105,7 +120,7 @@ private:
 	int _size;
 
     /** @brief 机器人的模型 */
-    robot::model::SerialLink* _serialLink;
+    robot::model::SerialLink::ptr _serialLink;
 
     /** @brief 平滑路径规划器 */
     SmoothMotionPlanner _smPlanner;

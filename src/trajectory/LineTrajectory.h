@@ -10,6 +10,7 @@
 
 # include "ConvertedInterpolator.h"
 # include "CompositeInterpolator.h"
+# include "Trajectory.h"
 # include <memory>
 
 using namespace robot::trajectory;
@@ -20,7 +21,7 @@ namespace trajectory {
 /**
  * @brief 直线运动的Q插补器
  */
-class LineTrajectory : public ikInterpolator{
+class LineTrajectory : public Interpolator<Q>{
 public:
 	using ptr = std::shared_ptr<LineTrajectory>;
 
@@ -32,33 +33,46 @@ public:
 	 * @param mappedlt [in] 对应的长度-时间插补器
 	 * @param mappedtt [in] 对应的角度-时间插补器
 	 */
+//	LineTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
+//			std::shared_ptr<robot::ik::IKSolver> iksolver,
+//			robot::model::Config config,
+//			LinearCompositeInterpolator<double>::ptr mappedlt,
+//			LinearCompositeInterpolator<double>::ptr mappedtt);
+
 	LineTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 			std::shared_ptr<robot::ik::IKSolver> iksolver,
 			robot::model::Config config,
-			LinearCompositeInterpolator<double>::ptr mappedlt,
-			LinearCompositeInterpolator<double>::ptr mappedtt);
+			SequenceInterpolator<double>::ptr lt,
+			Trajectory::ptr trajectory);
 
 	/** @brief 获取该规划的长度-时间插补器 */
 	inline const Interpolator<double>::ptr getLIpr() const{ return _lt;}
 
-	/** @brief 获取该规划的角度-时间插补器 */
-	inline const Interpolator<double>::ptr getTIpr() const{ return _lt;}
+//	/** @brief 获取该规划的角度-时间插补器 */
+//	inline const Interpolator<double>::ptr getTIpr() const{ return _tt;}
+	Q x(double t) const;
+	Q dx(double t) const;
+	Q ddx(double t) const;
+	double l(double t) const;
+	double dl(double t) const;
+	double ddl(double t) const;
+	double duration() const;
 
-	inline const double length(double t) const{ return _lt->x(t);}
+//	inline const double length(double t) const{ return _lt->x(t);}
+//
+//	inline const double dlength(double t) const{ return _lt->dx(t);}
+//
+//	inline const double ddlength(double t) const{ return _lt->ddx(t);}
+//
+//	inline const double theta(double t) const{ return _tt->x(t);}
+//
+//	inline const double dtheta(double t) const{ return _tt->dx(t);}
+//
+//	inline const double ddtheta(double t) const{ return _tt->ddx(t);}
 
-	inline const double dlength(double t) const{ return _lt->dx(t);}
-
-	inline const double ddlength(double t) const{ return _lt->ddx(t);}
-
-	inline const double theta(double t) const{ return _tt->x(t);}
-
-	inline const double dtheta(double t) const{ return _tt->dx(t);}
-
-	inline const double ddtheta(double t) const{ return _tt->ddx(t);}
-
-	inline const Interpolator<Vector3D<double> >::ptr getPosTIpr() const{ return _posInterpolator;}
-
-	inline const Interpolator<Rotation3D<double> >:: ptr getRotTIpr() const{ return _rotInterpolator;}
+//	inline const Interpolator<Vector3D<double> >::ptr getPosTIpr() const{ return _posInterpolator;}
+//
+//	inline const Interpolator<Rotation3D<double> >:: ptr getRotTIpr() const{ return _rotInterpolator;}
 
 	/**
 	 * @brief 获取长度l处所对应的插补器时间
@@ -76,11 +90,14 @@ public:
 	void doLengthAnalysis();
 	virtual ~LineTrajectory(){}
 private:
-	/** @brief 直线距离-时间插补器 */
-	Interpolator<double>::ptr _lt;
+	ikInterpolator::ptr _qIpr;
+	Trajectory::ptr _trajectory;
 
-	/** @brief 直线角度-时间插补器 */
-	Interpolator<double>::ptr _tt;
+	/** @brief 直线距离-时间插补器 */
+	SequenceInterpolator<double>::ptr _lt;
+
+//	/** @brief 直线角度-时间插补器 */
+//	Interpolator<double>::ptr _tt;
 
 	/** @brief 路径长度采样
 	 *

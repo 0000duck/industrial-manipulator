@@ -38,12 +38,10 @@ void mlabplannertest()
 	/**> 逆解器 */
 	std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robot));
 
-	Q qMin = Q(robot->getLink(0)->lmin(), robot->getLink(1)->lmin(), robot->getLink(2)->lmin(), robot->getLink(3)->lmin(), robot->getLink(4)->lmin(), robot->getLink(5)->lmin());
-	Q qMax = Q(robot->getLink(0)->lmax(), robot->getLink(1)->lmax(), robot->getLink(2)->lmax(), robot->getLink(3)->lmax(), robot->getLink(4)->lmax(), robot->getLink(5)->lmax());
 	Q dqLim = Q(3, 3, 3, 3, 5, 5);
 	Q ddqLim = Q(20, 20, 20, 20, 20, 20);
 
-	MultiLineArcBlendPlanner mlabplanner(qMin, qMax, dqLim, ddqLim, solver, robot);
+	MultiLineArcBlendPlanner mlabplanner(dqLim, ddqLim, solver, robot);
 
 	vector<Q> path;
 	path.push_back( Q::zero(6));

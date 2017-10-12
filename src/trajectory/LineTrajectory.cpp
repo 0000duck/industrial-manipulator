@@ -12,14 +12,59 @@
 namespace robot {
 namespace trajectory {
 
+//LineTrajectory::LineTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
+//		std::shared_ptr<robot::ik::IKSolver> iksolver,
+//		robot::model::Config config,
+//		LinearCompositeInterpolator<double>::ptr mappedlt,
+//		LinearCompositeInterpolator<double>::ptr mappedtt)
+//:ikInterpolator(origin, iksolver, config), _lt(mappedlt), _tt(mappedtt), _pathSize(1000)
+//{
+//	_lengthPath.reserve(_pathSize);
+//}
+
 LineTrajectory::LineTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 		std::shared_ptr<robot::ik::IKSolver> iksolver,
 		robot::model::Config config,
-		LinearCompositeInterpolator<double>::ptr mappedlt,
-		LinearCompositeInterpolator<double>::ptr mappedtt)
-:ikInterpolator(origin, iksolver, config), _lt(mappedlt), _tt(mappedtt), _pathSize(1000)
+		SequenceInterpolator<double>::ptr lt,
+		Trajectory::ptr trajectory)
+:_qIpr(new ikInterpolator(origin, iksolver, config)), _lt(lt), _trajectory(trajectory), _pathSize(trajectory->duration()/0.01 + 1)
 {
 	_lengthPath.reserve(_pathSize);
+}
+
+Q LineTrajectory::x(double t) const
+{
+	return _qIpr->x(t);
+}
+
+Q LineTrajectory::dx(double t) const
+{
+	return _qIpr->dx(t);
+}
+
+Q LineTrajectory::ddx(double t) const
+{
+	return _qIpr->ddx(t);
+}
+
+double LineTrajectory::l(double t) const
+{
+	return _lt->x(t);
+}
+
+double LineTrajectory::dl(double t) const
+{
+	return _lt->dx(t);
+}
+
+double LineTrajectory::ddl(double t) const
+{
+	return _lt->ddx(t);
+}
+
+double LineTrajectory::duration() const
+{
+	return _lt->duration();
 }
 
 double LineTrajectory::timeAt(double length) const
