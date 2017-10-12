@@ -13,7 +13,7 @@
 # include "SmoothMotionPlanner.h"
 # include <vector>
 # include "../model/SerialLink.h"
-# include "../trajectory/LineTrajectory.h"
+# include "../trajectory/LinePath.h"
 # include "../trajectory/LinearInterpolator.h"
 # include <memory>
 
@@ -68,7 +68,7 @@ public:
 	 * 不考虑直径的旋转约束, 这样做的好处是可以把位姿以路径长度为索引. 方法2中直线
 	 * 和旋转的速度规划是不统一的, 可能会造成"不同速度配置下, 路径不同"的结果;
 	 */
-	LineTrajectory::ptr query(const Q qStart, const Q qEnd, double speedRatio, double accRatio) const;
+	LinePath::ptr query(const Q qStart, const Q qEnd, double speedRatio, double accRatio) const;
 
 	/**
 	 * @brief 询问路径(方法2)
@@ -80,7 +80,7 @@ public:
 	 * 考虑路径的直线和旋转约束. 优点是可以考虑旋转约束. 但是在不同速度配置下, 会
 	 * 出现不同的路径.
 	 */
-	LineTrajectory::ptr query2(const Q qStart, const Q qEnd) const;
+	LinePath::ptr query2(const Q qStart, const Q qEnd) const;
 	virtual ~LinePlanner();
 private:
 	/** @brief 末端预定最大直线速度 */

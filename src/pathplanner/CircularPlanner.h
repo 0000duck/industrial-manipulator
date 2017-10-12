@@ -16,7 +16,7 @@
 # include "../model/SerialLink.h"
 # include "../trajectory/CompositeInterpolator.h"
 # include "../trajectory/LinearInterpolator.h"
-# include "../trajectory/CircularTrajectory.h"
+# include "../trajectory/CircularPath.h"
 # include <memory>
 
 using robot::math::Q;
@@ -31,7 +31,7 @@ public:
 	CircularPlanner(Q dqLim, Q ddqLim,
 			double vMaxLine, double aMaxLine, double hLine, double vMaxAngle, double aMaxAngle, double hAngle,
 			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink);
-	CircularTrajectory::ptr query(const Q qStart, const Q qIntermediate, const Q qEnd, double speedRatio, double accRatio) const;
+	CircularPath::ptr query(const Q qStart, const Q qIntermediate, const Q qEnd, double speedRatio, double accRatio) const;
 	virtual ~CircularPlanner(){}
 private:
 	/** @brief 末端预定最大直线速度 */

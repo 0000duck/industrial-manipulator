@@ -1,12 +1,12 @@
 /*
- * CircularTrajectory.h
+ * CircularPath.h
  *
  *  Created on: Oct 12, 2017
  *      Author: a1994846931931
  */
 
-#ifndef CIRCULARTRAJECTORY_H_
-#define CIRCULARTRAJECTORY_H_
+#ifndef CIRCULARPATH_H_
+#define CIRCULARPATH_H_
 
 # include "ConvertedInterpolator.h"
 # include "CompositeInterpolator.h"
@@ -18,10 +18,10 @@ using namespace robot::trajectory;
 namespace robot {
 namespace trajectory {
 
-class CircularTrajectory : public Interpolator<Q>{
+class CircularPath : public Interpolator<Q>{
 public:
-	using ptr = std::shared_ptr<CircularTrajectory>;
-	CircularTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
+	using ptr = std::shared_ptr<CircularPath>;
+	CircularPath(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 			std::shared_ptr<robot::ik::IKSolver> iksolver,
 			robot::model::Config config,
 			SequenceInterpolator<double>::ptr lt,
@@ -34,7 +34,7 @@ public:
 	double dl(double t) const;
 	double ddl(double t) const;
 	double duration() const;
-	virtual ~CircularTrajectory(){}
+	virtual ~CircularPath(){}
 private:
 	ikInterpolator::ptr _qIpr;
 	Trajectory::ptr _trajectory;

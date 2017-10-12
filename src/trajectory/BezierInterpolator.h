@@ -1,0 +1,77 @@
+/*
+ * BezierInterpolator.h
+ *
+ *  Created on: Oct 12, 2017
+ *      Author: a1994846931931
+ */
+
+#ifndef BEZIERINTERPOLATOR_H_
+#define BEZIERINTERPOLATOR_H_
+
+# include "Interpolator.h"
+# include "../math/Vector3D.h"
+# include "../common/printAdvance.h"
+
+using robot::math::Vector3D;
+using std::vector;
+
+namespace robot {
+namespace trajectory {
+
+/**
+ * @brief 通用贝塞线段插补类
+ * duration由const double _duration给定, 用户不能自由指定;
+ */
+class BezierInterpolator : public Interpolator<Vector3D<double> > {
+public:
+	using point = Vector3D<double>;
+	/**
+	 * @brief 二次贝塞尔
+	 * @param a [in] 点一
+	 * @param b [in] 点二
+	 * @param c [in] 点三
+	 */
+	BezierInterpolator(point &a, point &b, point &c);
+
+	/**
+	 * @brief 三次贝塞尔
+	 * @param a [in] 点一
+	 * @param b [in] 点二
+	 * @param c [in] 点三
+	 * @param d [in] 点四
+	 */
+	BezierInterpolator(point &a, point &b, point &c, point &d);
+
+	/**
+	 * @brief n次的贝塞尔线段
+	 * @warning 不建议使用高次贝塞尔
+	 * @param pointList [in] 点集合
+	 */
+	BezierInterpolator(vector<point>& pointList);
+	point x(double s) const;
+	point dx(double s) const;
+	point ddx(double s) const;
+	double duration() const;
+	virtual ~BezierInterpolator();
+protected:
+	point x3(double k, const vector<point>& pointList) const;
+	point dx3(double k, const vector<point>& pointList) const;
+	point ddx3(double k, const vector<point>& pointList) const;
+	point x4(double k, const vector<point>& pointList) const;
+	point dx4(double k, const vector<point>& pointList) const;
+	point ddx4(double k, const vector<point>& pointList) const;
+	point xn(double k, const vector<point>& pointList) const;
+	point dxn(double k, const vector<point>& pointList) const;
+	point ddxn(double k, const vector<point>& pointList) const;
+
+	static point interpolate(const point &p1, const point &p2, const double &k);
+protected:
+	int _size;
+	vector<point> _vpoint;
+	const double _duration = 1.0;
+};
+
+} /* namespace trajectory */
+} /* namespace robot */
+
+#endif /* BEZIERINTERPOLATOR_H_ */

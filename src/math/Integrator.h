@@ -8,8 +8,9 @@
 #ifndef INTEGRATOR_H_
 #define INTEGRATOR_H_
 
+# include "../trajectory/Interpolator.h"
+
 # include <vector>
-# include "../trajectory/LineTrajectory.h"
 
 using std::vector;
 using namespace robot::trajectory;

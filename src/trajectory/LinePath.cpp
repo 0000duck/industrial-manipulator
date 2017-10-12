@@ -5,7 +5,7 @@
  *      Author: a1994846931931
  */
 
-#include "LineTrajectory.h"
+#include "LinePath.h"
 # include "time.h"
 # include "../math/Integrator.h"
 
@@ -22,7 +22,7 @@ namespace trajectory {
 //	_lengthPath.reserve(_pathSize);
 //}
 
-LineTrajectory::LineTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
+LinePath::LinePath(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 		std::shared_ptr<robot::ik::IKSolver> iksolver,
 		robot::model::Config config,
 		SequenceInterpolator<double>::ptr lt,
@@ -32,42 +32,42 @@ LineTrajectory::LineTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , 
 	_lengthPath.reserve(_pathSize);
 }
 
-Q LineTrajectory::x(double t) const
+Q LinePath::x(double t) const
 {
 	return _qIpr->x(t);
 }
 
-Q LineTrajectory::dx(double t) const
+Q LinePath::dx(double t) const
 {
 	return _qIpr->dx(t);
 }
 
-Q LineTrajectory::ddx(double t) const
+Q LinePath::ddx(double t) const
 {
 	return _qIpr->ddx(t);
 }
 
-double LineTrajectory::l(double t) const
+double LinePath::l(double t) const
 {
 	return _lt->x(t);
 }
 
-double LineTrajectory::dl(double t) const
+double LinePath::dl(double t) const
 {
 	return _lt->dx(t);
 }
 
-double LineTrajectory::ddl(double t) const
+double LinePath::ddl(double t) const
 {
 	return _lt->ddx(t);
 }
 
-double LineTrajectory::duration() const
+double LinePath::duration() const
 {
 	return _lt->duration();
 }
 
-double LineTrajectory::timeAt(double length) const
+double LinePath::timeAt(double length) const
 {
 	if ((int)_lengthPath.size() <= 1)
 		throw(std::string("错误<LineInterpolator>: 尚未进行过路径长度分析, 无法获取目标位置的时间!"));
@@ -104,7 +104,7 @@ double LineTrajectory::timeAt(double length) const
 	return t;
 }
 
-void LineTrajectory::doLengthAnalysis()
+void LinePath::doLengthAnalysis()
 {
 	clock_t start = clock();
 	if ((int)_lengthPath.size() > 0)
