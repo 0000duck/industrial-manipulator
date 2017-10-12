@@ -18,7 +18,7 @@
 # include <vector>
 # include "../../trajectory/LinearInterpolator.h"
 # include "../../trajectory/ConvertedInterpolator.h"
-# include "../../trajectory/CircularPath.h"
+# include "../../trajectory/CircularTrajectory.h"
 # include "../../pathplanner/CircularPlanner.h"
 # include <memory>
 # include "../../parse/RobotXMLParser.h"
@@ -66,7 +66,7 @@ void circularplannerTest()
 		Q start = Q::zero(6);
 		Q intermediate = Q(0.7, 0, 0, 0, -1, 0);
 		Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
-		CircularPath::ptr circularIpr = planner.query(start, intermediate, end, 1.0, 1.0);
+		CircularTrajectory::ptr circularIpr = planner.query(start, intermediate, end, 1.0, 1.0);
 		clock_t clockEnd = clock();
 		cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 		int step = 1000;

@@ -5,12 +5,12 @@
  *      Author: a1994846931931
  */
 
-#include "CircularPath.h"
+#include "CircularTrajectory.h"
 
 namespace robot {
 namespace trajectory {
 
-CircularPath::CircularPath(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
+CircularTrajectory::CircularTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 		std::shared_ptr<robot::ik::IKSolver> iksolver,
 		robot::model::Config config,
 		SequenceInterpolator<double>::ptr lt,
@@ -20,37 +20,37 @@ CircularPath::CircularPath(std::pair<Interpolator<Vector3D<double> >::ptr , Inte
 	_lengthPath.reserve(_pathSize);
 }
 
-Q CircularPath::x(double t) const
+Q CircularTrajectory::x(double t) const
 {
 	return _qIpr->x(t);
 }
 
-Q CircularPath::dx(double t) const
+Q CircularTrajectory::dx(double t) const
 {
 	return _qIpr->dx(t);
 }
 
-Q CircularPath::ddx(double t) const
+Q CircularTrajectory::ddx(double t) const
 {
 	return _qIpr->ddx(t);
 }
 
-double CircularPath::l(double t) const
+double CircularTrajectory::l(double t) const
 {
 	return _lt->x(t);
 }
 
-double CircularPath::dl(double t) const
+double CircularTrajectory::dl(double t) const
 {
 	return _lt->dx(t);
 }
 
-double CircularPath::ddl(double t) const
+double CircularTrajectory::ddl(double t) const
 {
 	return _lt->ddx(t);
 }
 
-double CircularPath::duration() const
+double CircularTrajectory::duration() const
 {
 	return _lt->duration();
 }

@@ -13,7 +13,7 @@
 # include "../trajectory/ConvertedInterpolator.h"
 # include "../trajectory/CircularInterpolator.h"
 # include "../trajectory/Trajectory.h"
-# include "../trajectory/CircularPath.h"
+# include "../trajectory/CircularTrajectory.h"
 # include <memory>
 
 using namespace robot::model;
@@ -35,7 +35,7 @@ CircularPlanner::CircularPlanner(Q dqLim, Q ddqLim,
 		throw ("错误<圆弧规划>:　构造参数中数组的长度不一致！");
 }
 
-CircularPath::ptr CircularPlanner::query(const Q qStart, const Q qIntermediate, const Q qEnd, double speedRatio, double accRatio) const
+CircularTrajectory::ptr CircularPlanner::query(const Q qStart, const Q qIntermediate, const Q qEnd, double speedRatio, double accRatio) const
 {
 	/**> 检查config参数 */
 	Config config = _ikSolver->getConfig(qStart);
@@ -67,7 +67,7 @@ CircularPath::ptr CircularPlanner::query(const Q qStart, const Q qIntermediate, 
 	/**> 返回 */
 	auto origin = std::make_pair(CompositeInterpolator<Vector3D<double> >::ptr(new CompositeInterpolator<Vector3D<double> >(posIpr, lt)),
 			CompositeInterpolator<Rotation3D<double> >::ptr(new CompositeInterpolator<Rotation3D<double> >(rotIpr, lt)));
-	CircularPath::ptr cirlularTrajectory(new CircularPath(origin, _ikSolver, config, lt, trajectory));
+	CircularTrajectory::ptr cirlularTrajectory(new CircularTrajectory(origin, _ikSolver, config, lt, trajectory));
 	return cirlularTrajectory;
 }
 

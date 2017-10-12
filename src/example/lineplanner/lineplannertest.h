@@ -10,7 +10,7 @@
 
 # include "../../pathplanner/LinePlanner.h"
 
-LinePath::ptr lineplannerTest();
+LineTrajectory::ptr lineplannerTest();
 
 
 

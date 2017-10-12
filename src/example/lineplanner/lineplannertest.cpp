@@ -18,7 +18,7 @@
 # include "../../math/Integrator.h"
 # include <vector>
 # include "../../trajectory/LinearInterpolator.h"
-# include "../../trajectory/LinePath.h"
+# include "../../trajectory/LineTrajectory.h"
 # include "../../pathplanner/PointToPointPlanner.h"
 # include "../../pathplanner/LinePlanner.h"
 # include <memory>
@@ -33,7 +33,7 @@ using namespace robot::ik;
 using namespace robot::trajectory;
 using namespace robot::pathplanner;
 
-LinePath::ptr lineplannerTest()
+LineTrajectory::ptr lineplannerTest()
 {
 	/**> 读取模型文件 */
 	robot::parse::RobotXMLParser modelParser;
@@ -56,7 +56,7 @@ LinePath::ptr lineplannerTest()
 	double vMaxAngle = 1.0;
 	double aMaxAngle = 10.0;
 	double hAngle = 30;
-	LinePath::ptr lineIpr;
+	LineTrajectory::ptr lineIpr;
 	try{
 		LinePlanner planner = LinePlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle, solver, robot);
 

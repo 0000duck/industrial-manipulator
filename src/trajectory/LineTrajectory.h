@@ -1,12 +1,12 @@
 /*
- * LinePath.h
+ * LineTrajectory.h
  *
  *  Created on: Sep 20, 2017
  *      Author: a1994846931931
  */
 
-#ifndef LINEPATH_H_
-#define LINEPATH_H_
+#ifndef LINETRAJECTORY_H_
+#define LINETRAJECTORY_H_
 
 # include "ConvertedInterpolator.h"
 # include "CompositeInterpolator.h"
@@ -21,9 +21,9 @@ namespace trajectory {
 /**
  * @brief 直线运动的Q插补器
  */
-class LinePath : public Interpolator<Q>{
+class LineTrajectory : public Interpolator<Q>{
 public:
-	using ptr = std::shared_ptr<LinePath>;
+	using ptr = std::shared_ptr<LineTrajectory>;
 
 	/**
 	 * @brief 构造函数
@@ -39,7 +39,7 @@ public:
 //			LinearCompositeInterpolator<double>::ptr mappedlt,
 //			LinearCompositeInterpolator<double>::ptr mappedtt);
 
-	LinePath(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
+	LineTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 			std::shared_ptr<robot::ik::IKSolver> iksolver,
 			robot::model::Config config,
 			SequenceInterpolator<double>::ptr lt,
@@ -88,7 +88,7 @@ public:
 	 * 直线插补器的时长不会改变了才能调用此函数
 	 */
 	void doLengthAnalysis();
-	virtual ~LinePath(){}
+	virtual ~LineTrajectory(){}
 private:
 	ikInterpolator::ptr _qIpr;
 	Trajectory::ptr _trajectory;

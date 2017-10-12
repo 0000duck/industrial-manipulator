@@ -31,7 +31,7 @@ LinePlanner::LinePlanner(Q dqLim, Q ddqLim,
 		throw ("错误<直线规划器>:　构造参数中数组的长度不一致！");
 }
 
-LinePath::ptr LinePlanner::query(const Q qStart, const Q qEnd, double speedRatio, double accRatio) const
+LineTrajectory::ptr LinePlanner::query(const Q qStart, const Q qEnd, double speedRatio, double accRatio) const
 {
 	/**> 检查config参数 */
 	Config config = _ikSolver->getConfig(qStart);
@@ -63,7 +63,7 @@ LinePath::ptr LinePlanner::query(const Q qStart, const Q qEnd, double speedRatio
 	/**> 返回 */
 	auto origin = std::make_pair(CompositeInterpolator<Vector3D<double> >::ptr(new CompositeInterpolator<Vector3D<double> >(posIpr, lt)),
 			CompositeInterpolator<Rotation3D<double> >::ptr(new CompositeInterpolator<Rotation3D<double> >(rotIpr, lt)));
-	LinePath::ptr lineTrajectory(new LinePath(origin, _ikSolver, config, lt, trajectory));
+	LineTrajectory::ptr lineTrajectory(new LineTrajectory(origin, _ikSolver, config, lt, trajectory));
 	return lineTrajectory;
 }
 
