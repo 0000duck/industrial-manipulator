@@ -1,8 +1,7 @@
-/*
- * LineTrajectory.h
- *
- *  Created on: Sep 20, 2017
- *      Author: a1994846931931
+/**
+ * @brief LineTrajectory
+ * @date Sep 20, 2017
+ * @author a1994846931931
  */
 
 #ifndef LINETRAJECTORY_H_
@@ -19,26 +18,31 @@ namespace robot {
 namespace trajectory {
 
 /**
+ * @addtogroup trajectory
+ * @{
+ */
+
+/**
  * @brief 直线运动的Q插补器
  */
 class LineTrajectory : public Interpolator<Q>{
 public:
 	using ptr = std::shared_ptr<LineTrajectory>;
 
-	/**
-	 * @brief 构造函数
-	 * @param origin [in] 位姿插补器, 由一个Vector3D<double>类型的插补器和Rotation3D<double>类型的插补器构成
-	 * @param iksolver [in] 用于逆解的逆解器
-	 * @param config [in] 用于逆解的位姿参数
-	 * @param mappedlt [in] 对应的长度-时间插补器
-	 * @param mappedtt [in] 对应的角度-时间插补器
-	 */
 //	LineTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 //			std::shared_ptr<robot::ik::IKSolver> iksolver,
 //			robot::model::Config config,
 //			LinearCompositeInterpolator<double>::ptr mappedlt,
 //			LinearCompositeInterpolator<double>::ptr mappedtt);
 
+	/**
+	 * @brief 构造函数
+	 * @param origin [in] 位姿插补器, 位置和姿态插补器的pair(时间t为索引)
+	 * @param iksolver [in] 用于逆解的逆解器
+	 * @param config [in] 用于逆解的位姿参数
+	 * @param lt [in] 速度规划插补器
+	 * @param trajectory [in] 路径插补器(长度为索引)
+	 */
 	LineTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 			std::shared_ptr<robot::ik::IKSolver> iksolver,
 			robot::model::Config config,
@@ -53,9 +57,28 @@ public:
 	Q x(double t) const;
 	Q dx(double t) const;
 	Q ddx(double t) const;
+
+	/**
+	 * @brief 获取时间索引t处的路径长度
+	 * @param t [in] 时间索引
+	 * @return t处的路径长度
+	 */
 	double l(double t) const;
+
+	/**
+	 * @brief 获取时间索引t处的路径速度
+	 * @param t [in] 时间索引
+	 * @return t处的路径速度
+	 */
 	double dl(double t) const;
+
+	/**
+	 * @brief 获取时间索引t处的路径加速度
+	 * @param t [in] 时间索引
+	 * @return t处的路径加速度
+	 */
 	double ddl(double t) const;
+
 	double duration() const;
 
 //	inline const double length(double t) const{ return _lt->x(t);}
@@ -113,6 +136,8 @@ private:
 	robot::model::Config _config;
 	 */
 };
+
+/** @} */
 
 } /* namespace trajectory */
 } /* namespace robot */

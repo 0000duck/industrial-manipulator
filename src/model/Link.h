@@ -31,13 +31,14 @@ public:
 	using ptr = std::shared_ptr<Link>;
 	/**
 	 * @brief 连杆构造函数定义，生成初始DH变换阵
-	 * @param alpha [in]
-	 * @param a [in]
-	 * @param d [in]
-	 * @param theta [in]
-	 * @param min [in]
-	 * @param max [in]
-	 * @param sigma [in]
+	 * @param alpha [in] @f$ \alpha @f$
+	 * @param a [in] @f$ a @f$
+	 * @param d [in] @f$ d @f$
+	 * @param theta [in]  @f$ \theta @f$
+	 * @param min [in] @f$ min @f$
+	 * @param max [in] @f$ max @f$
+	 * @param name [in] 关节名称
+	 * @param sigma [in] @f$ \sigma @f$
 	 * @warning sigma为连杆类型，当sigma为0：转动副；sigma为1：移动副
 	 * min、max 为转动最小最大角度或伸缩长度
 	 */

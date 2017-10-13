@@ -1,8 +1,7 @@
-/*
- * SMPlannerEx.h
- *
- *  Created on: Sep 25, 2017
- *      Author: a1994846931931
+/**
+ * @brief SMPlannerEx
+ * @date Sep 25, 2017
+ * @author a1994846931931
  */
 
 #ifndef SMPLANNEREX_H_
@@ -15,6 +14,14 @@
 namespace robot {
 namespace pathplanner {
 
+/**
+ * @addtogroup pathplanner
+ * @{
+ */
+
+/**
+ * @brief 加强S速度曲线规划器
+ */
 class SMPlannerEx {
 public:
 	SMPlannerEx();
@@ -158,6 +165,8 @@ private:
 	robot::trajectory::SequenceInterpolator<double>::ptr threeLineMotion(double start, double s, double h, double aMax, double v1) const;
 	robot::trajectory::SequenceInterpolator<double>::ptr fourLineMotion(double start, double s, double h, double aMax, double v1) const;
 };
+
+/** @} */
 
 } /* namespace pathplanner */
 } /* namespace robot */

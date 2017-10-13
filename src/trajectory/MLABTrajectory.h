@@ -1,8 +1,7 @@
-/*
- * MLABTrajectory.h
- *
- *  Created on: Sep 26, 2017
- *      Author: a1994846931931
+/**
+ * @brief MLABTrajectory
+ * @date Sep 26, 2017
+ * @author a1994846931931
  */
 
 #ifndef MLABTRAJECTORY_H_
@@ -36,6 +35,20 @@ class MLABTrajectory: public Interpolator<Q> {
 public:
 	using ptr = std::shared_ptr<MLABTrajectory>;
 
+	/**
+	 * @brief 构造函数
+	 * @param arcPosIpr [in] 圆弧段位置插补器列表
+	 * @param linePosIpr [in] 直线段位置插补器列表
+	 * @param arcRotIpr [in] 圆弧段姿态插补器列表
+	 * @param lineRotIpr [in] 直线段姿态插补器列表
+	 * @param length [in] 各段长度列表(包括直线段和圆弧段)
+	 * @param qIpr [in] 各段的Q插补器列表(时间为索引, 包括直线段和圆弧段)
+	 * @param trajectoryIpr [in] 各段的Q插补器列表(长度为索引, 包括直线段和圆弧段)
+	 * @param lt [in] 各段的时间规划插补器列表(包括直线段和圆弧段)
+	 * @param origin [in] 整条线段的位置和姿态插补器(时间为索引)
+	 * @param iksolver [in] 用于逆解的逆解器
+	 * @param config [in] 用于逆解的位姿参数
+	 */
 	MLABTrajectory(
 			vector<CircularInterpolator<Vector3D<double> >::ptr> arcPosIpr,
 			vector<LinearInterpolator<Vector3D<double> >::ptr> linePosIpr,
@@ -52,10 +65,34 @@ public:
 	Q x(double t) const;
 	Q dx(double t) const;
 	Q ddx(double t) const;
+
+	/**
+	 * @brief 获取时间索引t处的路径长度
+	 * @param t [in] 时间索引
+	 * @return t处的路径长度
+	 */
 	double l(double t) const;
+
+	/**
+	 * @brief 获取时间索引t处的路径速度
+	 * @param t [in] 时间索引
+	 * @return t处的路径速度
+	 */
 	double dl(double t) const;
+
+	/**
+	 * @brief 获取时间索引t处的路径加速度
+	 * @param t [in] 时间索引
+	 * @return t处的路径加速度
+	 */
 	double ddl(double t) const;
+
 	double duration() const;
+
+	/**
+	 * @brief 获取各段的位置插补器列表
+	 * @return 各段的位置插补器列表
+	 */
 	vector<Interpolator<Vector3D<double> >::ptr> getPosIpr() const;
 	virtual ~MLABTrajectory(){}
 private:
@@ -95,6 +132,8 @@ private:
 	Trajectory::ptr _trajectory;
 
 };
+
+/** @} */
 
 } /* namespace trajectory */
 } /* namespace robot */

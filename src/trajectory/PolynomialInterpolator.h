@@ -22,10 +22,23 @@ namespace trajectory {
 /** @addtogroup trajectory
  * @{
  */
+
+/**
+ * @brief 一次多项式插补器
+ */
 template <class T>
 class PolynomialInterpolator1: public Interpolator<T> {
 public:
 	using ptr = std::shared_ptr<PolynomialInterpolator1>;
+
+	/**
+	 * @brief 构造函数
+	 * @param a [in] 参数
+	 * @param b [in] 参数
+	 * @param duration [in] 时长
+	 *
+	 * 构造 @f$ a + bt @f$ 的一次多项式
+	 */
 	PolynomialInterpolator1(const T& a,const T& b,double duration):
 		_a(a),_b(b),_vel(b),_acc(b*0),_duration(duration)
 {
@@ -57,10 +70,23 @@ private:
 	double _duration;
 };
 
+/**
+ * @brief 二次多项式插补器
+ */
 template <class T>
 class PolynomialInterpolator2: public Interpolator<T> {
 public:
 	using ptr = std::shared_ptr<PolynomialInterpolator2>;
+
+	/**
+	 * @brief 构造函数
+	 * @param a [in] 参数
+	 * @param b [in] 参数
+	 * @param c [in] 参数
+	 * @param duration [in] 时长
+	 *
+	 * 构造 @f$ a + bt + ct^2 @f$ 的二次多项式
+	 */
 	PolynomialInterpolator2(const T& a,const T& b,const T& c,double duration):
 		_a(a),_b(b),_c(c),_vel(b+2*c*duration),_acc(2*c),_duration(duration)
 {
@@ -108,11 +134,24 @@ private:
 	double _duration;
 };
 
-
+/**
+ * @brief 三次多项式插补器
+ */
 template <class T>
 class PolynomialInterpolator3: public Interpolator<T> {
 public:
 	using ptr = std::shared_ptr<PolynomialInterpolator3>;
+
+	/**
+	 * @brief 构造函数
+	 * @param a [in] 参数
+	 * @param b [in] 参数
+	 * @param c [in] 参数
+	 * @param d [in] 参数
+	 * @param duration [in] 时长
+	 *
+	 * 构造 @f$ a + bt + ct^2 + dt^3 @f$ 的三次多项式
+	 */
 	PolynomialInterpolator3(const T& a,const T& b,const T& c,const T&d,double duration):
 		_a(a),_b(b),_c(c),_d(d),_vel(_b+(2*_c+3*_d*duration)*duration),_acc(2*_c+6*_d*duration),_duration(duration)
 	{
@@ -163,10 +202,25 @@ private:
 	double _duration;
 };
 
+/**
+ * @brief 四次多项式插补器
+ */
 template <class T>
 class PolynomialInterpolator4: public Interpolator<T> {
 public:
 	using ptr = std::shared_ptr<PolynomialInterpolator4>;
+
+	/**
+	 * @brief 构造函数
+	 * @param a [in] 参数
+	 * @param b [in] 参数
+	 * @param c [in] 参数
+	 * @param d [in] 参数
+	 * @param e [in] 参数
+	 * @param duration [in] 时长
+	 *
+	 * 构造 @f$ a + bt + ct^2 + dt^3 + et^4 @f$ 的四次多项式
+	 */
 	PolynomialInterpolator4(const T& a,const T& b,const T& c,const T& d,const T& e,double duration):
 		_a(a),_b(b),_c(c),_d(d),_e(e),_vel(b+(2*c+(3*d+4*e*duration)*duration)*duration),_acc(2*c+(6*d+12*e*duration)*duration),_duration(duration)
 {
@@ -218,10 +272,26 @@ private:
 	double _duration;
 };
 
+/**
+ * @brief 五次多项式插补器
+ */
 template <class T>
 class PolynomialInterpolator5: public Interpolator<T> {
 public:
 	using ptr = std::shared_ptr<PolynomialInterpolator5>;
+
+	/**
+	 * @brief 构造函数
+	 * @param a [in] 参数
+	 * @param b [in] 参数
+	 * @param c [in] 参数
+	 * @param d [in] 参数
+	 * @param e [in] 参数
+	 * @param f [in] 参数
+	 * @param duration [in] 时长
+	 *
+	 * 构造 @f$ a + bt + ct^2 + dt^3 + et^4 + ft^5 @f$ 的五次多项式
+	 */
 	PolynomialInterpolator5(const T& a,const T& b,const T& c,const T& d,const T& e,const T& f,double duration):
 		_a(a),_b(b),_c(c),_d(d),_e(e),_f(f),_vel(b+(2*c+(3*d+(4*e+5*f*duration)*duration)*duration)*duration),_acc(2*c+(6*d+(12*e+20*f*duration)*duration)*duration),_duration(duration)
 {
@@ -312,10 +382,8 @@ private:
 	double _duration;
 };
 
-
-
-
 /** @} */
+
 } /* namespace trajectory */
 } /* namespace robot */
 

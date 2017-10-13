@@ -1,8 +1,7 @@
-/*
- * RobotXMLParser.h
- *
- *  Created on: Oct 10, 2017
- *      Author: a1994846931931
+/**
+ * @brief RobotXMLParser.h
+ * @date Oct 10, 2017
+ * @author a1994846931931
  */
 
 #ifndef ROBOTXMLPARSER_H_
@@ -15,14 +14,35 @@ using namespace robot::model;
 namespace robot {
 namespace parse {
 
+/**
+ * @addtogroup parse
+ * @{
+ */
+
+/**
+ * @brief 机器人模型文件解析器
+ */
 class RobotXMLParser {
 public:
 	RobotXMLParser();
-	SerialLink::ptr parse(const char* filename);
-	SerialLink::ptr parse(const std::string filename);
 	virtual ~RobotXMLParser();
+public:
+	/**
+	 * @brief 解析机器人模型文件
+	 * @param filename [in] 文件名(包含路径)
+	 * @return 机器人模型指针
+	 */
+	static SerialLink::ptr parse(const char* filename);
 
+	/**
+	 * @brief 解析机器人模型文件
+	 * @param filename [in] 文件名(包含路径)
+	 * @return 机器人模型指针
+	 */
+	static SerialLink::ptr parse(const std::string filename);
 };
+
+/**@}*/
 
 } /* namespace parse */
 } /* namespace robot */

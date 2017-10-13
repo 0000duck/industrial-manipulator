@@ -1,8 +1,7 @@
-/*
- * Trajectory.h
- *
- *  Created on: Sep 29, 2017
- *      Author: a1994846931931
+/**
+ * @brief Trajectory
+ * @date Sep 29, 2017
+ * @author a1994846931931
  */
 
 #ifndef TRAJECTORY_H_
@@ -17,6 +16,16 @@ using namespace robot::trajectory;
 namespace robot {
 namespace trajectory {
 
+/**
+ * @addtogroup trajectory
+ * @{
+ */
+
+/**
+ * @brief 路径类
+ *
+ * 要求缩索引为长度, 提供一些采样方法.
+ */
 class Trajectory : public ikInterpolator{
 public:
 	struct qVelAcc{
@@ -25,12 +34,31 @@ public:
 	};
 public:
 	using ptr = std::shared_ptr<Trajectory>;
+
+	/**
+	 * @brief 构造函数
+	 * @param origin [in] 位姿插补器, 位置和姿态插补器的pair(长度为索引)
+	 * @param iksolver [in] 用于逆解的逆解器
+	 * @param config [in] 用于逆解的位姿参数
+	 */
 	Trajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
 			std::shared_ptr<robot::ik::IKSolver> iksolver,
 			robot::model::Config config);
 
+	/**
+	 * @brief 沿路经关节速度加速度采样
+	 * @param count [in] 采样的点数
+	 * @param precision [in] 速度, 加速度数值计算的精度(dt)
+	 * @return 由速度采样点和加速度采样点构造的数据
+	 */
 	qVelAcc sampleVelAcc(const int count, double precision=0.00001);
 
+	/**
+	 * @brief 沿路经关节速度采样
+	 * @param count [in] 采样的点数
+	 * @param precision [in] 速度, 加速度数值计算的精度(dt)
+	 * @return 速度采样点列表
+	 */
 	vector<Q> sampleVel(const int count, double precision=0.00001);
 
 	/**
@@ -81,6 +109,8 @@ public:
 	virtual ~Trajectory(){}
 protected:
 };
+
+/** @} */
 
 } /* namespace trajectory */
 } /* namespace robot */
