@@ -70,10 +70,11 @@ public:
 	virtual ~CircularTrajectory(){}
 private:
 	ikInterpolator::ptr _qIpr;
-	Trajectory::ptr _trajectory;
 
 	/** @brief 直线距离-时间插补器 */
 	SequenceInterpolator<double>::ptr _lt;
+
+	Trajectory::ptr _trajectory;
 
 	std::vector<std::pair<double, double> > _lengthPath;
 	const int _pathSize;
