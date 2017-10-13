@@ -98,6 +98,10 @@ public:
 	 * 通过二分法对_length进行搜索上下线, 然后通过线性插值获取
 	 */
 	double t(double l) const;
+
+	double dt(double l) const;
+
+	double ddt(double l) const;
 	virtual ~BezierPath();
 protected:
 	/** @brief 保存的插补器 */

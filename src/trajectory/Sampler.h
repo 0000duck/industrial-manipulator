@@ -44,14 +44,17 @@ template< class T>
 		static vector<T> sample(std::shared_ptr<Interpolator<T> > ipr, int count, const char* method_c="x")
 		{
 			std::function<T(double)> method;
-			if (std::string(method_c) == std::string("x"))
+			if (std::string(method_c).compare(string("x")) == 0)
 				method = [&](double t){return ipr->x(t);};
-			if (std::string(method_c) == std::string("dx"))
-				method = [&](double t){return ipr->x(t);};
-			if (std::string(method_c) == std::string("ddx"))
-				method = [&](double t){return ipr->x(t);};
+			else if (std::string(method_c).compare(string("dx")) == 0)
+				method = [&](double t){return ipr->dx(t);};
+			else if (std::string(method_c).compare(string("ddx")) == 0)
+				method = [&](double t){return ipr->ddx(t);};
 			else
+			{
+				cout << "未识别采样方法, 改为x(t)\n";
 				method = [&](double t){return ipr->x(t);};
+			}
 			double duration = ipr->duration();
 			double dt = duration/(count - 1);
 			vector<double> t;
