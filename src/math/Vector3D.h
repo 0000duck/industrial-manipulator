@@ -309,6 +309,14 @@ public:
 		return Vector3D<T>(a(0)/len, a(1)/len, a(2)/len);
 	}
 
+	static double distance(Vector3D<T> &a, Vector3D<T> &b)
+	{
+		double d1 = a(0) - b(0);
+		double d2 = a(1) - b(1);
+		double d3 = a(2) - b(2);
+		return sqrt(d1*d1 + d2*d2 + d3*d3);
+	}
+
 	/**
 	 * @brief 向量规范化
 	 */

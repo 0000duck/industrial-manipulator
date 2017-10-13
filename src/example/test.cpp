@@ -11,6 +11,7 @@
 # include "../kinematics/Frame.h"
 # include "../kinematics/State.h"
 # include "../common/printAdvance.h"
+# include "../common/fileAdvance.h"
 # include "../model/Link.h"
 # include "../ik/SiasunSR4CSolver.h"
 # include "../model/Config.h"
@@ -19,6 +20,8 @@
 # include "../trajectory/LinearInterpolator.h"
 # include "../trajectory/ConvertedInterpolator.h"
 # include "../trajectory/MLABTrajectory.h"
+# include "../trajectory/BezierPath.h"
+# include "../trajectory/Sampler.h"
 # include "../pathplanner/PointToPointPlanner.h"
 # include "../pathplanner/LinePlanner.h"
 # include "../pathplanner/QBlend.h"
@@ -30,6 +33,7 @@
 # include <vector>
 # include <memory>
 # include <fstream>
+# include <algorithm>
 //# include "test.h"
 //# include "testIK.h"
 //# include "testIK2.h"
@@ -263,7 +267,7 @@ int main(){
 
 //	lineplannerTest();
 
-	circularplannerTest();
+//	circularplannerTest();
 
 //	simulationtest();
 
@@ -271,6 +275,20 @@ int main(){
 
 //	mlabplannertest();
 
+	Vector3D<double> p1(-1, 0, 0);
+	Vector3D<double> p2(0, 1, 0);
+	Vector3D<double> p3(1, 0, 0);
+	clock_t start = clock();
+	BezierPath::ptr bpIpr(new BezierPath(p1, p2, p3));
+	clock_t end = clock();
+	cout << "构造贝塞尔路径用时: " << end - start << endl;
+	vector<Vector3D<double> > path = robot::trajectory::Sampler<Vector3D<double> >::sample(bpIpr, 500, "x");
+	savePosPath("src/example/tempx.csv", path);
+	cout << "路径总长度: " << bpIpr->duration() << endl;
+	start = clock();
+	bpIpr->x(1.2);
+	end = clock();
+	cout << "获取路径用时 " << end - start << endl;
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

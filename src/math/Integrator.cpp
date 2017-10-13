@@ -26,7 +26,26 @@ vector<double> Integrator::integrate(Interpolator<Vector3D<double> >::ptr positi
 	for (int i=1; i<(int)size; i++)
 	{
 		curPosition = positionIpr->x(t[i]);
-		length.push_back((curPosition - prePosition).getLength());
+		length.push_back((curPosition - prePosition).getLength() + length[i - 1]);
+		prePosition = curPosition;
+	}
+	return length;
+}
+
+double Integrator::integrate(Interpolator<Vector3D<double> >::ptr positionIpr, int count)
+{
+	int size = count;
+	double length = 0;
+	Vector3D<double> prePosition = positionIpr->x(0);
+	Vector3D<double> curPosition;
+	double T = positionIpr->duration();
+	double dt = T/(count - 1);
+	for (int i=1; i<(int)size; i++)
+	{
+		curPosition = positionIpr->x(dt*i);
+		length += ((curPosition - prePosition).getLength());
+//		length += Vector3D<double>::distance(curPosition, prePosition); //未见加速
+		prePosition = curPosition;
 	}
 	return length;
 }

@@ -9,14 +9,17 @@
 #define FILEADVANCE_H_
 
 # include "../math/Q.h"
+# include "../math/HTransform3D.h"
 
 namespace robot{
 namespace common{
 
 using std::vector;
-using robot::math::Q;
+using namespace robot::math;
 
 bool saveQPath(const char* filename, vector<Q>& qPath);
+
+bool savePosPath(const char* filename, vector<Vector3D<double>>& vPath); //,,格式
 
 bool saveDoublePath(const char* filename, vector<double>& doublePath, vector<double>& time);
 
