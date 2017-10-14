@@ -1,8 +1,7 @@
-/*
- * Integrator.h
- *
- *  Created on: Sep 22, 2017
- *      Author: a1994846931931
+/**
+ * @brief Integrator
+ * @date Sep 22, 2017
+ * @author a1994846931931
  */
 
 #ifndef INTEGRATOR_H_
@@ -18,6 +17,14 @@ using namespace robot::trajectory;
 namespace robot {
 namespace math {
 
+/**
+ * @addtogroup math
+ * @{
+ */
+
+/**
+ * @brief 积分器, 提供一些积分算法
+ */
 class Integrator {
 public:
 	Integrator();
@@ -31,7 +38,7 @@ public:
 	 * double integrate(Interpolator<Vector3D<double> >::ptr positionIpr, int count);
 	 * 经测试, 速度可以提高20%左右;
 	 */
-	vector<double> integrate(Interpolator<Vector3D<double> >::ptr positionIpr, vector<double> t);
+	static vector<double> integrate(Interpolator<Vector3D<double> >::ptr positionIpr, vector<double> t);
 
 	/**
 	 * @brief 获取路径总长度
@@ -40,9 +47,11 @@ public:
 	 * @return 路径从时刻0到duration()返回的时刻之间的长度
 	 * @note 采样的精度和count有关; 积分方式为把采样点之间的路径看做是一段直线;
 	 */
-	double integrate(Interpolator<Vector3D<double> >::ptr positionIpr, int count);
+	static double integrate(Interpolator<Vector3D<double> >::ptr positionIpr, int count);
 	virtual ~Integrator();
 };
+
+/** @} */
 
 } /* namespace math */
 } /* namespace robot */

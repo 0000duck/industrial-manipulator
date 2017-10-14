@@ -1,8 +1,7 @@
-/*
- * Sampler.h
- *
- *  Created on: Oct 13, 2017
- *      Author: a1994846931931
+/**
+ * @brief Sampler
+ * @date Oct 13, 2017
+ * @author a1994846931931
  */
 
 #ifndef SAMPLER_H_
@@ -17,6 +16,14 @@ using robot::trajectory::Interpolator;
 namespace robot {
 namespace trajectory {
 
+/**
+ * @addtogroup trajectory
+ * @{
+ */
+
+/**
+ * @brief 通用采样器
+ */
 template< class T>
 	class Sampler {
 	public:
@@ -26,7 +33,7 @@ template< class T>
 		 * @brief 插补器采样函数
 		 * @param ipr [in] 插补器
 		 * @param count [in] 采样点数
-		 * @param method [in] 获取方法. 对于Interpolator, 可以选择
+		 * @param method_c [in] 获取方法. 对于Interpolator, 可以选择
 		 * 	- "x" 默认
 		 * 	- "dx"
 		 * 	- "ddx"
@@ -70,6 +77,8 @@ template< class T>
 		}
 		virtual ~Sampler(){}
 	};
+
+/** @} */
 
 } /* namespace trajectory */
 } /* namespace robot */

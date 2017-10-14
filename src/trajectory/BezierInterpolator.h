@@ -1,8 +1,7 @@
-/*
- * BezierInterpolator.h
- *
- *  Created on: Oct 12, 2017
- *      Author: a1994846931931
+/**
+ * @brief BezierInterpolator
+ * @date Oct 12, 2017
+ * @author a1994846931931
  */
 
 #ifndef BEZIERINTERPOLATOR_H_
@@ -17,6 +16,11 @@ using std::vector;
 
 namespace robot {
 namespace trajectory {
+
+/**
+ * @addtogroup trajectory
+ * @{
+ */
 
 /**
  * @brief 通用贝塞线段插补类
@@ -48,9 +52,29 @@ public:
 	 * @param pointList [in] 点集合
 	 */
 	BezierInterpolator(vector<point>& pointList);
+
+	/**
+	 * @brief 获取s索引对应的位置
+	 * @param s [in] s索引, 范围为0~_duration
+	 * @return s索引处的位置
+	 */
 	point x(double s) const;
+
+	/**
+	 * @brief 获取s索引对应的速度
+	 * @param s [in] s索引, 范围为0~_duration
+	 * @return s索引处的速度
+	 */
 	point dx(double s) const;
+
+	/**
+	 * @brief 获取s索引对应的加速度
+	 * @param s [in] s索引, 范围为0~_duration
+	 * @return s索引处的加速度
+	 */
 	point ddx(double s) const;
+
+	/**@brief 索引长度 */
 	double duration() const;
 	virtual ~BezierInterpolator();
 protected:
@@ -63,13 +87,15 @@ protected:
 	point xn(double k, const vector<point>& pointList) const;
 	point dxn(double k, const vector<point>& pointList) const;
 	point ddxn(double k, const vector<point>& pointList) const;
-
+protected:
 	static point interpolate(const point &p1, const point &p2, const double &k);
 protected:
 	int _size;
 	vector<point> _vpoint;
 	const double _duration = 1.0;
 };
+
+/** @} */
 
 } /* namespace trajectory */
 } /* namespace robot */

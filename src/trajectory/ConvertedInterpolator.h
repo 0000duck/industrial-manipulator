@@ -44,6 +44,9 @@ public:
 	 *
 	 * 记录源插补器的指针
 	 * @param origin [in] 源插补器
+	 * @param transformx [in] 用于转变x(t)结果的函数
+	 * @param transformdx [in]  用于转变dx(t)结果的函数
+	 * @param transformddx [in]  用于转变ddx(t)结果的函数
 	 */
 	ConvertedInterpolator(std::shared_ptr<Interpolator<B> > origin, std::function<T(B)> transformx, std::function<T(B)> transformdx, std::function<T(B)> transformddx)
 	:_transformx(transformx), _transformdx(transformdx), _transformddx(transformddx)

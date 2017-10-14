@@ -179,11 +179,6 @@ public:
 	/** @brief 设置关节数值 */
 	void setQ(robot::math::Q);
 
-	/**
-	 * @brief 获取关节姿态配置
-	 * @param q [in] 关节数值
-	 * @return 关节数值为Q时机器人的姿态配置
-	 */
 //	Config getConfig(const Q&) const;
 
 	/**

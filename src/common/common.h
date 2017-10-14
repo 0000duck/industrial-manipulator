@@ -48,8 +48,8 @@ double fixAngle(double angle);
  */
 double fixZero(double num);
 
+/** @} */
 }
 }
 
-/** @} */
 #endif /* COMMON_H_ */

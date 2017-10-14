@@ -1,8 +1,7 @@
-/*
- * CircularPlanner.h
- *
- *  Created on: Sep 18, 2017
- *      Author: a1994846931931
+/**
+ * @brief CircularPlanner
+ * @date Sep 18, 2017
+ * @author a1994846931931
  */
 
 #ifndef CIRCULARPLANNER_H_
@@ -26,11 +25,42 @@ using namespace robot::trajectory;
 namespace robot {
 namespace pathplanner {
 
+/**
+ * @addtogroup pathplanner
+ * @{
+ */
+
+/**
+ * 圆弧路径规划器
+ */
 class CircularPlanner {
 public:
+	/**
+	 * @brief 构造函数
+	 * @param dqLim [in] 关节最大速度
+	 * @param ddqLim [in] 关节最大加速度
+	 * @param vMaxLine [in] 直线路径最大速度
+	 * @param aMaxLine [in] 直线路径最大加速度
+	 * @param hLine [in] 直线路径加加速度
+	 * @param vMaxAngle [in] 直线路径最大角速度
+	 * @param aMaxAngle [in] 直线路径最大角加速度
+	 * @param hAngle [in] 直线路径角加加速度
+	 * @param ikSolver [in] 逆解器
+	 * @param serialLink [in] 机器人模型
+	 */
 	CircularPlanner(Q dqLim, Q ddqLim,
 			double vMaxLine, double aMaxLine, double hLine, double vMaxAngle, double aMaxAngle, double hAngle,
 			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink);
+
+	/**
+	 * @brief 询问路径
+	 * @param qStart [in] 圆弧开始点的关节数值
+	 * @param qIntermediate [in] 圆弧中间点的关节数值
+	 * @param qEnd [in] 圆弧结束点的关节数值
+	 * @param speedRatio [in] 速度占最大速度的比例
+	 * @param accRatio [in] 加速度占最大加速度的比例
+	 * @return
+	 */
 	CircularTrajectory::ptr query(const Q qStart, const Q qIntermediate, const Q qEnd, double speedRatio, double accRatio) const;
 	virtual ~CircularPlanner(){}
 private:
@@ -76,6 +106,8 @@ private:
     /** @brief 平滑路径规划器 */
     SmoothMotionPlanner _smPlanner;
 };
+
+/** @} */
 
 } /* namespace pathplanner */
 } /* namespace robot */

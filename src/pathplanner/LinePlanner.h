@@ -42,8 +42,6 @@ class LinePlanner {
 public:
 	/**
 	 * @brief 构造函数
-	 * @param qMin [in] 关节下限
-	 * @param qMax [in] 关节上限
 	 * @param dqLim [in] 关节最大速度
 	 * @param ddqLim [in] 关节最大加速度
 	 * @param vMaxLine [in] 直线路径最大速度
@@ -63,6 +61,8 @@ public:
 	 * @brief 询问路径(方法1)
 	 * @param qStart [in] 起始位置
 	 * @param qEnd [in] 终点位置
+	 * @param speedRatio [in] 速度占最大速度的比例
+	 * @param accRatio [in] 加速度占最大加速度的比例
 	 * @return 直线路径的Q插补器
 	 *
 	 * 不考虑直径的旋转约束, 这样做的好处是可以把位姿以路径长度为索引. 方法2中直线

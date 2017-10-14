@@ -75,7 +75,6 @@ double BezierPath::t(double l) const
 }
 
 BezierPath::~BezierPath() {
-	// TODO Auto-generated destructor stub
 }
 
 void BezierPath::init()
