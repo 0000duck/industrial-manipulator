@@ -110,7 +110,7 @@ Vector3D<double> BezierInterpolator::dx4(double k, const vector<point>& pointLis
 Vector3D<double> BezierInterpolator::ddx4(double k, const vector<point>& pointList) const
 {
 	double j = 1.0 - k;
-	return pointList[0]*(6.0*j) + pointList[1]*(-12.0 + 18.0*k)+ pointList[2]*(6.0 - 18.0*k) +  pointList[2]*(6.0*k);
+	return pointList[0]*(-6.0*j) + pointList[1]*(-12.0 + 18.0*k)+ pointList[2]*(6.0 - 18.0*k) +  pointList[2]*(6.0*k);
 }
 
 Vector3D<double> BezierInterpolator::xn(double k, const vector<point>& pointList) const

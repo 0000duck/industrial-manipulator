@@ -282,11 +282,11 @@ int main(){
 	BezierPath::ptr bpIpr(new BezierPath(p1, p2, p3));
 	clock_t end = clock();
 	cout << "构造贝塞尔路径用时: " << end - start << endl;
-	vector<Vector3D<double> > path = robot::trajectory::Sampler<Vector3D<double> >::sample(bpIpr, 500, "dx");
-	savePosPath("src/example/tempdx.csv", path);
+	vector<Vector3D<double> > path = robot::trajectory::Sampler<Vector3D<double> >::sample(bpIpr, 500, "ddx");
+	savePosPath("src/example/tempddx.csv", path);
 	cout << "路径总长度: " << bpIpr->duration() << endl;
 	start = clock();
-	bpIpr->x(1.2);
+	bpIpr->ddx(1.2);
 	end = clock();
 	cout << "获取路径用时 " << end - start << endl;
 

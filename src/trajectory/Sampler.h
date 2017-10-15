@@ -24,7 +24,7 @@ namespace trajectory {
 /**
  * @brief 通用采样器
  */
-template< class T>
+template< class T=double>
 	class Sampler {
 	public:
 		Sampler(){}
@@ -77,6 +77,18 @@ template< class T>
 			for (auto it=t.begin(); it != t.end(); it++)
 				result.push_back(method(*it));
 			return result;
+		}
+
+		static vector<T> linspace(T start, T end, int count)
+		{
+			vector<T> vt;
+			T dt = (end - start)/(count - 1);
+			for (int i=0; i<count - 1; i++)
+			{
+				vt.push_back(start + dt*i);
+			}
+			vt.push_back(end);
+			return vt;
 		}
 		virtual ~Sampler(){}
 	};
