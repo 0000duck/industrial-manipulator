@@ -180,6 +180,84 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible
 	}
 }
 
+robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_stop(double s0, double v0, double a0, double h, double aMax)
+{
+	if (v0 <= 0)
+		throw("错误<SMPlannerEx::query_stop>: 初始速度必须大于0!");
+	if (fixZero(abs(a0) - abs(aMax)) > 0)
+		throw("错误<SMPlannerEx::query_stop>: 初始加速度与最大加速度不匹配!");
+	h = abs(h);
+	aMax = abs(aMax);
+	if (a0 > 0)
+	{
+		if ((aMax*aMax/h - v0 - a0*a0/(2*h)) >= 0)
+		{
+			//三段
+			aMax = sqrt(v0*h + a0*a0/2.0);
+			double t1 = a0/h;
+			double t2 = aMax/h;
+			double t3 = t2;
+			double d1 = v0*t1 + h*pow(t1, 3)/6.0;
+			double d2 = (v0 + a0*a0/(2.0*h))*t2 - h*pow(t2, 3)/6.0 + d1;
+			robot::trajectory::SequenceInterpolator<double>::ptr result(new robot::trajectory::SequenceInterpolator<double>());
+			result->addInterpolator(std::make_shared<PolynomialInterpolator3<double> >(s0, v0, h*t1/2.0, -h/6.0, t1));
+			result->addInterpolator(std::make_shared<PolynomialInterpolator3<double> >(s0 + d1, v0 + pow(a0, 2)/(2*h), 0, -h/6.0, t2));
+			result->addInterpolator(std::make_shared<PolynomialInterpolator3<double> >(s0 + d2 -h*pow(t3, 3)/6.0 + h*pow(t2, 3)/6.0, h*pow(t3, 2)/2.0, -h*t3/2.0, h/6.0, t3));
+			return result;
+		}
+		else
+		{
+			//四段
+			double t1 = a0/h;
+			double t2 = aMax/h;
+			double t3 = v0/aMax + pow(a0, 2)/(2.0*h*aMax) - aMax/h;
+			double t4 = t2;
+			double d1 = v0*t1 + h*pow(t1, 3)/3.0;
+			double d2 = (v0 + pow(a0, 2)/(2.0*h))*t2 - h*pow(t2, 3)/6.0 + d1;
+			double d3 = d2 + (v0 + pow(a0, 2)/(2.0*h) - h*pow(t2, 2)/2.0)*t3 - aMax*pow(t3, 2)/2.0;
+			robot::trajectory::SequenceInterpolator<double>::ptr result(new robot::trajectory::SequenceInterpolator<double>());
+			result->addInterpolator(std::make_shared<PolynomialInterpolator3<double> >(s0, v0, h*t1/2.0, -h/6.0, t1));
+			result->addInterpolator(std::make_shared<PolynomialInterpolator3<double> >(s0 + d1, v0 + pow(a0, 2)/(2*h), 0, -h/6.0, t2));
+			result->addInterpolator(std::make_shared<PolynomialInterpolator2<double> >(s0 + d2, v0 + pow(a0, 2)/(2.0*h) - h*pow(t2, 2)/2.0, -aMax/2.0, t3));
+			result->addInterpolator(std::make_shared<PolynomialInterpolator3<double> >(s0 + d3 + h*pow(t2, 3)/6.0 -h*pow(t4, 3)/6.0, h*pow(t4, 2)/2.0, -h*t4/2.0, h/6.0, t4));
+			return result;
+		}
+	}
+	else //a0<=0
+	{
+		a0 = abs(a0);
+		if ((aMax*aMax/h - v0 - a0*a0/(2*h)) >= 0)
+		{
+			//两段
+			aMax = sqrt(v0*h + a0*a0/2.0);
+			double t1 = (aMax - a0)/h;
+			double t2 = aMax/h;
+			double v1 = v0 + (pow(a0, 2) - pow(aMax, 2))/(2.0*h);
+			double d1 = s0 + v0*t1 - a0*pow(t1, 2)/2.0 - h*pow(t1, 3)/6.0;
+			robot::trajectory::SequenceInterpolator<double>::ptr result(new robot::trajectory::SequenceInterpolator<double>());
+			result->addInterpolator(std::make_shared<PolynomialInterpolator3<double> >(s0, v0, -a0/2.0, -h/6.0, t1));
+			result->addInterpolator(std::make_shared<PolynomialInterpolator3<double> >(d1, v1, -aMax/2.0, h/6.0, t2));
+			return result;
+		}
+		else
+		{
+			//三段
+			double t1 = (aMax - a0)/h;
+			double v1 = v0 - (pow(aMax, 2) - pow(a0, 2))/(2.0*h);
+			double t2 = (v1 - pow(aMax, 2)/(2.0*h))/aMax;
+			double t3 = aMax/h;
+			double d1 = s0 + v0*t1 - 0.5*a0*pow(t1, 2) - h*pow(t1, 3)/6.0;
+			double v2 = v1 - aMax*t2;
+			double d2 = d1 + v1*t2 - aMax*pow(t2, 2)/2.0;
+			robot::trajectory::SequenceInterpolator<double>::ptr result(new robot::trajectory::SequenceInterpolator<double>());
+			result->addInterpolator(std::make_shared<PolynomialInterpolator3<double> >(s0, v0, -0.5*a0, -h/6.0, t1));
+			result->addInterpolator(std::make_shared<PolynomialInterpolator2<double> >(d1, v1, -aMax/2.0, t2));
+			result->addInterpolator(std::make_shared<PolynomialInterpolator3<double> >(d2, v2, -aMax/2.0, h/6.0, t3));
+			return result;
+		}
+	}
+}
+
 bool SMPlannerEx::checkDitance(double s, double h, double aMax, double v1, double v2, double &realV2, bool stop) const
 {
 	if (stop)

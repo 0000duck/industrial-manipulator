@@ -32,7 +32,7 @@ bool savePosPath(const char* filename, vector<Vector3D<double>>& vPath)
 	return true;
 }
 
-bool saveDoublePath(const char* filename, vector<double>& doublePath, vector<double>& time)
+bool saveDoublePath(const char* filename, const vector<double>& doublePath, const vector<double>& time)
 {
 	std::ofstream out(filename);
 	for (int i=0; i<(int)doublePath.size(); i++)

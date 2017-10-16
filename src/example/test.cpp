@@ -27,6 +27,7 @@
 # include "../pathplanner/QBlend.h"
 # include "../pathplanner/CircularPlanner.h"
 # include "../pathplanner/MultiLineArcBlendPlanner.h"
+# include "../pathplanner/SMPlannerEx.h"
 # include "../simulation/IterativeSimulator.h"
 # include <math.h>
 # include <string>
@@ -275,20 +276,15 @@ int main(){
 
 //	mlabplannertest();
 
-	Vector3D<double> p1(-1, 0, 0);
-	Vector3D<double> p2(0, 1, 0);
-	Vector3D<double> p3(1, 0, 0);
-	clock_t start = clock();
-	BezierPath::ptr bpIpr(new BezierPath(p1, p2, p3));
-	clock_t end = clock();
-	cout << "构造贝塞尔路径用时: " << end - start << endl;
-	vector<Vector3D<double> > path = robot::trajectory::Sampler<Vector3D<double> >::sample(bpIpr, 500, "ddx");
-	savePosPath("src/example/tempddx.csv", path);
-	cout << "路径总长度: " << bpIpr->duration() << endl;
-	start = clock();
-	bpIpr->ddx(1.2);
-	end = clock();
-	cout << "获取路径用时 " << end - start << endl;
+	SMPlannerEx planner;
+	Interpolator<double>::ptr ipr = planner.query_stop(0, 1, -2, 100, 50);
+	vector<double> vt = Sampler<double>::linspace(0, ipr->duration(), 200);
+	vector<double> path(Sampler<double>::sample(ipr, 200, "x"));
+	vector<double> dpath(Sampler<double>::sample(ipr, 200, "dx"));
+	vector<double> ddpath(Sampler<double>::sample(ipr, 200, "ddx"));
+	saveDoublePath("src/example/tempx.csv", path, vt);
+	saveDoublePath("src/example/tempdx.csv", dpath, vt);
+	saveDoublePath("src/example/tempddx.csv", ddpath, vt);
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

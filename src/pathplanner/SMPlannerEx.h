@@ -87,6 +87,8 @@ public:
 			double &realV2,
 			double &realV3) const;
 
+	robot::trajectory::SequenceInterpolator<double>::ptr query_stop(double s0, double v0, double a0, double h, double aMax);
+
 	/**
 	 * @brief 判断要满足v1, v2, h, aMax条件下距离s是否足够
 	 * @param s [in] 要到达的距离

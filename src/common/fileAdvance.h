@@ -49,7 +49,7 @@ bool savePosPath(const char* filename, vector<Vector3D<double>>& vPath); //,,格
  *
  * 每行保存的格式为 "num,t\n"
  */
-bool saveDoublePath(const char* filename, vector<double>& doublePath, vector<double>& time);
+bool saveDoublePath(const char* filename, const vector<double>& doublePath, const vector<double>& time);
 
 /** @} */
 }
