@@ -7,6 +7,7 @@
 
 # include "common.h"
 # include <stdlib.h>
+# include <sys/time.h>
 # include <math.h>
 
 namespace robot{
@@ -30,6 +31,14 @@ double fixZero(double num)
 		return 0;
 	return num;
 }
+
+unsigned long long getUTime()
+{
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return tv.tv_sec*1000000 + tv.tv_usec;
+}
+
 }
 }
 

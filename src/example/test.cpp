@@ -12,6 +12,7 @@
 # include "../kinematics/State.h"
 # include "../common/printAdvance.h"
 # include "../common/fileAdvance.h"
+# include "../common/common.h"
 # include "../model/Link.h"
 # include "../ik/SiasunSR4CSolver.h"
 # include "../model/Config.h"
@@ -36,6 +37,10 @@
 # include <memory>
 # include <fstream>
 # include <algorithm>
+# include <sys/time.h>
+# include <stdlib.h>
+# include <stdio.h>
+# include <unistd.h>
 //# include "test.h"
 //# include "testIK.h"
 //# include "testIK2.h"
@@ -267,24 +272,6 @@ int main(){
 //	smplannertest();
 
 //	mlabplannertest();
-
-	double vMaxLine = 1.0;
-	double aMaxLine = 20.0;
-	double hLine = 50;
-//	double vMaxAngle = 1.0;
-//	double aMaxAngle = 10.0;
-//	double hAngle = 30;
-	LineTrajectory::ptr lineIpr;
-	Q start = Q::zero(6);
-	Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
-	LinePlanner planner = LinePlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, solver, robot, end);
-	Interpolator<Q>::ptr stopIpr;
-	lineIpr = planner.query(start);
-	clock_t tstart = clock();
-	planner.stop(1, stopIpr);
-	clock_t tend = clock();
-	cout << "停止规划用时: " << tend - tstart << endl;
-
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);
