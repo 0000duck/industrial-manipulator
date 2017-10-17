@@ -10,9 +10,9 @@
 # include "../trajectory/Interpolator.h"
 # include "../math/Q.h"
 # include "../ik/IKSolver.h"
-# include "SmoothMotionPlanner.h"
 # include <vector>
 # include "../model/SerialLink.h"
+# include "../model/Config.h"
 # include "../trajectory/LineTrajectory.h"
 # include "../trajectory/LinearInterpolator.h"
 # include <memory>
@@ -54,8 +54,9 @@ public:
 	 * @param serialLink [in] 机器人模型
 	 */
 	LinePlanner(Q dqLim, Q ddqLim,
-			double vMaxLine, double aMaxLine, double hLine, double vMaxAngle, double aMaxAngle, double hAngle,
-			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink);
+			double vMaxLine, double aMaxLine, double hLine,
+			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink,
+			Q qEnd);
 
 	/**
 	 * @brief 询问路径(方法1)
@@ -68,7 +69,7 @@ public:
 	 * 不考虑直径的旋转约束, 这样做的好处是可以把位姿以路径长度为索引. 方法2中直线
 	 * 和旋转的速度规划是不统一的, 可能会造成"不同速度配置下, 路径不同"的结果;
 	 */
-	LineTrajectory::ptr query(const Q qStart, const Q qEnd, double speedRatio, double accRatio) const;
+	LineTrajectory::ptr query(const Q qStart);
 
 	/**
 	 * @brief 询问路径(方法2)
@@ -81,25 +82,21 @@ public:
 	 * 出现不同的路径.
 	 */
 	LineTrajectory::ptr query2(const Q qStart, const Q qEnd) const;
+
+
+	bool stop(double t, Interpolator<Q>::ptr& stopIpr);
+	LineTrajectory::ptr resume(const Q qStart); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
+
 	virtual ~LinePlanner();
 private:
 	/** @brief 末端预定最大直线速度 */
-	double _vMaxLine;
+	double _vMax;
 
 	/** @brief 末端预定最大直线加速度 */
-	double _aMaxLine;
+	double _aMax;
 
 	/** @brief 末端预定最大直线加加速度 */
-	double _hLine;
-
-	/** @brief 末端预定最大角速度 */
-	double _vMaxAngle;
-
-	/** @brief 末端预定最大角加速度 */
-	double _aMaxAngle;
-
-	/** @brief 末端预定最大角加加速度 */
-	double _hAngle;
+	double _h;
 
 	/** @brief 逆解器 */
 	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
@@ -122,8 +119,14 @@ private:
     /** @brief 机器人的模型 */
     robot::model::SerialLink::ptr _serialLink;
 
-    /** @brief 平滑路径规划器 */
-    SmoothMotionPlanner _smPlanner;
+    Q _qEnd;
+
+    /**> 记录的停止点, 用于恢复运动时检查启动点的位置正不正确 */
+    Q _qStop;
+
+    robot::model::Config _config;
+
+    LineTrajectory::ptr _lineTrajectory;
 };
 
 /** @} */

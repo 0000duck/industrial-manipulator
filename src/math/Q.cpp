@@ -50,6 +50,13 @@ double Q::operator[](int index) const
 	return _value[index];
 }
 
+void Q::operator=(const Q& q)
+{
+	_size = q.size();
+	_value.clear();
+	_value = q._value;
+}
+
 Q Q::operator+(const Q& q1) const
 {
 	if (this->size() != q1.size())

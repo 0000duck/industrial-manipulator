@@ -29,6 +29,7 @@
 # include "../pathplanner/MultiLineArcBlendPlanner.h"
 # include "../pathplanner/SMPlannerEx.h"
 # include "../simulation/IterativeSimulator.h"
+# include "../parse/RobotXMLParser.h"
 # include <math.h>
 # include <string>
 # include <vector>
@@ -127,7 +128,7 @@ void printPosition(positionFunction posFun, double t)
 
 int main(){
 	println("*** test ***");
-	SerialLink robot;
+//	SerialLink robot;
 
 //	double alpha1 = M_PI/2;
 //	double alpha2 = 0;
@@ -233,28 +234,19 @@ int main(){
 	double lmax5 = M_PI/180.0*30; //120
 	double lmax6 = M_PI/180.0*360; //360
 
-//	Link(alpha, a, d, theta, min, max, sigma=0)
-	Link l1(alpha1, a1, d1, theta1, lmin1, lmax1);
-	Link l2(alpha2, a2, d2, theta2, lmin2, lmax2);
-	Link l3(alpha3, a3, d3, theta3, lmin3, lmax3);
-	Link l4(alpha4, a4, d4, theta4, lmin4, lmax4);
-	Link l5(alpha5, a5, d5, theta5, lmin5, lmax5);
-	Link l6(alpha6, a6, d6, theta6, lmin6, lmax6);
-	robot.append(&l1);
-	robot.append(&l2);
-	robot.append(&l3);
-	robot.append(&l4);
-	robot.append(&l5);
-	robot.append(&l6);
+	/**> 读取模型文件 */
+	robot::parse::RobotXMLParser modelParser;
+	SerialLink::ptr robot = modelParser.parse("src/example/modelData/siasun6.xml");
 
+	/**> 设置工具(可选) */
 	HTransform3D<double> tran = HTransform3D<double>(Vector3D<double>(0, 0, 0.2), Rotation3D<double>());
 	Frame tool = Frame(tran);
 //	robot.setTool(&tool);
 //	solver->init();
 
-//	std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robot));
-	Q qMin = Q(lmin1, lmin2, lmin3, lmin4, lmin5, lmin6);
-	Q qMax = Q(lmax1, lmax2, lmax3, lmax4, lmax5, lmax6);
+	/**> 逆解器 */
+	std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robot));
+
 	Q dqLim = Q(3, 3, 3, 3, 5, 5);
 	Q ddqLim = Q(20, 20, 20, 20, 20, 20);
 
@@ -276,15 +268,23 @@ int main(){
 
 //	mlabplannertest();
 
-	SMPlannerEx planner;
-	Interpolator<double>::ptr ipr = planner.query_stop(0, 1, -2, 100, 50);
-	vector<double> vt = Sampler<double>::linspace(0, ipr->duration(), 200);
-	vector<double> path(Sampler<double>::sample(ipr, 200, "x"));
-	vector<double> dpath(Sampler<double>::sample(ipr, 200, "dx"));
-	vector<double> ddpath(Sampler<double>::sample(ipr, 200, "ddx"));
-	saveDoublePath("src/example/tempx.csv", path, vt);
-	saveDoublePath("src/example/tempdx.csv", dpath, vt);
-	saveDoublePath("src/example/tempddx.csv", ddpath, vt);
+	double vMaxLine = 1.0;
+	double aMaxLine = 20.0;
+	double hLine = 50;
+//	double vMaxAngle = 1.0;
+//	double aMaxAngle = 10.0;
+//	double hAngle = 30;
+	LineTrajectory::ptr lineIpr;
+	Q start = Q::zero(6);
+	Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
+	LinePlanner planner = LinePlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, solver, robot, end);
+	Interpolator<Q>::ptr stopIpr;
+	lineIpr = planner.query(start);
+	clock_t tstart = clock();
+	planner.stop(1, stopIpr);
+	clock_t tend = clock();
+	cout << "停止规划用时: " << tend - tstart << endl;
+
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

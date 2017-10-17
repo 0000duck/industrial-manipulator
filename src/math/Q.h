@@ -57,6 +57,12 @@ public:
 	double operator[](int index) const;
 
 	/**
+	 * @brief 赋值
+	 * @param q [in] 赋值数组
+	 */
+	void operator=(const Q& q);
+
+	/**
 	 * @brief 数组相加
 	 * @param q [in] 被加数组
 	 * @return 对应位置相加, 返回得到的数组

@@ -113,6 +113,8 @@ public:
 	 * 直线插补器的时长不会改变了才能调用此函数
 	 */
 	void doLengthAnalysis();
+
+	Trajectory::ptr getTrajectory() const;
 	virtual ~LineTrajectory(){}
 private:
 	ikInterpolator::ptr _qIpr;
