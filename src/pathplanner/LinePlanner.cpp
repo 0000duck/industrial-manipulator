@@ -212,7 +212,7 @@ bool LinePlanner::isTrajectoryExist() const
 	return true;
 }
 
-Interpolator<Q>::ptr LinePlanner::getTrajectory() const
+Interpolator<Q>::ptr LinePlanner::getQTrajectory() const
 {
 	return _lineTrajectory;
 }

@@ -90,7 +90,7 @@ public:
 	bool stop(double t, Interpolator<Q>::ptr& stopIpr);
 	void resume(const Q qStart); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
 	bool isTrajectoryExist() const;
-	Interpolator<Q>::ptr getTrajectory() const;
+	Interpolator<Q>::ptr getQTrajectory() const;
 
 	virtual ~LinePlanner();
 private:
