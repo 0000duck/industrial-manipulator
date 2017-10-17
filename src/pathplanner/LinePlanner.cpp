@@ -205,6 +205,18 @@ void LinePlanner::resume(const Q qStart)
 		cout << "警告<LinePlanner>: 恢复点与停止点的距离相差过大!\n";
 }
 
+bool LinePlanner::isTrajectoryExist() const
+{
+	if (_lineTrajectory.get() == NULL)
+		return false;
+	return true;
+}
+
+Interpolator<Q>::ptr LinePlanner::getTrajectory() const
+{
+	return _lineTrajectory;
+}
+
 LinePlanner::~LinePlanner() {
 }
 

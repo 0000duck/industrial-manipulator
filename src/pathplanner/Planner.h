@@ -27,6 +27,9 @@ public:
 
 	virtual bool stop(double t, Interpolator<Q>::ptr& stopIpr) = 0;
 	virtual void resume(const Q qStart) = 0;
+	virtual bool isTrajectoryExist() const = 0;
+	virtual Interpolator<Q>::ptr getTrajectory() const = 0;
+protected:
 };
 
 } /* namespace pathplanner */

@@ -76,6 +76,11 @@ public:
 	 */
 	virtual T ddx(double t) const = 0;
 
+	T getEnd() const
+	{
+		return x(duration());
+	}
+
 	/**
 	 * @brief 总时长
 	 * @return 规定的总时长
