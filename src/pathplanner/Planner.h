@@ -10,10 +10,12 @@
 
 # include "../trajectory/Interpolator.h"
 # include "../math/Q.h"
+# include "../kinematics/State.h"
 # include <memory>
 
 using robot::trajectory::Interpolator;
 using robot::math::Q;
+using robot::kinematic::State;
 
 namespace robot {
 namespace pathplanner {

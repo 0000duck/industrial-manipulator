@@ -88,6 +88,12 @@ void State::setAcceleration(double acceleration, int jointNumber)
 	_state[2](jointNumber) = jointNumber;
 }
 
+void State::operator=(const State &state)
+{
+	_size = state._size;
+	_state = state._state;
+}
+
 State::~State()
 {
 }

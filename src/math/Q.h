@@ -268,6 +268,12 @@ public:
 	double getMax() const;
 
 	/**
+	 * @brief 判断是否为0数组
+	 * @return 是否为0数组
+	 */
+	bool isZero(double precision=1e-12) const;
+
+	/**
 	 * @brief 格式化打印
 	 */
 	void print() const;

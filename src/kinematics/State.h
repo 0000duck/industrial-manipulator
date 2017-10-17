@@ -118,6 +118,8 @@ public:
 	 * @param jointNumber [in] 索引值
 	 */
 	void setAcceleration(double acceleration, int jointNumber);
+
+	void operator=(const State &state);
 	~State();
 private:
 	/**

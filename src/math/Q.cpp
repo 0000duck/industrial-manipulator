@@ -200,7 +200,7 @@ bool Q::operator==(const Q& q) const
 		return false;
 	for (int i=0; i<_size; i++)
 	{
-		if (_value[i] != q[i])
+		if (fabs(_value[i] - q[i]) > 1e-12)
 			return false;
 	}
 	return true;
@@ -309,6 +309,18 @@ double Q::getMin() const
 double Q::getMax() const
 {
 	return *(max_element(_value.begin(), _value.end()));
+}
+
+bool Q::isZero(double precision) const
+{
+	for (int i=0; i<_size; i++)
+	{
+		if (fabs(_value[i]) > precision )
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 void Q::print() const
