@@ -15,6 +15,7 @@
 # include "../model/Config.h"
 # include "../trajectory/LineTrajectory.h"
 # include "../trajectory/LinearInterpolator.h"
+# include "Planner.h"
 # include <memory>
 
 using robot::math::Q;
@@ -38,8 +39,10 @@ namespace pathplanner {
  * - 如果路径超出了关节的最大速度约束或者最大加速度约束, 则降低速度, 返回降速后的路径(插补器).
  * - 规划器会检查起始和结束位置的config参数, 若config参数不相同, 则抛出错误(直线规划器的首末config必须相同)
  */
-class LinePlanner {
+class LinePlanner : public Planner {
 public:
+	using ptr = std::shared_ptr<LinePlanner>;
+
 	/**
 	 * @brief 构造函数
 	 * @param dqLim [in] 关节最大速度
@@ -85,7 +88,7 @@ public:
 
 
 	bool stop(double t, Interpolator<Q>::ptr& stopIpr);
-	LineTrajectory::ptr resume(const Q qStart); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
+	void resume(const Q qStart); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
 
 	virtual ~LinePlanner();
 private:
