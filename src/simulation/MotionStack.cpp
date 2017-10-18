@@ -38,13 +38,14 @@ int MotionStack::addPlanner(Planner::ptr planner)
 		double precision = 0.0001;
 		if (
 				(! planner->getQTrajectory()->dx(0).isZero(precision)) ||
-				(! planner->getQTrajectory()->ddx(0).isZero(precision)) ||
-				(! planner->getQTrajectory()->dx(duration).isZero(precision)) ||
-				(! planner->getQTrajectory()->ddx(duration).isZero(precision)))
+//				(! planner->getQTrajectory()->ddx(0).isZero(precision)) ||
+				(! planner->getQTrajectory()->dx(duration).isZero(precision))
+//				(! planner->getQTrajectory()->ddx(duration).isZero(precision))
+				)
 			return 4;
 	}
 	_motionQueue.push(motionData{_id++, planner, planner->getQTrajectory()->duration()});
-	if (_status == 0)
+	if (_status == stackEmpty)
 		_status = stackWait;
 	return 0;
 }
@@ -84,7 +85,7 @@ int MotionStack::state(unsigned long long t, State &state)
 	case stackPause://栈不空, 运行暂停路径状态
 	{
 		double time = (double(t - _recordTime))/1000000.0; //秒
-		if ((_stopIpr->duration()) > time) //时间超出
+		if ((_stopIpr->duration()) <= time) //时间超出
 		{
 			Q end = _stopIpr->end();
 			Q zero = Q::zero(end.size());
@@ -102,7 +103,7 @@ int MotionStack::state(unsigned long long t, State &state)
 	}
 	double time = (double(t - _recordTime))/1000000.0; //秒
 	Interpolator<Q>::ptr qIpr = _motionQueue.front().planner->getQTrajectory();
-	if ((qIpr->duration()) > time) //时间超出
+	if ((qIpr->duration()) <= time) //时间超出
 	{
 		Q end = qIpr->end();
 		Q zero = Q::zero(end.size());
@@ -142,6 +143,7 @@ int MotionStack::pause()
 	if (planner->stop(time, _stopIpr)) //成功规划暂停路径
 	{
 		_status = stackPause;
+		_recordTime = getUTime();
 		return 0;
 	}
 	else //无法规划暂停路径

@@ -31,7 +31,7 @@ public:
 	 *
 	 * 全部数据会被初始化为0
 	 */
-	State(int size);
+	State(int size=0);
 
 	/**
 	 * @brief 构造函数

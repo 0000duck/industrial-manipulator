@@ -31,6 +31,17 @@ using namespace robot::math;
 bool saveQPath(const char* filename, vector<Q>& qPath);
 
 /**
+ * @brief 保存含时间的Q路径
+ * @param filename [in] 文件名(包含路径)
+ * @param qPath [in] 要保存的路径
+ * @param vt [in] 时间向量
+ * @return 是否保存成功
+ *
+ * 每行保存的格式为 "q1,q2,q3,q4,q5,q6,t;\n"
+ */
+bool saveQPath(const char* filename, vector<Q>& qPath, vector<double>& vt);
+
+/**
  * @brief 保存Vector3D<double>路径
  * @param filename [in] 文件名(包含路径)
  * @param vPath [in] 要保存的路径

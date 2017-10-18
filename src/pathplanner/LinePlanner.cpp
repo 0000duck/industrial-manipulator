@@ -194,6 +194,7 @@ bool LinePlanner::stop(double t, Interpolator<Q>::ptr& stopIpr)
 		return false;
 	}
 	stopIpr = std::make_shared<CompositeInterpolator<Q> > (_lineTrajectory->getTrajectory(), stopLt);
+	_qStop = stopIpr->end();
 	return true;
 }
 
@@ -203,6 +204,7 @@ void LinePlanner::resume(const Q qStart)
 	deltaQ.abs();
 	if (deltaQ.getMax() > 0.01)
 		cout << "警告<LinePlanner>: 恢复点与停止点的距离相差过大!\n";
+	query(qStart);
 }
 
 bool LinePlanner::isTrajectoryExist() const

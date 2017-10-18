@@ -30,6 +30,7 @@
 # include "../pathplanner/MultiLineArcBlendPlanner.h"
 # include "../pathplanner/SMPlannerEx.h"
 # include "../simulation/IterativeSimulator.h"
+# include "../simulation/MotionStack.h"
 # include "../parse/RobotXMLParser.h"
 # include <math.h>
 # include <string>
@@ -37,10 +38,12 @@
 # include <memory>
 # include <fstream>
 # include <algorithm>
+# include <functional>
 # include <sys/time.h>
 # include <stdlib.h>
 # include <stdio.h>
 # include <unistd.h>
+# include <thread>
 //# include "test.h"
 //# include "testIK.h"
 //# include "testIK2.h"
@@ -68,67 +71,50 @@ using namespace robot::pathplanner;
 using namespace robot::simulation;
 using Eigen::MatrixXd;
 
-class base{
-public:
-	base(){}
-	virtual void print(){}
-	virtual ~base(){}
-	const string& getType() const{return _type;}
-protected:
-	std::string _type;
-};
+typedef enum{
+	StatusNormal,
+	StatusPause,
+	StatusStop
+} Status;
 
-Q getQ(){
-	Q q = Q::zero(6);
-//	println(&q);
-	return q;
-}
-class class1:public base{
-public:
-	class1(){_type = std::string("class1");}
-	virtual void print1()
-	{
-		cout << "class1 method" << endl;
-	}
-	void setQ()
-	{
-		Q q = getQ();
-		_q = q;
-	}
-	void printQ()
-	{
-		_q.print();
-	}
-	virtual ~class1(){}
-private:
-	Q _q;
-};
-class class2:public base{
-public:
-	class2(){_type = std::string("class2");}
-	virtual void print2()
-	{
-		cout << "class2 method" << endl;
-	}
-	void setQ()
-	{
-		Q q = getQ();
-		_q = q;
-	}
-	void printQ()
-	{
-		_q.print();
-	}
-	virtual ~class2(){}
-private:
-	Q _q;
-};
+vector<double> vt;
+vector<Q> vxpath;
+vector<Q> vdxpath;
+vector<Q> vddxpath;
+const unsigned long long t0 = getUTime();
+void record(State &state) {Q x = state.getAngle();Q dx = state.getVelocity(); Q ddx = state.getAcceleration();vxpath.push_back(x);vdxpath.push_back(dx);vddxpath.push_back(ddx);};
 
-/** 以函数作为传参 */
-typedef Vector3D<double>(*positionFunction)(double);
-void printPosition(positionFunction posFun, double t)
+void move(MotionStack *motionStack, int *status, State *state)
 {
-	posFun(t).print();
+	unsigned long long next = getUTime();
+	const unsigned int dt = 4000;
+	while(*status == StatusNormal || *status == StatusPause)
+	{
+		double timeToNext = (double(next - getUTime()))/1000000;
+		if (timeToNext < 0)
+			continue;
+		usleep(timeToNext*1000000);
+		unsigned long long t = getUTime();
+		int result = motionStack->state(t, *state);
+		if (result == 0 || result == 1)
+		{
+			cout << "下发命令\n";
+			record(*state); //下发指令
+			vt.push_back((double(t - t0))/1000000);
+			if (result == 1) //任务完成
+			{
+				*status = StatusStop;
+				cout << "任务完成\n";
+				break;
+			}
+		}
+		else
+		{
+			cout << "错误\n";
+		}
+		next += dt;
+	}
+	cout << "退出move进程\n";
 }
 
 int main(){
@@ -254,6 +240,62 @@ int main(){
 
 	Q dqLim = Q(3, 3, 3, 3, 5, 5);
 	Q ddqLim = Q(20, 20, 20, 20, 20, 20);
+
+
+	MotionStack motionStack;
+	State state;
+	int status = StatusStop;
+	double vMaxLine = 1.0;
+	double aMaxLine = 20.0;
+	double hLine = 50;
+	Q start = Q::zero(6);
+	Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
+	LinePlanner::ptr planner( new LinePlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, solver, robot, end));
+	planner->query(start);
+	motionStack.addPlanner(planner);
+
+	if (motionStack.start() == 0)
+		status = StatusNormal;
+	else
+	{
+		cout << "启动不成功\n";
+		return 1;
+	}
+	std::thread normal_t(move, &motionStack, &status, &state);
+	normal_t.detach();
+	sleep(1); //1秒后停止
+	cout << "停止结果: " << motionStack.pause() << endl;
+	status = StatusPause;
+	try{
+		while(status != StatusStop)
+		{
+			usleep(4000);
+		}
+		cout << "完成停止\n";
+		sleep(1);
+		int result = motionStack.resume(*(vxpath.end() - 1));
+		cout << "恢复结果: " << result << "\n";
+		if (result == 0)
+		{
+			cout << "再启动结果: " << motionStack.start() << endl;
+			status = StatusNormal;
+			std::thread normal_t(move, &motionStack, &status, &state);
+			normal_t.detach();
+		}
+		while(status != StatusStop)
+		{
+			usleep(4000);
+		}
+	}
+	catch(char const* msg)
+	{
+		cout << msg << endl;
+	}
+	saveQPath("src/example/tempx.csv", vxpath, vt);
+	saveQPath("src/example/tempdx.csv", vdxpath, vt);
+	saveQPath("src/example/tempddx.csv", vddxpath, vt);
+
+
 
 //	ikTest();
 
