@@ -13,11 +13,16 @@
 # include "../math/HTransform3D.h"
 # include "../trajectory/CircularInterpolator.h"
 # include "../trajectory/LinearInterpolator.h"
+# include "../model/Config.h"
+# include "Planner.h"
+# include <queue>
 
 using namespace robot::trajectory;
 using std::vector;
 using robot::model::SerialLink;
 using robot::math::HTransform3D;
+using std::queue;
+using robot::model::Config;
 
 namespace robot {
 namespace pathplanner {
@@ -30,8 +35,10 @@ namespace pathplanner {
 /**
  * @brief 连续规划-多直线圆弧混合路径规划器
  */
-class MultiLineArcBlendPlanner {
+class MultiLineArcBlendPlanner : Planner{
 public:
+	using ptr = std::shared_ptr<MultiLineArcBlendPlanner>;
+
 	/**
 	 * @brief 构造函数
 	 * @param dqLim [in] 关节最大速度
@@ -40,7 +47,8 @@ public:
 	 * @param serialLink [in] 机器人模型
 	 */
 	MultiLineArcBlendPlanner(Q dqLim, Q ddqLim,
-			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink);
+			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink,
+			const vector<Q>& path, const vector<double>& arcRatio, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk);
 
 	/**
 	 * @brief 询问路径
@@ -51,8 +59,15 @@ public:
 	 * @param jerk [in] 各个线段上的最大加加速度
 	 * @return 直线圆弧连续轨迹插补器的指针
 	 */
-	MLABTrajectory::ptr query(const vector<Q>& path, const vector<double>& arcRatio, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk);
-	vector<SequenceInterpolator<double>::ptr> getLt(double arcSize, double lineSize, vector<Trajectory::ptr>& trajectoryIpr, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk);
+	MLABTrajectory::ptr query();
+
+	vector<SequenceInterpolator<double>::ptr> getLt(vector<Trajectory::ptr>& trajectoryIpr);
+
+	bool stop(double t, Interpolator<Q>::ptr& stopIpr);
+	void resume(const Q qStart); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
+	bool isTrajectoryExist() const;
+	Interpolator<Q>::ptr getQTrajectory() const;
+
 	virtual ~MultiLineArcBlendPlanner();
 private:
 private:
@@ -76,6 +91,22 @@ private:
 
     /** @brief 机器人的模型 */
 	SerialLink::ptr _serialLink;
+
+	Q _qStop;
+
+	vector<vector<HTransform3D<double> > > _task;
+
+	vector<double> _velocity;
+
+	vector<double> _acceleration;
+
+	vector<double> _jerk;
+
+	bool _startFromLine;
+
+	Config _config;
+
+	MLABTrajectory::ptr _mLABTrajectory;
 };
 
 /**@}*/

@@ -97,8 +97,6 @@ public:
 //
 //	inline const Interpolator<Rotation3D<double> >:: ptr getRotTIpr() const{ return _rotInterpolator;}
 
-	int stop(double t, Interpolator<Q>::ptr &stopIpr);
-
 	/**
 	 * @brief 获取长度l处所对应的插补器时间
 	 * @param length [in] l
