@@ -14,6 +14,7 @@
 # include "../trajectory/CircularInterpolator.h"
 # include "../trajectory/Trajectory.h"
 # include "../trajectory/CircularTrajectory.h"
+# include "SMPlannerEx.h"
 # include <memory>
 
 using namespace robot::model;
@@ -25,145 +26,102 @@ namespace robot {
 namespace pathplanner {
 
 CircularPlanner::CircularPlanner(Q dqLim, Q ddqLim,
-		double vMaxLine, double aMaxLine, double hLine, double vMaxAngle, double aMaxAngle, double hAngle,
-		std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink) :
-	_vMaxLine(vMaxLine), _aMaxLine(aMaxLine), _hLine(hLine), _vMaxAngle(vMaxLine), _aMaxAngle(aMaxLine), _hAngle(hLine),
-	_ikSolver(ikSolver), _qMin(serialLink->getJointMin()), _qMax(serialLink->getJointMax()), _dqLim(dqLim), _ddqLim(ddqLim), _serialLink(serialLink)
+		double vMaxLine, double aMaxLine, double hLine,
+		std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink,
+		const Q qIntermediate, const Q qEnd) :
+	_vMax(vMaxLine), _aMax(aMaxLine), _h(hLine),
+	_ikSolver(ikSolver), _qMin(serialLink->getJointMin()), _qMax(serialLink->getJointMax()), _dqLim(dqLim), _ddqLim(ddqLim), _serialLink(serialLink),
+	_qIntermediate(qIntermediate), _qEnd(qEnd)
 {
 	_size = _serialLink->getDOF();
-	if (_qMax.size() != _size || _qMax.size() != _size || dqLim.size() != _size || ddqLim.size() != _size)
+	if (_qMax.size() != _size || _qMax.size() != _size || dqLim.size() != _size || ddqLim.size() != _size || _size != _qIntermediate.size() || _size != _qEnd.size())
 		throw ("错误<圆弧规划>:　构造参数中数组的长度不一致！");
+
+	/**> 检查config参数 */
+	_config = _ikSolver->getConfig(qIntermediate);
+	if (_config != _ikSolver->getConfig(qEnd))
+		throw ("错误<圆弧规划>: 中间点和结束点的Config不同!");
 }
 
-CircularTrajectory::ptr CircularPlanner::query(const Q qStart, const Q qIntermediate, const Q qEnd, double speedRatio, double accRatio) const
+CircularTrajectory::ptr CircularPlanner::query(const Q qStart)
 {
-	/**> 检查config参数 */
-	Config config = _ikSolver->getConfig(qStart);
-	if (config != _ikSolver->getConfig(qEnd))
-		throw ("错误<直线规划>: 初始和结束的Config不同!");
-	double assignedVelocity = speedRatio*_vMaxLine;
-	double assignedAcceleration = accRatio*_aMaxLine;
+	double assignedVelocity = _vMax;
+	double assignedAcceleration = _aMax;
 	/**> 检查dof */
-	double dof = _serialLink->getDOF();
-	if (dof != qStart.size() || dof != qEnd.size())
-		throw ("错误<直线规划>: 查询的关节数值与机器人的自由度不符!");
+	if (_size != qStart.size())
+		throw ("错误<圆弧规划>: 查询的关节数值与机器人的自由度不符!");
 	Vector3D<double> startPos = (_serialLink->getEndTransform(qStart)).getPosition();
-	Vector3D<double> intermediatePos = (_serialLink->getEndTransform(qIntermediate)).getPosition();
-	Vector3D<double> endPos = (_serialLink->getEndTransform(qEnd)).getPosition();
+	Vector3D<double> intermediatePos = (_serialLink->getEndTransform(_qIntermediate)).getPosition();
+	Vector3D<double> endPos = (_serialLink->getEndTransform(_qEnd)).getPosition();
 	/**> 构造圆弧位置与姿态的线性插补器 l为索引 */
 	CircularInterpolator<Vector3D<double> >::ptr posIpr(new CircularInterpolator<Vector3D<double> >(startPos, intermediatePos, endPos));
 	double Length = posIpr->getLength();
 	LinearInterpolator<Rotation3D<double> >::ptr rotIpr(new LinearInterpolator<Rotation3D<double> >(
-		_serialLink->getEndTransform(qStart).getRotation(), _serialLink->getEndTransform(qEnd).getRotation(), Length));
+		_serialLink->getEndTransform(qStart).getRotation(), _serialLink->getEndTransform(_qEnd).getRotation(), Length));
 	/**> 生成Trajectory */
-	Trajectory::ptr trajectory(new Trajectory(std::make_pair(posIpr, rotIpr), _ikSolver, config));
+	Trajectory::ptr trajectory(new Trajectory(std::make_pair(posIpr, rotIpr), _ikSolver, _config));
 	/**> 直线平滑插补器_l(t) */
 	double sampledl = 0.01;
 	int count = Length/sampledl + 1;
 	/** 策略 */
 	double velocity = trajectory->getMaxSpeed(count, _dqLim, _ddqLim, assignedVelocity);
 	double acceleration = assignedAcceleration;
-	SequenceInterpolator<double>::ptr lt = _smPlanner.query(Length, _hLine, acceleration, velocity, 0);
+	SmoothMotionPlanner smPlanner;
+	SequenceInterpolator<double>::ptr lt = smPlanner.query(Length, _h, acceleration, velocity, 0);
 	/**> 返回 */
 	auto origin = std::make_pair(CompositeInterpolator<Vector3D<double> >::ptr(new CompositeInterpolator<Vector3D<double> >(posIpr, lt)),
 			CompositeInterpolator<Rotation3D<double> >::ptr(new CompositeInterpolator<Rotation3D<double> >(rotIpr, lt)));
-	CircularTrajectory::ptr cirlularTrajectory(new CircularTrajectory(origin, _ikSolver, config, lt, trajectory));
-	return cirlularTrajectory;
+	CircularTrajectory::ptr circularTrajectory(new CircularTrajectory(origin, _ikSolver, _config, lt, trajectory));
+	_circularTrajectory = circularTrajectory;
+	return circularTrajectory;
 }
 
-//Interpolator<Q>::ptr CircularPlanner::query(const Q qStart, const Q qIntermediate, const Q qEnd) const
-//{
-//	/**> 检查config参数 */
-//	Config config = _ikSolver->getConfig(qStart);
-//	if (config != _ikSolver->getConfig(qEnd) || config != _ikSolver->getConfig(qIntermediate))
-//		throw ("错误<圆弧规划>: 初始, 中间点和结束的Config不同!");
-//	/**> 检查dof */
-//	double dof = _serialLink->getDOF();
-//	if (dof != qStart.size() || dof != qEnd.size() || dof != qIntermediate.size())
-//		throw ("错误<圆弧规划>: 查询的关节数值与机器人的自由度不符!");
-//	/**> 构造直线以及角度的平滑插补器 */
-//	Quaternion startQuaternion = _serialLink->getEndQuaternion(qStart);
-//	Quaternion endQuaternion = _serialLink->getEndQuaternion(qEnd);
-//	Quaternion startToEndQuat = startQuaternion.conjugate()*endQuaternion;
-//	if (startToEndQuat.r() < 0)
-//		startToEndQuat = -startToEndQuat;
-//	Quaternion::rotVar rot = startToEndQuat.getRotationVariables();
-//	Vector3D<double> startPos = (_serialLink->getEndTransform(qStart)).getPosition();
-//	Vector3D<double> intermediatePos = (_serialLink->getEndTransform(qIntermediate)).getPosition();
-//	Vector3D<double> endPos = (_serialLink->getEndTransform(qEnd)).getPosition();
-//	/**> 构造圆弧与角度的(位置与姿态)的线性插补器 */
-//	CircularInterpolator<Vector3D<double> >::ptr posLinearInterpolator(new CircularInterpolator<Vector3D<double> >(startPos, intermediatePos, endPos));
-//	LinearInterpolator<Rotation3D<double> >::ptr quatLinearInterpolator(new LinearInterpolator<Rotation3D<double> >(
-//			startQuaternion.toRotation3D(), endQuaternion.toRotation3D(), rot.theta));
-//	double Length = posLinearInterpolator->getLength();
-//	/**> 平滑插补器_l(t) */
-//	SequenceInterpolator<double>::ptr lt = _smPlanner.query(Length, _hLine, _aMaxLine, _vMaxLine, 0);
-//	/**> 角度平滑插补器_theta(t) */
-//	SequenceInterpolator<double>::ptr tt = _smPlanner.query(rot.theta, _hAngle, _aMaxAngle, _vMaxAngle, 0);
-//	/**> 统一插补器l(t)与theta(t)的时长 */
-//	LinearCompositeInterpolator<double>::ptr mappedtt;
-//	LinearCompositeInterpolator<double>::ptr mappedlt;
-//	if ((lt->duration()) > (tt->duration()))
-//	{
-//		mappedtt = LinearCompositeInterpolator<double>::ptr(new LinearCompositeInterpolator<double>(tt, (tt->duration())/(lt->duration())));
-//		mappedlt = LinearCompositeInterpolator<double>::ptr(new LinearCompositeInterpolator<double>(lt, 1));
-//	}
-//	else
-//	{
-//		mappedlt = LinearCompositeInterpolator<double>::ptr(new LinearCompositeInterpolator<double>(lt, (lt->duration())/(tt->duration())));
-//		mappedtt = LinearCompositeInterpolator<double>::ptr(new LinearCompositeInterpolator<double>(tt, 1));
-//	}
-//	/**> 构造复合插补器, 构造直线与角度的(位置与姿态)的平滑插补器 */
-//	CompositeInterpolator<Vector3D<double> >::ptr pos_t(new CompositeInterpolator<Vector3D<double> >(posLinearInterpolator, mappedlt));
-//	CompositeInterpolator<Rotation3D<double> >::ptr quat_t(new CompositeInterpolator<Rotation3D<double> >(quatLinearInterpolator, mappedtt));
-//	/**> 构造ik插补器 */
-//	std::pair<Interpolator<Vector3D<double> >::ptr, Interpolator<Rotation3D<double> >::ptr > endInterpolator(pos_t, quat_t);
-//	ikInterpolator::ptr qInterpolator(new ikInterpolator(endInterpolator, _ikSolver, config)); /**> Q插补器 */
-//	/**> 约束检查, 若出现无法到达的采样点, 则抛出错误 */
-//	int step = 1000;
-//	double T = qInterpolator->duration();
-//	double dt = T/(step - 1);
-//	std::vector<Q> result;
-//	State state(_size);
-//	Q dqMax = _dqLim;
-//	Q ddqMax = _ddqLim;
-//	try{
-//		for (double t=0; t<=T; t+=dt)
-//		{
-//			state = qInterpolator->getState(t);
-//			for (int i=0; i<_size; i++)
-//			{
-//				if (dqMax(i) < fabs(state.getVelocity()[i]))
-//					dqMax(i) = fabs(state.getVelocity()[i]);
-//				if (ddqMax(i) < fabs(state.getAcceleration()[i]))
-//					ddqMax(i) = fabs(state.getAcceleration()[i]);
-//			}
-//		}
-//	}
-//	catch(std::string& msg)
-//	{
-//		if (msg.find("无法进行逆解"))
-//		{
-//			throw(std::string("错误<直线规划>: 路径位置无法达到!\n") + std::string(msg));
-//		}
-//	}
-//	/**> 若超出关节的速度与加速度约束, 则降低速度 */
-//	Q kv = _dqLim/dqMax;
-//	Q ka = _ddqLim/ddqMax;
-//	double k = 1.0;
-//	for (int i=0; i<_size; i++)
-//	{
-//		ka(i) = sqrt(ka[i]);
-//	}
-//	for (int i=0; i<_size; i++)
-//	{
-//		k = (k <= kv[i])? k:kv[i];
-//		k = (k <= ka[i])? k:ka[i];
-//	}
-//	mappedlt->update(mappedlt->getFactor()*k);
-//	mappedtt->update(mappedtt->getFactor()*k);
-//	return qInterpolator;
-//}
+bool CircularPlanner::stop(double t, Interpolator<Q>::ptr& stopIpr)
+{
+	if (_circularTrajectory.get() == NULL)
+	{
+		throw( "警告<CircularPlanner>: 尚未进行规划!\n");
+	}
+	double s0 = _circularTrajectory->l(t);
+	double v0 = _circularTrajectory->dl(t);
+	double a0 = _circularTrajectory->ddl(t);
+	double S = _circularTrajectory->l(_circularTrajectory->duration());
+	double remainLength = S - s0;
+	SMPlannerEx planner;
+	Interpolator<double>::ptr stopLt = planner.query_stop(s0, v0, a0, _h, _aMax);
+	/**> 判断剩余距离是否足够停止 */
+	if (stopLt->end() >= remainLength)
+	{
+		cout << "错误<CircularPlanner>: 距离不够, 无法停止!\n";
+		return false;
+	}
+	Trajectory::ptr originalTrajectory = _circularTrajectory->getTrajectory();
+	stopIpr = std::make_shared<CompositeInterpolator<Q> > (originalTrajectory, stopLt);
+	double s1 = s0 + stopLt->end();
+	_qIntermediate = originalTrajectory->x((s1 + S)/2.0); //重新计算中间点
+	_qStop = stopIpr->end();
+	return true;
+}
+
+void CircularPlanner::resume(const Q qStart)
+{
+	Q deltaQ = (qStart - _qStop);
+	deltaQ.abs();
+	if (deltaQ.getMax() > 0.01)
+		cout << "警告<CircularPlanner>: 恢复点与停止点的距离相差过大!\n";
+	query(qStart);
+}
+
+bool CircularPlanner::isTrajectoryExist() const
+{
+	if (_circularTrajectory.get() == NULL)
+		return false;
+	return true;
+}
+Interpolator<Q>::ptr CircularPlanner::getQTrajectory() const
+{
+	return _circularTrajectory;
+}
 
 } /* namespace pathplanner */
 } /* namespace robot */

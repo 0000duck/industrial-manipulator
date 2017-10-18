@@ -39,7 +39,7 @@ public:
 	 * @param vel [in] 关节速度
 	 * @param acc [in] 关节加速度
 	 */
-	State(Q& pos, Q& vel, Q& acc);
+	State(Q pos, Q vel, Q acc);
 
 	/**
 	 * @brief 获取所有位置

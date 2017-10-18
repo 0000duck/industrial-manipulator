@@ -55,6 +55,7 @@
 //# include "simulation/simulationtest.h"
 //# include "smplannerex/smplannertest.h"
 # include "mlabplanner/mlabplannertest.h"
+# include "motionstack/motionstacktest.h"
 # include <functional>
 
 using namespace robot::math;
@@ -71,51 +72,6 @@ using namespace robot::pathplanner;
 using namespace robot::simulation;
 using Eigen::MatrixXd;
 
-typedef enum{
-	StatusNormal,
-	StatusPause,
-	StatusStop
-} Status;
-
-vector<double> vt;
-vector<Q> vxpath;
-vector<Q> vdxpath;
-vector<Q> vddxpath;
-const unsigned long long t0 = getUTime();
-void record(State &state) {Q x = state.getAngle();Q dx = state.getVelocity(); Q ddx = state.getAcceleration();vxpath.push_back(x);vdxpath.push_back(dx);vddxpath.push_back(ddx);};
-
-void move(MotionStack *motionStack, int *status, State *state)
-{
-	unsigned long long next = getUTime();
-	const unsigned int dt = 4000;
-	while(*status == StatusNormal || *status == StatusPause)
-	{
-		double timeToNext = (double(next - getUTime()))/1000000;
-		if (timeToNext < 0)
-			continue;
-		usleep(timeToNext*1000000);
-		unsigned long long t = getUTime();
-		int result = motionStack->state(t, *state);
-		if (result == 0 || result == 1)
-		{
-			cout << "下发命令\n";
-			record(*state); //下发指令
-			vt.push_back((double(t - t0))/1000000);
-			if (result == 1) //任务完成
-			{
-				*status = StatusStop;
-				cout << "任务完成\n";
-				break;
-			}
-		}
-		else
-		{
-			cout << "错误\n";
-		}
-		next += dt;
-	}
-	cout << "退出move进程\n";
-}
 
 int main(){
 	println("*** test ***");
@@ -187,43 +143,6 @@ int main(){
 //	double lmax6 = M_PI/180.0*360;
 
 	// *** siasun 6kg
-	double alpha1 = 0;
-	double alpha2 = -M_PI/2;
-	double alpha3 = 0;
-	double alpha4 = -M_PI/2;
-	double alpha5 = M_PI/2;
-	double alpha6 = -M_PI/2;
-	double a1 = 0;
-	double a2 = 0.16;
-	double a3 = 0.575;
-	double a4 = 0.13;
-	double a5 = 0;
-	double a6 = 0;
-	double d1 = 0.439;
-	double d2 = 0;
-	double d3 = 0;
-	double d4 = 0.644;
-	double d5 = 0;
-	double d6 = 0.1095;
-	double theta1 = 0;
-	double theta2 = -M_PI/2;
-	double theta3 = 0;
-	double theta4 = 0;
-	double theta5 = M_PI/2;
-	double theta6 = 0;
-	// ***
-	double lmin1 = M_PI/180.0*-180; //-180
-	double lmin2 = M_PI/180.0*-130; //-210
-	double lmin3 = M_PI/180.0*-70; //-70
-	double lmin4 = M_PI/180.0*-240; //-240
-	double lmin5 = M_PI/180.0*-200; //-110
-	double lmin6 = M_PI/180.0*-360; //-360
-	double lmax1 = M_PI/180.0*180; //180
-	double lmax2 = M_PI/180.0*80; //-10
-	double lmax3 = M_PI/180.0*160; //160
-	double lmax4 = M_PI/180.0*240; //240
-	double lmax5 = M_PI/180.0*30; //120
-	double lmax6 = M_PI/180.0*360; //360
 
 	/**> 读取模型文件 */
 	robot::parse::RobotXMLParser modelParser;
@@ -240,60 +159,6 @@ int main(){
 
 	Q dqLim = Q(3, 3, 3, 3, 5, 5);
 	Q ddqLim = Q(20, 20, 20, 20, 20, 20);
-
-
-	MotionStack motionStack;
-	State state;
-	int status = StatusStop;
-	double vMaxLine = 1.0;
-	double aMaxLine = 20.0;
-	double hLine = 50;
-	Q start = Q::zero(6);
-	Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
-	LinePlanner::ptr planner( new LinePlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, solver, robot, end));
-	planner->query(start);
-	motionStack.addPlanner(planner);
-
-	if (motionStack.start() == 0)
-		status = StatusNormal;
-	else
-	{
-		cout << "启动不成功\n";
-		return 1;
-	}
-	std::thread normal_t(move, &motionStack, &status, &state);
-	normal_t.detach();
-	sleep(1); //1秒后停止
-	cout << "停止结果: " << motionStack.pause() << endl;
-	status = StatusPause;
-	try{
-		while(status != StatusStop)
-		{
-			usleep(4000);
-		}
-		cout << "完成停止\n";
-		sleep(1);
-		int result = motionStack.resume(*(vxpath.end() - 1));
-		cout << "恢复结果: " << result << "\n";
-		if (result == 0)
-		{
-			cout << "再启动结果: " << motionStack.start() << endl;
-			status = StatusNormal;
-			std::thread normal_t(move, &motionStack, &status, &state);
-			normal_t.detach();
-		}
-		while(status != StatusStop)
-		{
-			usleep(4000);
-		}
-	}
-	catch(char const* msg)
-	{
-		cout << msg << endl;
-	}
-	saveQPath("src/example/tempx.csv", vxpath, vt);
-	saveQPath("src/example/tempdx.csv", vdxpath, vt);
-	saveQPath("src/example/tempddx.csv", vddxpath, vt);
 
 
 
@@ -314,6 +179,8 @@ int main(){
 //	smplannertest();
 
 //	mlabplannertest();
+
+	motionstacktest();
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

@@ -12,10 +12,11 @@ namespace simulation {
 
 using robot::common::getUTime;
 
-MotionStack::MotionStack() {
+MotionStack::MotionStack(Q& initialQ) : _staticQ(initialQ), _zero(Q::zero(initialQ.size())){
 	_id = 0;
 	_status = stackEmpty;
 	_recordTime = 0;
+	_size = initialQ.size();
 }
 
 int MotionStack::addPlanner(Planner::ptr planner)
@@ -77,9 +78,15 @@ int MotionStack::state(unsigned long long t, State &state)
 	switch (_status)
 	{
 	case stackEmpty://栈空
+	{
+		state = State(_staticQ, _zero, _zero);
 		return 2;//处于非发送状态
+	}
 	case stackWait://栈不空, 等待状态
+	{
+		state = State(_staticQ, _zero, _zero);
 		return 2;//处于非发送状态
+	}
 	case stackNormal://栈不空, 正常发送状态
 		break;//正常发送状态
 	case stackPause://栈不空, 运行暂停路径状态
@@ -87,9 +94,8 @@ int MotionStack::state(unsigned long long t, State &state)
 		double time = (double(t - _recordTime))/1000000.0; //秒
 		if ((_stopIpr->duration()) <= time) //时间超出
 		{
-			Q end = _stopIpr->end();
-			Q zero = Q::zero(end.size());
-			state = State(end, zero, zero);
+			_staticQ = _stopIpr->end();
+			state = State(_staticQ, _zero, _zero);
 			_status = stackStop;
 			return 1;
 		}
@@ -105,9 +111,8 @@ int MotionStack::state(unsigned long long t, State &state)
 	Interpolator<Q>::ptr qIpr = _motionQueue.front().planner->getQTrajectory();
 	if ((qIpr->duration()) <= time) //时间超出
 	{
-		Q end = qIpr->end();
-		Q zero = Q::zero(end.size());
-		state = State(end, zero, zero);
+		_staticQ = qIpr->end();
+		state = State(_staticQ, _zero, _zero);
 		_motionQueue.pop();
 		if (_motionQueue.empty())
 			_status = stackEmpty;
@@ -146,7 +151,7 @@ int MotionStack::pause()
 		_recordTime = getUTime();
 		return 0;
 	}
-	else //无法规划暂停路径
+	else //无法规划暂停路径, 若不处理, 运动堆栈仍可以按照原来的轨迹运行
 	{
 		return 1;
 	}

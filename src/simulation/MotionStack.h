@@ -27,7 +27,7 @@ typedef enum{
 
 class MotionStack {
 public:
-	MotionStack();
+	MotionStack(Q& initialQ);
 	/**
 	 * @brief 向堆栈中添加路径
 	 * @param planner [in] 添加的规划器指针, 规划器应事先规划好一条路径
@@ -87,6 +87,8 @@ public:
 	 */
 	bool clear();
 
+	inline int getStatus()const {return _status;}
+
 	virtual ~MotionStack();
 protected:
 	struct motionData{
@@ -107,6 +109,12 @@ private:
 	unsigned long long int _recordTime;
 	/**> 用于存放停止路径 */
 	Interpolator<Q>::ptr _stopIpr;
+
+	Q& _staticQ;
+
+	int _size;
+private:
+	const Q _zero;
 };
 
 } /* namespace simulation */

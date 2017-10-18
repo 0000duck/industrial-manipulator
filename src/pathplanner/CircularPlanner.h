@@ -16,6 +16,7 @@
 # include "../trajectory/CompositeInterpolator.h"
 # include "../trajectory/LinearInterpolator.h"
 # include "../trajectory/CircularTrajectory.h"
+# include "Planner.h"
 # include <memory>
 
 using robot::math::Q;
@@ -33,8 +34,10 @@ namespace pathplanner {
 /**
  * 圆弧路径规划器
  */
-class CircularPlanner {
+class CircularPlanner : public Planner{
 public:
+	using ptr = std::shared_ptr<CircularPlanner>;
+
 	/**
 	 * @brief 构造函数
 	 * @param dqLim [in] 关节最大速度
@@ -49,8 +52,9 @@ public:
 	 * @param serialLink [in] 机器人模型
 	 */
 	CircularPlanner(Q dqLim, Q ddqLim,
-			double vMaxLine, double aMaxLine, double hLine, double vMaxAngle, double aMaxAngle, double hAngle,
-			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink);
+			double vMaxLine, double aMaxLine, double hLine,
+			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink,
+			const Q qIntermediate, const Q qEnd);
 
 	/**
 	 * @brief 询问路径
@@ -61,26 +65,23 @@ public:
 	 * @param accRatio [in] 加速度占最大加速度的比例
 	 * @return
 	 */
-	CircularTrajectory::ptr query(const Q qStart, const Q qIntermediate, const Q qEnd, double speedRatio, double accRatio) const;
+	CircularTrajectory::ptr query(const Q qStart);
+
+	bool stop(double t, Interpolator<Q>::ptr& stopIpr);
+	void resume(const Q qStart); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
+	bool isTrajectoryExist() const;
+	Interpolator<Q>::ptr getQTrajectory() const;
+
 	virtual ~CircularPlanner(){}
 private:
 	/** @brief 末端预定最大直线速度 */
-	double _vMaxLine;
+	double _vMax;
 
 	/** @brief 末端预定最大直线加速度 */
-	double _aMaxLine;
+	double _aMax;
 
 	/** @brief 末端预定最大直线加加速度 */
-	double _hLine;
-
-	/** @brief 末端预定最大角速度 */
-	double _vMaxAngle;
-
-	/** @brief 末端预定最大角加速度 */
-	double _aMaxAngle;
-
-	/** @brief 末端预定最大角加加速度 */
-	double _hAngle;
+	double _h;
 
 	/** @brief 逆解器 */
 	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
@@ -103,8 +104,13 @@ private:
     /** @brief 机器人的模型 */
     robot::model::SerialLink::ptr _serialLink;
 
-    /** @brief 平滑路径规划器 */
-    SmoothMotionPlanner _smPlanner;
+    Q _qIntermediate;
+    Q _qEnd;
+    Q _qStop;
+
+    robot::model::Config _config;
+
+    CircularTrajectory::ptr _circularTrajectory;
 };
 
 /** @} */

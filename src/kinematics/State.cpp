@@ -21,7 +21,7 @@ State::State(int size):
 	_state.push_back(Q::zero(size));
 }
 
-State::State(Q& pos, Q& vel, Q& acc)
+State::State(Q pos, Q vel, Q acc)
 {
 	_size = pos.size();
 	_state.push_back(pos);
