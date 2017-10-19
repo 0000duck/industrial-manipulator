@@ -12,6 +12,7 @@
 # include "../kinematics/State.h"
 # include "../common/printAdvance.h"
 # include "../common/fileAdvance.h"
+# include "../common/common.h"
 # include "../model/Link.h"
 # include "../ik/SiasunSR4CSolver.h"
 # include "../model/Config.h"
@@ -27,13 +28,22 @@
 # include "../pathplanner/QBlend.h"
 # include "../pathplanner/CircularPlanner.h"
 # include "../pathplanner/MultiLineArcBlendPlanner.h"
+# include "../pathplanner/SMPlannerEx.h"
 # include "../simulation/IterativeSimulator.h"
+# include "../simulation/MotionStack.h"
+# include "../parse/RobotXMLParser.h"
 # include <math.h>
 # include <string>
 # include <vector>
 # include <memory>
 # include <fstream>
 # include <algorithm>
+# include <functional>
+# include <sys/time.h>
+# include <stdlib.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <thread>
 //# include "test.h"
 //# include "testIK.h"
 //# include "testIK2.h"
@@ -45,6 +55,7 @@
 //# include "simulation/simulationtest.h"
 //# include "smplannerex/smplannertest.h"
 # include "mlabplanner/mlabplannertest.h"
+# include "motionstack/motionstacktest.h"
 # include <functional>
 
 using namespace robot::math;
@@ -61,72 +72,10 @@ using namespace robot::pathplanner;
 using namespace robot::simulation;
 using Eigen::MatrixXd;
 
-class base{
-public:
-	base(){}
-	virtual void print(){}
-	virtual ~base(){}
-	const string& getType() const{return _type;}
-protected:
-	std::string _type;
-};
-
-Q getQ(){
-	Q q = Q::zero(6);
-//	println(&q);
-	return q;
-}
-class class1:public base{
-public:
-	class1(){_type = std::string("class1");}
-	virtual void print1()
-	{
-		cout << "class1 method" << endl;
-	}
-	void setQ()
-	{
-		Q q = getQ();
-		_q = q;
-	}
-	void printQ()
-	{
-		_q.print();
-	}
-	virtual ~class1(){}
-private:
-	Q _q;
-};
-class class2:public base{
-public:
-	class2(){_type = std::string("class2");}
-	virtual void print2()
-	{
-		cout << "class2 method" << endl;
-	}
-	void setQ()
-	{
-		Q q = getQ();
-		_q = q;
-	}
-	void printQ()
-	{
-		_q.print();
-	}
-	virtual ~class2(){}
-private:
-	Q _q;
-};
-
-/** 以函数作为传参 */
-typedef Vector3D<double>(*positionFunction)(double);
-void printPosition(positionFunction posFun, double t)
-{
-	posFun(t).print();
-}
 
 int main(){
 	println("*** test ***");
-	SerialLink robot;
+//	SerialLink robot;
 
 //	double alpha1 = M_PI/2;
 //	double alpha2 = 0;
@@ -194,68 +143,24 @@ int main(){
 //	double lmax6 = M_PI/180.0*360;
 
 	// *** siasun 6kg
-	double alpha1 = 0;
-	double alpha2 = -M_PI/2;
-	double alpha3 = 0;
-	double alpha4 = -M_PI/2;
-	double alpha5 = M_PI/2;
-	double alpha6 = -M_PI/2;
-	double a1 = 0;
-	double a2 = 0.16;
-	double a3 = 0.575;
-	double a4 = 0.13;
-	double a5 = 0;
-	double a6 = 0;
-	double d1 = 0.439;
-	double d2 = 0;
-	double d3 = 0;
-	double d4 = 0.644;
-	double d5 = 0;
-	double d6 = 0.1095;
-	double theta1 = 0;
-	double theta2 = -M_PI/2;
-	double theta3 = 0;
-	double theta4 = 0;
-	double theta5 = M_PI/2;
-	double theta6 = 0;
-	// ***
-	double lmin1 = M_PI/180.0*-180; //-180
-	double lmin2 = M_PI/180.0*-130; //-210
-	double lmin3 = M_PI/180.0*-70; //-70
-	double lmin4 = M_PI/180.0*-240; //-240
-	double lmin5 = M_PI/180.0*-200; //-110
-	double lmin6 = M_PI/180.0*-360; //-360
-	double lmax1 = M_PI/180.0*180; //180
-	double lmax2 = M_PI/180.0*80; //-10
-	double lmax3 = M_PI/180.0*160; //160
-	double lmax4 = M_PI/180.0*240; //240
-	double lmax5 = M_PI/180.0*30; //120
-	double lmax6 = M_PI/180.0*360; //360
 
-//	Link(alpha, a, d, theta, min, max, sigma=0)
-	Link l1(alpha1, a1, d1, theta1, lmin1, lmax1);
-	Link l2(alpha2, a2, d2, theta2, lmin2, lmax2);
-	Link l3(alpha3, a3, d3, theta3, lmin3, lmax3);
-	Link l4(alpha4, a4, d4, theta4, lmin4, lmax4);
-	Link l5(alpha5, a5, d5, theta5, lmin5, lmax5);
-	Link l6(alpha6, a6, d6, theta6, lmin6, lmax6);
-	robot.append(&l1);
-	robot.append(&l2);
-	robot.append(&l3);
-	robot.append(&l4);
-	robot.append(&l5);
-	robot.append(&l6);
+	/**> 读取模型文件 */
+	robot::parse::RobotXMLParser modelParser;
+	SerialLink::ptr robot = modelParser.parse("src/example/modelData/siasun6.xml");
 
+	/**> 设置工具(可选) */
 	HTransform3D<double> tran = HTransform3D<double>(Vector3D<double>(0, 0, 0.2), Rotation3D<double>());
 	Frame tool = Frame(tran);
 //	robot.setTool(&tool);
 //	solver->init();
 
-//	std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robot));
-	Q qMin = Q(lmin1, lmin2, lmin3, lmin4, lmin5, lmin6);
-	Q qMax = Q(lmax1, lmax2, lmax3, lmax4, lmax5, lmax6);
+	/**> 逆解器 */
+	std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robot));
+
 	Q dqLim = Q(3, 3, 3, 3, 5, 5);
 	Q ddqLim = Q(20, 20, 20, 20, 20, 20);
+
+
 
 //	ikTest();
 
@@ -275,20 +180,7 @@ int main(){
 
 //	mlabplannertest();
 
-	Vector3D<double> p1(-1, 0, 0);
-	Vector3D<double> p2(0, 1, 0);
-	Vector3D<double> p3(1, 0, 0);
-	clock_t start = clock();
-	BezierPath::ptr bpIpr(new BezierPath(p1, p2, p3));
-	clock_t end = clock();
-	cout << "构造贝塞尔路径用时: " << end - start << endl;
-	vector<Vector3D<double> > path = robot::trajectory::Sampler<Vector3D<double> >::sample(bpIpr, 500, "x");
-	savePosPath("src/example/tempx.csv", path);
-	cout << "路径总长度: " << bpIpr->duration() << endl;
-	start = clock();
-	bpIpr->x(1.2);
-	end = clock();
-	cout << "获取路径用时 " << end - start << endl;
+	motionstacktest();
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

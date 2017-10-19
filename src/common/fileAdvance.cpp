@@ -21,6 +21,17 @@ bool saveQPath(const char* filename, vector<Q>& qPath)
 	return true;
 }
 
+bool saveQPath(const char* filename, vector<Q>& qPath, vector<double>& vt)
+{
+	std::ofstream out(filename);
+	for (int i=0; i<(int)qPath.size(); i++)
+	{
+		out << qPath[i][0] << ", " << qPath[i][1] << ", " << qPath[i][2] << ", " << qPath[i][3] << ", " << qPath[i][4] << ", " << qPath[i][5] << ", " << vt[i] << ";\n";
+	}
+	out.close();
+	return true;
+}
+
 bool savePosPath(const char* filename, vector<Vector3D<double>>& vPath)
 {
 	std::ofstream out(filename);
@@ -32,7 +43,7 @@ bool savePosPath(const char* filename, vector<Vector3D<double>>& vPath)
 	return true;
 }
 
-bool saveDoublePath(const char* filename, vector<double>& doublePath, vector<double>& time)
+bool saveDoublePath(const char* filename, const vector<double>& doublePath, const vector<double>& time)
 {
 	std::ofstream out(filename);
 	for (int i=0; i<(int)doublePath.size(); i++)

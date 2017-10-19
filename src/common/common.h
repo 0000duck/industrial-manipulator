@@ -48,6 +48,8 @@ double fixAngle(double angle);
  */
 double fixZero(double num);
 
+unsigned long long getUTime();
+
 /** @} */
 }
 }

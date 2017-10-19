@@ -81,13 +81,13 @@ BezierInterpolator::~BezierInterpolator() {
 Vector3D<double> BezierInterpolator::x3(double k, const vector<point>& pointList) const
 {
 	double j = 1.0 - k;
-	return pointList[0]*(j*j) + pointList[1]*(2*j*k)+ pointList[2]*(k*k);
+	return pointList[0]*(j*j) + pointList[1]*(2.0*j*k)+ pointList[2]*(k*k);
 }
 
 Vector3D<double> BezierInterpolator::dx3(double k, const vector<point>& pointList) const
 {
 	double j = 1.0 - k;
-	return pointList[0]*(-2*j) + pointList[1]*(2 - 4*k)+ pointList[2]*(2*k);
+	return pointList[0]*(-2.0*j) + pointList[1]*(2.0 - 4.0*k)+ pointList[2]*(2.0*k);
 }
 
 Vector3D<double> BezierInterpolator::ddx3(double k, const vector<point>& pointList) const
@@ -98,19 +98,19 @@ Vector3D<double> BezierInterpolator::ddx3(double k, const vector<point>& pointLi
 Vector3D<double> BezierInterpolator::x4(double k, const vector<point>& pointList) const
 {
 	double j = 1.0 - k;
-	return pointList[0]*(j*j*j) + pointList[1]*(3*j*j*k)+ pointList[2]*(3*j*k*k) +  pointList[2]*(k*k*k);
+	return pointList[0]*(j*j*j) + pointList[1]*(3.0*j*j*k)+ pointList[2]*(3.0*j*k*k) +  pointList[2]*(k*k*k);
 }
 
 Vector3D<double> BezierInterpolator::dx4(double k, const vector<point>& pointList) const
 {
 	double j = 1.0 - k;
-	return pointList[0]*(-3*j*j) + pointList[1]*(3 - 12*k + 9*k*k)+ pointList[2]*(6*k - 9*k*k) +  pointList[2]*(3*k*k);
+	return pointList[0]*(-3.0*j*j) + pointList[1]*(3.0 - 12.0*k + 9.0*k*k)+ pointList[2]*(6.0*k - 9.0*k*k) +  pointList[2]*(3.0*k*k);
 }
 
 Vector3D<double> BezierInterpolator::ddx4(double k, const vector<point>& pointList) const
 {
 	double j = 1.0 - k;
-	return pointList[0]*(6*j) + pointList[1]*(-12 + 18*k)+ pointList[2]*(6 - 18*k) +  pointList[2]*(6*k);
+	return pointList[0]*(-6.0*j) + pointList[1]*(-12.0 + 18.0*k)+ pointList[2]*(6.0 - 18.0*k) +  pointList[2]*(6.0*k);
 }
 
 Vector3D<double> BezierInterpolator::xn(double k, const vector<point>& pointList) const
@@ -136,7 +136,7 @@ Vector3D<double> BezierInterpolator::dxn(double k, const vector<point>& pointLis
 Vector3D<double> BezierInterpolator::ddxn(double k, const vector<point>& pointList) const
 {
 	double precision = 0.00000001;
-	return (xn(k + 2*precision, pointList) - xn(k + precision, pointList)*2.0 + xn(k, pointList))/(precision*precision);
+	return (xn(k + 2.0*precision, pointList) - xn(k + precision, pointList)*2.0 + xn(k, pointList))/(precision*precision);
 }
 
 point BezierInterpolator::interpolate(const point &p1, const point &p2, const double &k)

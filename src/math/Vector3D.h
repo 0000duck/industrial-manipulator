@@ -309,7 +309,7 @@ public:
 		return Vector3D<T>(a(0)/len, a(1)/len, a(2)/len);
 	}
 
-	static double distance(Vector3D<T> &a, Vector3D<T> &b)
+	static double distance(const Vector3D<T> &a, const Vector3D<T> &b)
 	{
 		double d1 = a(0) - b(0);
 		double d2 = a(1) - b(1);

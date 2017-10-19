@@ -21,13 +21,13 @@ namespace simulation {
 
 class IterativeSimulator {
 public:
-	IterativeSimulator(SerialLink* robot);
+	IterativeSimulator(SerialLink::ptr robot);
 	const State getState();
 	void setSpeed(Q velocity, double duration);
 	double getDuration() const;
 	virtual ~IterativeSimulator(){}
 private:
-	SerialLink* _robot;
+	SerialLink::ptr _robot;
 	Q _position;
 	Q _velocity;
 	Q _acceleration;

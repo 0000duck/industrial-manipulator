@@ -124,5 +124,10 @@ void LineTrajectory::doLengthAnalysis()
 	cout << "<LineInterpolator>: 完成直线路径长度分析, 用时: " << end - start << endl;
 }
 
+Trajectory::ptr LineTrajectory::getTrajectory() const
+{
+	return _trajectory;
+}
+
 } /* namespace trajectory */
 } /* namespace robot */

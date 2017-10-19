@@ -53,17 +53,17 @@ LineTrajectory::ptr lineplannerTest()
 	double vMaxLine = 1.0;
 	double aMaxLine = 20.0;
 	double hLine = 50;
-	double vMaxAngle = 1.0;
-	double aMaxAngle = 10.0;
-	double hAngle = 30;
+//	double vMaxAngle = 1.0;
+//	double aMaxAngle = 10.0;
+//	double hAngle = 30;
 	LineTrajectory::ptr lineIpr;
 	try{
-		LinePlanner planner = LinePlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle, solver, robot);
 
 		clock_t clockStart = clock();
 		Q start = Q::zero(6);
 		Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
-		lineIpr = planner.query(start, end, 1.0, 1.0);
+		LinePlanner planner = LinePlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, solver, robot, end);
+		lineIpr = planner.query(start);
 		clock_t clockEnd = clock();
 		cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 		int step = 300;

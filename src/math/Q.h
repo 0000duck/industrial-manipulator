@@ -57,6 +57,12 @@ public:
 	double operator[](int index) const;
 
 	/**
+	 * @brief 赋值
+	 * @param q [in] 赋值数组
+	 */
+	void operator=(const Q& q);
+
+	/**
 	 * @brief 数组相加
 	 * @param q [in] 被加数组
 	 * @return 对应位置相加, 返回得到的数组
@@ -260,6 +266,12 @@ public:
 	 * @return 最大的数值
 	 */
 	double getMax() const;
+
+	/**
+	 * @brief 判断是否为0数组
+	 * @return 是否为0数组
+	 */
+	bool isZero(double precision=1e-12) const;
 
 	/**
 	 * @brief 格式化打印

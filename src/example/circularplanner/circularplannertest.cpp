@@ -52,21 +52,18 @@ void circularplannerTest()
 	double vMaxLine = 1.0;
 	double aMaxLine = 20.0;
 	double hLine = 50;
-	double vMaxAngle = 1.0;
-	double aMaxAngle = 10.0;
-	double hAngle = 30;
+	Q start = Q::zero(6);
+	Q intermediate = Q(0.7, 0, 0, 0, -1, 0);
+	Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
 	try{
-		CircularPlanner planner = CircularPlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, vMaxAngle, aMaxAngle, hAngle,
-				solver, robot);
+		CircularPlanner planner = CircularPlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, solver, robot,
+				intermediate, end);
 
 	//	robot.setTool(&tool);
 	//	solver->init();
 
 		clock_t clockStart = clock();
-		Q start = Q::zero(6);
-		Q intermediate = Q(0.7, 0, 0, 0, -1, 0);
-		Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
-		CircularTrajectory::ptr circularIpr = planner.query(start, intermediate, end, 1.0, 1.0);
+		CircularTrajectory::ptr circularIpr = planner.query(start);
 		clock_t clockEnd = clock();
 		cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 		int step = 1000;

@@ -67,13 +67,17 @@ public:
 	 */
 	double ddl(double t) const;
 	double duration() const;
+
+	/** @brief 返回距离为索引的插补器 */
+	inline Trajectory::ptr getTrajectory(){return _trajectory;}
 	virtual ~CircularTrajectory(){}
-private:
+protected:
 	ikInterpolator::ptr _qIpr;
-	Trajectory::ptr _trajectory;
 
 	/** @brief 直线距离-时间插补器 */
 	SequenceInterpolator<double>::ptr _lt;
+
+	Trajectory::ptr _trajectory;
 
 	std::vector<std::pair<double, double> > _lengthPath;
 	const int _pathSize;

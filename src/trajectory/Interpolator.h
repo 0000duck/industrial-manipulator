@@ -77,6 +77,24 @@ public:
 	virtual T ddx(double t) const = 0;
 
 	/**
+	 * @brief 返回末端位置
+	 * @return 末端位置
+	 */
+	T end() const
+	{
+		return x(duration());
+	}
+
+	/**
+	 * @brief 返回开始位置
+	 * @return 开始位置
+	 */
+	T start() const
+	{
+		return x(0);
+	}
+
+	/**
 	 * @brief 总时长
 	 * @return 规定的总时长
 	 */
@@ -117,6 +135,24 @@ public:
 	virtual Q ddx(double t) const = 0;
 
 	/**
+	 * @brief 返回末端位置
+	 * @return 末端位置
+	 */
+	Q end() const
+	{
+		return x(duration());
+	}
+
+	/**
+	 * @brief 返回开始位置
+	 * @return 开始位置
+	 */
+	Q start() const
+	{
+		return x(0);
+	}
+
+	/**
 	 * @brief 总时长
 	 * @return 规定的总时长
 	 */
@@ -132,7 +168,7 @@ public:
 	 * 需要求解三次x(t), 如果用数值方法分开求解这三个数据将需要6次求x(t). 用这个方法只
 	 * 需要求解3次x(t), 计算上更为节省.
 	 */
-	virtual State getState(double t, double precision=0.0001) const
+	virtual State getState(double t, double precision=0.00001) const
 	{
 		Q x0 = this->x(t);
 		Q x1 = this->x(t + precision);

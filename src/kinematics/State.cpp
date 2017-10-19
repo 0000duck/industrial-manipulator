@@ -21,7 +21,7 @@ State::State(int size):
 	_state.push_back(Q::zero(size));
 }
 
-State::State(Q& pos, Q& vel, Q& acc)
+State::State(Q pos, Q vel, Q acc)
 {
 	_size = pos.size();
 	_state.push_back(pos);
@@ -86,6 +86,12 @@ void State::setVelocity(double velocity, int jointNumber)
 void State::setAcceleration(double acceleration, int jointNumber)
 {
 	_state[2](jointNumber) = jointNumber;
+}
+
+void State::operator=(const State &state)
+{
+	_size = state._size;
+	_state = state._state;
 }
 
 State::~State()

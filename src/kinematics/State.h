@@ -31,7 +31,7 @@ public:
 	 *
 	 * 全部数据会被初始化为0
 	 */
-	State(int size);
+	State(int size=0);
 
 	/**
 	 * @brief 构造函数
@@ -39,7 +39,7 @@ public:
 	 * @param vel [in] 关节速度
 	 * @param acc [in] 关节加速度
 	 */
-	State(Q& pos, Q& vel, Q& acc);
+	State(Q pos, Q vel, Q acc);
 
 	/**
 	 * @brief 获取所有位置
@@ -118,6 +118,8 @@ public:
 	 * @param jointNumber [in] 索引值
 	 */
 	void setAcceleration(double acceleration, int jointNumber);
+
+	void operator=(const State &state);
 	~State();
 private:
 	/**

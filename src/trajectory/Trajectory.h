@@ -108,6 +108,7 @@ public:
 	double getMaxSpeed(const int count, Q dqMax, Q ddqMax, double v, double precision=0.00001);
 	virtual ~Trajectory(){}
 protected:
+	const double _samplel = 0.01;
 };
 
 /** @} */

@@ -11,80 +11,36 @@ namespace robot {
 namespace trajectory {
 
 MLABTrajectory::MLABTrajectory(
-		vector<CircularInterpolator<Vector3D<double> >::ptr> arcPosIpr,
-		vector<LinearInterpolator<Vector3D<double> >::ptr> linePosIpr,
-		vector<LinearInterpolator<Rotation3D<double> >::ptr> arcRotIpr,
-		vector<LinearInterpolator<Rotation3D<double> >::ptr> lineRotIpr,
-		vector<double> length,
-		vector<Interpolator<Q>::ptr> qIpr,
-		vector<Trajectory::ptr> trajectoryIpr,
-		vector<SequenceInterpolator<double>::ptr > lt,
-		std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
-		std::shared_ptr<robot::ik::IKSolver> iksolver,
-		robot::model::Config config):
-			_varcPosIpr ( arcPosIpr),
-			_vlinePosIpr ( linePosIpr),
-			_varcRotIpr ( arcRotIpr),
-			_vlineRotIpr ( lineRotIpr),
-			_vlength ( length),
-			_vtrajectoryIpr( trajectoryIpr),
-			_vqIpr ( qIpr),
-			_vlt ( lt),
-			_lt( new SequenceInterpolator<double>()),
-			_trajectory( new Trajectory(origin, iksolver, config))
+		vector<Trajectory::ptr> vtrajectory,
+		vector<SequenceInterpolator<double>::ptr > vlt,
+		vector<Interpolator<Q>::ptr> vqIpr,
+		Trajectory::ptr trajectory,
+		SequenceInterpolator<double>::ptr lt,
+		Interpolator<Q>::ptr qIpr
+		):
+		_vtrajectory(vtrajectory), _vlt(vlt), _vqIpr(vqIpr), _trajectory(trajectory), _lt(lt), _qIpr(qIpr)
 {
-	_size = (int)(linePosIpr.size() + arcRotIpr.size());
-	_vt.push_back(0);
-	_vl.push_back(0);
-	for (int i=0; i<(int)_vlt.size() - 1; i++)
-	{
-		_vt.push_back(_vt[i] + _vlt[i]->duration());
-		_vl.push_back(_vl[i] + _vlt[i]->x(_vt[i + 1] - _vt[i]));
-	}
-	for (int i=0; i<(int)_vt.size(); i++)
-	{
-		cout << "t" << i << " = " << _vt[i] << endl;
-	}
-	for (int i=0; i<(int)_vlt.size(); i++)
-	{
-		_lt->appendInterpolator(_vlt[i]);
-	}
+	_size = (int)(vlt.size());
 }
 
 Q MLABTrajectory::x(double t) const
 {
-	int i=(int)_vt.size() - 1;
-	for (; i >= 0; i--)
-	{
-		if (t >= _vt[i])
-			break;
-	}
-	////////////************////////////
-//	println("MLABTrajec...");
-//	cout << "i = " << i << endl;
-	return _vqIpr[i]->x(t - _vt[i]);
+	return _qIpr->x(t);
 }
 
 Q MLABTrajectory::dx(double t) const
 {
-	int i=(int)_vt.size() - 1;
-	for (; i >= 0; i--)
-	{
-		if (t >= _vt[i])
-			break;
-	}
-	return _vqIpr[i]->dx(t - _vt[i]);
+	return _qIpr->dx(t);
 }
 
 Q MLABTrajectory::ddx(double t) const
 {
-	int i=(int)_vt.size() - 1;
-	for (; i >= 0; i--)
-	{
-		if (t >= _vt[i])
-			break;
-	}
-	return _vqIpr[i]->ddx(t - _vt[i]);
+	return _qIpr->ddx(t);
+}
+
+double MLABTrajectory::duration() const
+{
+	return _qIpr->duration();
 }
 
 
@@ -103,30 +59,54 @@ double MLABTrajectory::ddl(double t) const
 	return _lt->ddx(t);
 }
 
-double MLABTrajectory::duration() const
+vector<double> MLABTrajectory::getTimeVector() const
 {
-	return _lt->duration();
+	vector<double> vt;
+	for (int i=0; i<_size; i++)
+	{
+		vt.push_back(_vlt[i]->duration());
+	}
+	return vt;
 }
 
-vector<Interpolator<Vector3D<double> >::ptr> MLABTrajectory::getPosIpr() const
+vector<double> MLABTrajectory::getLengthVector() const
 {
-	vector<Interpolator<Vector3D<double> >::ptr> posIpr;
-
-	bool indexOnLine = true;
-	for (int i=0; i<(int)_size; i++)
+	vector<double> vl;
+	for (int i=0; i<_size; i++)
 	{
-		if (indexOnLine)
+		vl.push_back(_vtrajectory[i]->duration());
+	}
+	return vl;
+}
+
+int MLABTrajectory::getIndexFromTime(double t) const
+{
+	vector<double> vt = getTimeVector();
+	for (int i=0; i<_size; i++)
+	{
+		if (t >= vt[i])
 		{
-			posIpr.push_back(_vlinePosIpr[i/2]);
-			indexOnLine = !indexOnLine;
+			t -= vt[i];
 		}
 		else
-		{
-			posIpr.push_back(_varcPosIpr[(i - 1)/2]);
-			indexOnLine = !indexOnLine;
-		}
+			return i;
 	}
-	return posIpr;
+	return _size - 1;
+}
+
+int MLABTrajectory::getIndexFromLength(double l) const
+{
+	vector<double> vl = getLengthVector();
+	for (int i=0; i<_size; i++)
+	{
+		if (l >= vl[i])
+		{
+			l -= vl[i];
+		}
+		else
+			return i;
+	}
+	return _size - 1;
 }
 
 } /* namespace trajectory */

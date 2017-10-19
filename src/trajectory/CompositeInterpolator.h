@@ -45,9 +45,9 @@ public:
 	{
 		_interpolator = interpolator;
 		_mapper = mapper;
-		if (fabs(mapper->x(mapper->duration()) - interpolator->duration()) > 1e-3)
-			cout << "警告: 复合插补器, mapper的范围与源插补器的时间周期不一致. 源插补器周期为: " << interpolator->duration() <<
-			"mapper最大范围为: " << mapper->x(mapper->duration()) << endl;;
+//		if (fabs(mapper->x(mapper->duration()) - interpolator->duration()) > 1e-3)
+//			cout << "警告: 复合插补器, mapper的范围与源插补器的时间周期不一致. 源插补器周期为: " << interpolator->duration() <<
+//			"mapper最大范围为: " << mapper->x(mapper->duration()) << endl;;
 	}
 
 	T x(double t) const

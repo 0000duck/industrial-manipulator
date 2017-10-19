@@ -41,15 +41,13 @@ void mlabplannertest()
 	Q dqLim = Q(3, 3, 3, 3, 5, 5);
 	Q ddqLim = Q(20, 20, 20, 20, 20, 20);
 
-	MultiLineArcBlendPlanner mlabplanner(dqLim, ddqLim, solver, robot);
-
-	vector<Q> path;
-	path.push_back( Q::zero(6));
-	path.push_back( Q(0.7, 0, -60.0/180*M_PI, 0, 0, 0));
-	path.push_back( Q(1.4, 0, 80.0/180*M_PI, 0, 0, 0));
+	Q start = Q::zero(6);
+	Q intermediate = Q(0.7, 0, 0, 0, -0.7, 0);
+	Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
+	vector<Q> qPath = {start, intermediate, end};
 
 	vector<double> arcRatio;
-	arcRatio.push_back(0.1);
+	arcRatio.push_back(0.5);
 
 	vector<double> velocity;
 	velocity.push_back(1.0);
@@ -61,11 +59,13 @@ void mlabplannertest()
 
 	vector<double> jerk(2, 50.0);
 
+	MultiLineArcBlendPlanner mlabplanner(dqLim, ddqLim, solver, robot, qPath, arcRatio, velocity, acceleration, jerk);
+
 	MLABTrajectory::ptr mlabTrajectory;
 
 	clock_t clockStart = clock();
 	try{
-		mlabTrajectory = mlabplanner.query(path, arcRatio, velocity, acceleration, jerk);
+		mlabTrajectory = mlabplanner.query();
 	}
 	catch(char const* msg)
 	{

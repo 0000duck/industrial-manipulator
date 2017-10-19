@@ -50,21 +50,21 @@ public:
 	 * @param config [in] 用于逆解的位姿参数
 	 */
 	MLABTrajectory(
-			vector<CircularInterpolator<Vector3D<double> >::ptr> arcPosIpr,
-			vector<LinearInterpolator<Vector3D<double> >::ptr> linePosIpr,
-			vector<LinearInterpolator<Rotation3D<double> >::ptr> arcRotIpr,
-			vector<LinearInterpolator<Rotation3D<double> >::ptr> lineRotIpr,
-			vector<double> length,
-			vector<Interpolator<Q>::ptr> qIpr,
-			vector<Trajectory::ptr> trajectoryIpr,
-			vector<SequenceInterpolator<double>::ptr > lt,
-			std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
-			std::shared_ptr<robot::ik::IKSolver> iksolver,
-			robot::model::Config config);
+			vector<Trajectory::ptr> vtrajectory,
+			vector<SequenceInterpolator<double>::ptr > vlt,
+			vector<Interpolator<Q>::ptr> vqIpr,
+			Trajectory::ptr trajectory,
+			SequenceInterpolator<double>::ptr lt,
+			Interpolator<Q>::ptr qIpr
+			);
 
 	Q x(double t) const;
+
 	Q dx(double t) const;
+
 	Q ddx(double t) const;
+
+	double duration() const;
 
 	/**
 	 * @brief 获取时间索引t处的路径长度
@@ -87,49 +87,38 @@ public:
 	 */
 	double ddl(double t) const;
 
-	double duration() const;
+	vector<double> getTimeVector() const;
 
-	/**
-	 * @brief 获取各段的位置插补器列表
-	 * @return 各段的位置插补器列表
-	 */
-	vector<Interpolator<Vector3D<double> >::ptr> getPosIpr() const;
+	vector<double> getLengthVector() const;
+
+	int getIndexFromTime(double t) const;
+
+	int getIndexFromLength(double l) const;
+
+	inline Trajectory::ptr getTrajectory() const{return _trajectory;}
+
 	virtual ~MLABTrajectory(){}
 private:
 	/** @brief 线段段数 n */
 	int _size;
 
-	/** 以下均以每一段的路径长度作为索引 */
-	/** @brief 圆弧位置插补器 n-1 */
-	vector<CircularInterpolator<Vector3D<double> >::ptr> _varcPosIpr;
-	/** @brief 直线位置插补器 n */
-	vector<LinearInterpolator<Vector3D<double> >::ptr> _vlinePosIpr;
-	/** @brief 圆弧姿态插补器 n-1 */
-	vector<LinearInterpolator<Rotation3D<double> >::ptr> _varcRotIpr;
-	/** @brief 直线姿态插补器 n */
-	vector<LinearInterpolator<Rotation3D<double> >::ptr> _vlineRotIpr;
+	/** @brief 各段的trajectory长度为索引 */
+	vector<Trajectory::ptr> _vtrajectory;
 
-	/** @brief 各段的长度 2n-1 */
-	vector<double> _vlength;
-	/** @brief 各段的ikInterpolator 长度为索引 */
-	vector<Trajectory::ptr> _vtrajectoryIpr;
-	/** @brief 各段的ikInterpolator 2n-1 时间为索引*/
+	/** @brief 各段的lt 2n-1 */
+	vector<SequenceInterpolator<double>::ptr > _vlt;
+
+	/** @brief 各段的q插补器 2n-1 时间为索引*/
 	vector<Interpolator<Q>::ptr > _vqIpr;
 
-	/** @brief l(t) 2n-1 */
-	vector<SequenceInterpolator<double>::ptr > _vlt;
-	/** @brief 时间索引 */
-	vector<double> _vt;
-	/** @brief 长度索引 */
-	vector<double> _vl;
-	/** @brief t(l) 2n-1 */
-//	Interpolator<double>::ptr _tl;
+	/**> 统一的路径 */
+	Trajectory::ptr _trajectory;
 
 	/**> 统一的lt */
 	SequenceInterpolator<double>::ptr _lt;
 
-	/**> 统一的路径 */
-	Trajectory::ptr _trajectory;
+	/**> 统一的q插补器 */
+	Interpolator<Q>::ptr _qIpr;
 
 };
 

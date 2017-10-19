@@ -13,6 +13,7 @@
 # include "../trajectory/CompositeInterpolator.h"
 # include "../common/printAdvance.h"
 # include "../pathplanner/SMPlannerEx.h"
+# include <algorithm>
 
 using robot::math::Quaternion;
 using robot::model::Config;
@@ -22,47 +23,37 @@ namespace robot {
 namespace pathplanner {
 
 MultiLineArcBlendPlanner::MultiLineArcBlendPlanner(Q dqLim, Q ddqLim,
-		std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink) :
+		std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink,
+		const vector<Q>& Qpath, const vector<double>& arcRatio, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk) :
 	_ikSolver(ikSolver), _qMin(serialLink->getJointMin()), _qMax(serialLink->getJointMax()), _dqLim(dqLim), _ddqLim(ddqLim), _serialLink(serialLink)
 {
+	_startFromLine = true;
 	_size = _serialLink->getDOF();
 	if (_qMin.size() != _size || _qMax.size() != _size || dqLim.size() != _size || ddqLim.size() != _size)
 		throw ("错误<多线段圆弧混合规划器>:　构造参数中数组的长度不一致！");
-}
 
-MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, const vector<double>& arcRatio, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk)
-{
-	using cIpr = CircularInterpolator<Vector3D<double> >;
-	using lIpr = LinearInterpolator<Vector3D<double> >;
-	using rIpr = LinearInterpolator<Rotation3D<double> >;
+	int num = (int)Qpath.size() - 1; //线段的数量
+	if (num != (int)arcRatio.size() + 1 || num != (int)velocity.size() || num != (int)acceleration.size() ||num != (int)jerk.size())
+		throw ("错误<多线段圆弧混合规划器>:　构造参数的长度不一致！");
 
-	vector<HTransform3D<double> > path; /** 路径点 n */
-	vector<double> lineLength; /** 原线段的长度 n-1*/
+	_qStop = Qpath[0];
+	_velocity.push_back(velocity[0]);
+	_acceleration.push_back(acceleration[0]);
+	_jerk.push_back(jerk[0]);
+	for (int i=1; i<num; i++)
+	{
+		_velocity.push_back(velocity[i - 1] > velocity[i] ? velocity[i - 1] : velocity[i]);
+		_velocity.push_back(velocity[i]);
+		_acceleration.push_back(acceleration[i - 1] > acceleration[i] ? acceleration[i - 1] : acceleration[i]);
+		_acceleration.push_back(acceleration[i]);
+		_jerk.push_back(jerk[i - 1] > jerk[i] ? jerk[i - 1] : jerk[i]);
+		_jerk.push_back(jerk[i]);
+	}
+
 	vector<std::pair<Rotation3D<double>, Rotation3D<double> > > lineRotation; /** 直线段上的关键姿态 (n-1)*2 */
 	vector<std::pair<Vector3D<double>, Vector3D<double> > > linePosition; /** 直线段上的关键点 (n-1)*2 */
 	vector<Vector3D<double> > arcMidPosition; /** 圆弧中间点 n-2 */
-	vector<std::pair<double, double> > modifiedRatio; /** 修正插补比例因子 (n-2)*2 */
-
-	/** 圆弧位置插补器 n-2 (长度为索引) */
-	vector<cIpr::ptr> arcPosIpr;
-	/** 线段位置插补器 n-1 (长度为索引) */
-	vector<lIpr::ptr> linePosIpr;
-	/** 圆弧姿态插补器 n-2 (长度为索引) */
-	vector<rIpr::ptr> arcRotIpr;
-	/** 线段姿态插补器 n-1 (长度为索引) */
-	vector<rIpr::ptr> lineRotIpr;
-	/** 各段的长度 2n-3 */
-	vector<double> length;
-	/** @brief 各段的ikInterpolator 2n-1 长度为索引*/
-	vector<Trajectory::ptr> trajectoryIpr;
-	/** @brief 各段的qInterpolator 2n-1 时间为索引*/
-	vector<Interpolator<Q>::ptr > qIpr;
-	/** @brief 各段的lt 2n-1 */
-//	vector<Interpolator<double>::ptr> lt;
-	/**> 统一的位置插补器 */
-	SequenceInterpolator<Vector3D<double> >::ptr posIpr(new SequenceInterpolator<Vector3D<double> >());
-	/**> 统一的姿态插补器 */
-	SequenceInterpolator<Rotation3D<double> >::ptr rotIpr(new SequenceInterpolator<Rotation3D<double> >);
+	vector<Rotation3D<double> > arcMidRotation; /** 圆弧中间点 n-2 */
 
 	/** n */
 	int pathSize = (int)Qpath.size();
@@ -77,26 +68,29 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 		throw("错误<MultiLineArcBlendPlanner>: 圆弧比例参数数量不足!");
 
 	/**> 检查config参数 */
-	Config config = _ikSolver->getConfig(Qpath[0]);
+	_config = _ikSolver->getConfig(Qpath[0]);
 	for (int i=1; i<pathSize; i++)
-		if (config != _ikSolver->getConfig(Qpath[i]))
+		if (_config != _ikSolver->getConfig(Qpath[i]))
 		{
 			cout << "初始Config: \n" ;
-			config.print();
+			_config.print();
 			cout << "该关节Config: \n" ;
 			(_ikSolver->getConfig(Qpath[i])).print();
 			throw (std::string("错误<MultiLineArcBlendPlanner>: 第 ") + to_string(i + 1) + std::string(" 个关节的的Config和初始点不同!"));
 		}
 
 	/**> 保存路径点 */
+	vector<HTransform3D<double> > path; /** 路径点 n */
 	for (int i=0; i<pathSize; i++)
 		path.push_back(_serialLink->getEndTransform(Qpath[i]));
 
 	/**> 记录线段长度 */
+	vector<double> lineLength;
 	for (int i=0; i<lineSize; i++)
 		lineLength.push_back((path[i].getPosition() - path[i + 1].getPosition()).getLength());
 
 	/**> 记录修正比例因子 */
+	vector<std::pair<double, double> > modifiedRatio; /** 修正插补比例因子 (n-2)*2 */
 	for (int i=0; i<arcSize; i++)
 	{
 		double l1 = lineLength[i];
@@ -142,7 +136,7 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 	linePosition.push_back(std::pair<Vector3D<double>, Vector3D<double> >(
 			path[i].getPosition()*(1.0 - k1) + path[i + 1].getPosition()*k1,
 			path[i].getPosition()*(1.0 - k2) + path[i + 1].getPosition()*k2));
-	/**> 记录圆弧中间点位置 n-2 */
+	/**> 记录圆弧中间点位置和姿态 n-2 */
 	for (int i=0; i<arcSize; i++)
 	{
 		Vector3D<double> A = linePosition[i].second; /** 圆弧左边点 */
@@ -157,117 +151,118 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query(const vector<Q>& Qpath, cons
 		double k = (1.0 - sin(theta))/(ct*ct);
 		/** 记录圆弧中点 */
 		arcMidPosition.push_back(OC*k + O);
+		/** 记录圆弧中点姿态 */
+		arcMidRotation.push_back(Quaternion::interpolate(lineRotation[i].second, lineRotation[i + 1].first, 0.5));
 	}
-	/**> 构造圆弧位置和姿态插补器 长度为索引*/
-	for (int i=0; i<arcSize; i++)
-	{
-		cIpr::ptr circularIpr( new cIpr(linePosition[i].second, arcMidPosition[i], linePosition[i + 1].first));
-		arcPosIpr.push_back(circularIpr);
-		rIpr::ptr cRotIpr( new rIpr(lineRotation[i].second, lineRotation[i + 1].first, arcPosIpr[i]->duration()));
-		arcRotIpr.push_back(cRotIpr);
-	}
-	/**> 构造直线位置和姿态插补器 长度为索引*/
-	for (int i=0; i<lineSize; i++)
-	{
-		lIpr::ptr lineIpr( new lIpr(linePosition[i].first, linePosition[i].second, (linePosition[i].first - linePosition[i].second).getLength()));
-		linePosIpr.push_back(lineIpr);
-		rIpr::ptr lRotIpr( new rIpr(lineRotation[i].first, lineRotation[i].second, linePosIpr[i]->duration()));
-		lineRotIpr.push_back(lRotIpr);
-	}
-	/**> 记录长度 */
-	println("MultiLine: 记录长度");
 	bool indexOnLine = true;
 	for (int i=0; i<arcSize + lineSize; i++)
 	{
 		if (indexOnLine)
 		{
-			length.push_back(linePosIpr[i/2]->duration());
+			vector<HTransform3D<double> > lineEndPoint;
+			HTransform3D<double> endTran = HTransform3D<double>(linePosition[i/2].second, lineRotation[i/2].second);
+			lineEndPoint.push_back(endTran);
+			_task.push_back(lineEndPoint);
 		}
 		else
 		{
-			length.push_back(arcPosIpr[(i - 1)/2]->duration());
+			vector<HTransform3D<double> > arcPoints;
+			HTransform3D<double> midTran = HTransform3D<double>(arcMidPosition[(i - 1)/2], arcMidRotation[(i - 1)/2]);
+			HTransform3D<double> endTran = HTransform3D<double>(linePosition[(i + 1)/2].first, lineRotation[(i + 1)/2].first);
+			arcPoints.push_back(midTran);
+			arcPoints.push_back(endTran);
+			_task.push_back(arcPoints);
 		}
 		indexOnLine = !indexOnLine;
 	}
-	println("MultiLine: 生成ikInterpolator");
-	/**> 生成trajectory */
-	indexOnLine = true;
-	for (int i=0; i<arcSize + lineSize; i++)
+}
+
+MLABTrajectory::ptr MultiLineArcBlendPlanner::query()
+{
+	/**> 生成各段的trajectory, 保存统一的位置插补器和统一的姿态插补器(长度为索引) */
+	vector<Trajectory::ptr> vTrajectory;
+	auto posIpr = std::make_shared<SequenceInterpolator<Vector3D<double> > >();
+	auto rotIpr = std::make_shared<SequenceInterpolator<Rotation3D<double> > >();
+
+	bool isLine = _startFromLine;
+	HTransform3D<double> startTran = _serialLink->getEndTransform(_qStop);
+	for (auto task : _task)
 	{
-		if (indexOnLine)
+		if (isLine)
 		{
-			trajectoryIpr.push_back(Trajectory::ptr(new Trajectory(std::make_pair(linePosIpr[i/2], lineRotIpr[i/2]), _ikSolver, config)));
+			HTransform3D<double> endTran = task[0];
+			auto linePosIpr = std::make_shared<LinearInterpolator<Vector3D<double> > >(
+					startTran.getPosition(),
+					endTran.getPosition(),
+					Vector3D<double>::distance(startTran.getPosition(),endTran.getPosition())
+					);
+			auto lineRotIpr = std::make_shared<LinearInterpolator<Rotation3D<double> > >(
+					startTran.getRotation(),
+					endTran.getRotation(),
+					linePosIpr->duration()
+					);
+			posIpr->addInterpolator(linePosIpr);
+			rotIpr->addInterpolator(lineRotIpr);
+			Trajectory::ptr trajectory = std::make_shared<Trajectory>(
+					std::make_pair(linePosIpr, lineRotIpr),
+					_ikSolver,
+					_config);
+			vTrajectory.push_back(trajectory);
+			startTran = endTran;
+			isLine = !isLine;
 		}
 		else
 		{
-			trajectoryIpr.push_back(Trajectory::ptr(new Trajectory(std::make_pair(arcPosIpr[(i - 1)/2], arcRotIpr[(i - 1)/2]), _ikSolver, config)));
+			HTransform3D<double> midTran = task[0];
+			HTransform3D<double> endTran = task[1];
+			auto cirPosIpr = std::make_shared<CircularInterpolator<Vector3D<double> > >(
+					startTran.getPosition(),
+					midTran.getPosition(),
+					endTran.getPosition());
+			auto cirRotIpr = std::make_shared<LinearInterpolator<Rotation3D<double> > >(
+					startTran.getRotation(),
+					endTran.getRotation(),
+					cirPosIpr->duration());
+			Trajectory::ptr trajectory = std::make_shared<Trajectory>(
+					std::make_pair(cirPosIpr, cirRotIpr),
+					_ikSolver,
+					_config);
+			posIpr->addInterpolator(cirPosIpr);
+			rotIpr->addInterpolator(cirRotIpr);
+			vTrajectory.push_back(trajectory);
+			startTran = endTran;
+			isLine = !isLine;
 		}
-		indexOnLine = !indexOnLine;
 	}
+
 	/**> 生成lt */
-	println("MultiLine: 生成lt");
-	vector<SequenceInterpolator<double>::ptr> lt = getLt(arcSize, lineSize, trajectoryIpr, velocity, acceleration, jerk);
+	vector<SequenceInterpolator<double>::ptr> vlt = getLt(vTrajectory);
 
 	/**> 生成qIpr */
-	for (int i=0; i<arcSize + lineSize; i++)
+	vector<Interpolator<Q>::ptr> vqIpr;
+	for (int i=0; i<(int)vTrajectory.size(); i++)
 	{
-		qIpr.push_back(CompositeInterpolator<Q>::ptr(new CompositeInterpolator<Q>(trajectoryIpr[i], lt[i])));
+		vqIpr.push_back(CompositeInterpolator<Q>::ptr(new CompositeInterpolator<Q>(vTrajectory[i], vlt[i])));
 	}
 
-	/**> 生成统一的位置插补器 */
-	indexOnLine = true;
-	for (int i=0; i<arcSize + lineSize; i++)
-	{
-		if (indexOnLine)
-		{
-			Interpolator<Vector3D<double> >::ptr temp = linePosIpr[i/2];
-			posIpr->addInterpolator(temp);
-		}
-		else
-		{
-			posIpr->addInterpolator(arcPosIpr[(i - 1)/2]);
-		}
-		indexOnLine = !indexOnLine;
-	}
+	/**> 生成统一的trajectory, lt 和 qIpr */
+	auto trajectory = std::make_shared<Trajectory> (
+			std::make_pair(posIpr, rotIpr),
+			_ikSolver,
+			_config);
 
-	/**> 生成统一的姿态插补器 */
-	indexOnLine = true;
-	for (int i=0; i<arcSize + lineSize; i++)
-	{
-		if (indexOnLine)
-		{
-			rotIpr->addInterpolator(lineRotIpr[i/2]);
-		}
-		else
-		{
-			rotIpr->addInterpolator(arcRotIpr[(i - 1)/2]);
-		}
-		indexOnLine = !indexOnLine;
-	}
+	auto lt = std::make_shared<SequenceInterpolator<double> > ();
+	for_each(vlt.begin(), vlt.end(), [&](SequenceInterpolator<double>::ptr ipr){lt->appendInterpolator(ipr);});
 
-	/**> 统一的lt由MLABTrajecoty自动生成 */
+	auto qIpr = std::make_shared<SequenceInterpolator<Q> > ();
+	for_each(vqIpr.begin(), vqIpr.end(), [&](Interpolator<Q>::ptr ipr){qIpr->addInterpolator(ipr);});
 
-//	println("MultiLine: 测试");
-//	/**** 测试用 ****/
-//	double duration = 0;
-//	for (int i=0; i<arcSize + lineSize; i++)
-//	{
-//		duration=trajectoryIpr[i]->duration();
-//		cout << "length = " << duration << endl;
-//		lt.push_back(Interpolator<double>::ptr(new LinearInterpolator<double>(0, duration, duration)));
-//	}
-//	for (int i=0; i<arcSize + lineSize; i++)
-//	{
-//		qIpr.push_back(CompositeInterpolator<Q>::ptr(new CompositeInterpolator<Q>(trajectoryIpr[i], lt[i])));
-//	}
-
-	println("MultiLine: 生成结果");
-	MLABTrajectory::ptr mlabTrajectory(new MLABTrajectory(arcPosIpr, linePosIpr, arcRotIpr, lineRotIpr, length, qIpr, trajectoryIpr, lt,
-			std::make_pair(posIpr, rotIpr), _ikSolver, config));
+	auto mlabTrajectory = std::make_shared<MLABTrajectory> (vTrajectory, vlt, vqIpr, trajectory, lt, qIpr);
+	_mLABTrajectory = mlabTrajectory;
 	return mlabTrajectory;
 }
 
-vector<SequenceInterpolator<double>::ptr> MultiLineArcBlendPlanner::getLt(double arcSize, double lineSize, vector<Trajectory::ptr>& trajectoryIpr, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk)
+vector<SequenceInterpolator<double>::ptr> MultiLineArcBlendPlanner::getLt(vector<Trajectory::ptr>& trajectoryIpr)
 {
 	/** 策略 1 **/
 //	vector<Interpolator<double>::ptr> lt;
@@ -309,11 +304,11 @@ vector<SequenceInterpolator<double>::ptr> MultiLineArcBlendPlanner::getLt(double
 	double sampledl = 0.01;
 	SMPlannerEx smPlanner;
 	vector<double> maxSpeed;
-	for (int i=0; i<arcSize + lineSize; i++)
+	for (int i=0; i<(int)_task.size(); i++)
 	{
 		double L = trajectoryIpr[i]->duration();
 		int count = L/sampledl + 1;
-		double tempMaxSpeed = trajectoryIpr[i]->getMaxSpeed(count, _dqLim, _ddqLim, velocity[i/2]);
+		double tempMaxSpeed = trajectoryIpr[i]->getMaxSpeed(count, _dqLim, _ddqLim, _velocity[i]);
 		if (tempMaxSpeed <= 0)
 			throw(string("错误<MulriLineArcBlendPlanner>: 第") + to_string(i + 1) + string("段限制速度为0"));
 		maxSpeed.push_back(tempMaxSpeed);// 受解耦的关节速度, 加速度约束
@@ -321,26 +316,28 @@ vector<SequenceInterpolator<double>::ptr> MultiLineArcBlendPlanner::getLt(double
 	double v1 = 0;
 	double v2 = 0;
 	double v3 = 0;
-	for (int i=0; i<arcSize + lineSize; i++)
+	bool isLine = _startFromLine;
+	int num = (int)trajectoryIpr.size();
+	for (int i=0; i<num; i++)
 	{
 		double L = trajectoryIpr[i]->duration();
 		try{
 			/**> 终止段规划 */
-			if (i == arcSize + lineSize - 1)
+			if (i == num - 1)
 			{
 				v1 = v3;
 				v3 = maxSpeed[i];
-				lt.push_back(smPlanner.query_flexible(0, L, jerk[i/2], acceleration[i/2], v1, v3, v3, true));
+				lt.push_back(smPlanner.query_flexible(0, L, _jerk[i], _acceleration[i], v1, v3, v3, true));
 				if (fabs(v3 - maxSpeed[i]) > 1e-12)
 					cout << "MulriLineArcBlendPlanner: 第" << i + 1 << "段速度无法达到. 期望速度 = " << maxSpeed[i] << " -> 实际速度 = " << v3 << endl;
 			}
 			/**> 除终止段外的线段 */
-			else if (i%2 == 0)
+			else if (isLine)
 			{
 				v1 = v3;
 				v2 = maxSpeed[i];
 				v3 = maxSpeed[i + 1];
-				lt.push_back(smPlanner.query_flexible(0, L, jerk[i/2], acceleration[i/2], v1, v2, v3, v2, v3));
+				lt.push_back(smPlanner.query_flexible(0, L, _jerk[i], _acceleration[i], v1, v2, v3, v2, v3));
 				if (fabs(v2 - maxSpeed[i]) > 1e-12)
 					cout << "MulriLineArcBlendPlanner: 第" << i + 1 << "段速度无法达到. 期望速度 = " << maxSpeed[i] << " -> 实际速度 = " << v2 << endl;
 			}
@@ -349,7 +346,7 @@ vector<SequenceInterpolator<double>::ptr> MultiLineArcBlendPlanner::getLt(double
 			{
 				v1 = v3;
 				v3 = maxSpeed[i];
-				lt.push_back(smPlanner.query_flexible(0, L, jerk[i/2], acceleration[i/2], v1, v3, v3, false));
+				lt.push_back(smPlanner.query_flexible(0, L, _jerk[i], _acceleration[i], v1, v3, v3, false));
 				if (fabs(v3 - maxSpeed[i]) > 1e-12)
 					cout << "MulriLineArcBlendPlanner: 第" << i + 1 << "段速度无法达到. 期望速度 = " << maxSpeed[i] << " -> 实际速度 = " << v3 << endl;
 			}
@@ -368,6 +365,75 @@ vector<SequenceInterpolator<double>::ptr> MultiLineArcBlendPlanner::getLt(double
 		}
 	}
 	return lt;
+}
+
+bool MultiLineArcBlendPlanner::stop(double t, Interpolator<Q>::ptr& stopIpr)
+{
+	if (_mLABTrajectory.get() == NULL)
+	{
+		throw( "警告<MulriLineArcBlendPlanner>: 尚未进行规划!\n");
+	}
+	double s0 = _mLABTrajectory->l(t);
+	double v0 = _mLABTrajectory->dl(t);
+	double a0 = _mLABTrajectory->ddl(t);
+	double S = _mLABTrajectory->l(_mLABTrajectory->duration());
+	double remainLength = S - s0;
+	SMPlannerEx planner;
+	int index = _mLABTrajectory->getIndexFromTime(t);
+	double h = _jerk[index];
+	double aMax = _acceleration[index];
+	Interpolator<double>::ptr stopLt = planner.query_stop(s0, v0, a0, h, aMax); //在圆弧上减速是很危险的
+	/**> 判断剩余距离是否足够停止 */
+	if ((stopLt->end() - s0) >= remainLength)
+	{
+		cout << stopLt->end() << " " << remainLength << endl;
+		cout << "错误<MulriLineArcBlendPlanner>: 距离不够, 无法停止!\n";
+		return false;
+	}
+	Trajectory::ptr originalTrajectory = _mLABTrajectory->getTrajectory();
+	stopIpr = std::make_shared<CompositeInterpolator<Q> > (originalTrajectory, stopLt);
+	double s1 = stopLt->end(); //停止点的距离
+	index = _mLABTrajectory->getIndexFromLength(s1); //停止点落在哪条轨迹上
+	_qStop = stopIpr->end(); //记录停止点
+	int count = index;
+	while(count > 0)
+	{
+		_task.erase(_task.begin());
+		_velocity.erase(_velocity.begin());
+		_acceleration.erase(_acceleration.begin());
+		_jerk.erase(_jerk.begin());
+		_startFromLine = !_startFromLine;
+		count -= 1;
+	}
+	if (!_startFromLine)
+	{
+		cout << "暂停到圆弧上\n";
+		double s2 = 0; //求圆弧段终点的距离
+		vector<double> vl = _mLABTrajectory->getLengthVector();
+		for (int i=0; i<index+1; i++)
+		{
+			s2 += vl[i];
+		}
+		(*_task.begin())[0] = _serialLink->getEndTransform(originalTrajectory->x((s1 + s2)/2.0)); //重新计算中间点
+	}
+	return true;
+}
+
+void MultiLineArcBlendPlanner::resume(const Q qStart)
+{
+	query();
+}
+
+bool MultiLineArcBlendPlanner::isTrajectoryExist() const
+{
+	if (_mLABTrajectory.get() == NULL)
+		return false;
+	return true;
+}
+
+Interpolator<Q>::ptr MultiLineArcBlendPlanner::getQTrajectory() const
+{
+	return _mLABTrajectory;
 }
 
 MultiLineArcBlendPlanner::~MultiLineArcBlendPlanner() {

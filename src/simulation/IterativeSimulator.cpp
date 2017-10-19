@@ -10,7 +10,7 @@
 namespace robot {
 namespace simulation {
 
-IterativeSimulator::IterativeSimulator(SerialLink* robot)
+IterativeSimulator::IterativeSimulator(SerialLink::ptr robot)
 {
 	_robot = robot;
 	_position = robot->getQ();
