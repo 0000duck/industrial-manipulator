@@ -12,6 +12,7 @@
 # include "math.h"
 # include "../trajectory/SequenceInterpolator.h"
 # include "../trajectory/Interpolator.h"
+# include "../math/Q.h"
 
 using robot::math::Integrator;
 
@@ -20,10 +21,10 @@ namespace trajectory {
 
 using namespace robot::trajectory;
 
-TwopartBezier::TwopartBezier() {
-	// TODO Auto-generated constructor stub
-
-}
+//TwopartBezier::TwopartBezier() {
+//	// TODO Auto-generated constructor stub
+//
+//}
 
 TwopartBezier::TwopartBezier(const point &p1, const point &p2, const point &p3, double k, double duration)
 :_p1(p1), _p2(p2), _p3(p3), _duration(duration)
@@ -46,9 +47,22 @@ TwopartBezier::TwopartBezier(const point &p1, const point &p2, const point &p3, 
 	BezierPath::ptr part2(new BezierPath(_q, _b22, _b21, _p2));
 	_part -> addInterpolator (part1);
 	_part -> addInterpolator (part2);
-
 }
 
+robot::math::Vector3D<double> TwopartBezier::x(double t)
+{
+	return _part -> x(t);
+}
+
+robot::math::Vector3D<double> TwopartBezier::dx(double t)
+{
+	return _part -> dx(t);
+}
+
+robot::math::Vector3D<double> TwopartBezier::ddx(double t)
+{
+	return _part -> ddx(t);
+}
 
 TwopartBezier::~TwopartBezier() {
 	// TODO Auto-generated destructor stub
