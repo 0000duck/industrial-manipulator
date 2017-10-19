@@ -39,8 +39,8 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query(double s
 	/**> 如果始末速度相同, 则返回线性插补器 */
 	if (fabs(v2 - v1) < 1e-10)
 	{
-		cout << "线性规划" << endl;
-		Interpolator<double>::ptr interpolator0(new LinearInterpolator<double>(0, s, 2*s/(v1 + v2)));
+//		cout << "线性规划" << endl;
+		Interpolator<double>::ptr interpolator0(new LinearInterpolator<double>(start, start + s, 2*s/(v1 + v2)));
 		SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
 		interpolator->addInterpolator(interpolator0);
 		return interpolator;
@@ -81,7 +81,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible
 {
 	if (stop && (fixZero(v2) != 0))
 		return query_flexible_stop(start, s, h, aMax, v1, v2, realV2);
-	println("SMPlannerEx: 柔性规划过渡段.");
+//	println("SMPlannerEx: 柔性规划过渡段.");
 	/**> 判断参数合理性 */
 	if (s <= 0)
 		throw("错误<SMPlannerEx>: 距离必须为正数!");
@@ -93,7 +93,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible
 	if (fabs(v2 - v1) < 1e-10)
 	{
 		cout << "线性规划" << endl;
-		Interpolator<double>::ptr interpolator0(new LinearInterpolator<double>(0, s, 2*s/(v1 + v2)));
+		Interpolator<double>::ptr interpolator0(new LinearInterpolator<double>(start, start + s, 2*s/(v1 + v2)));
 		SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
 		interpolator->addInterpolator(interpolator0);
 		return interpolator;
@@ -147,7 +147,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible
 		double &realV2,
 		double &realV3) const
 {
-	println("SMPlannerEx: 三速度柔性规划.");
+//	println("SMPlannerEx: 三速度柔性规划.");
 	/**> 判断参数合理性 */
 	if (s <= 0)
 		throw("错误<SMPlannerEx>: 距离必须为正数!");
@@ -162,11 +162,8 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible
 		double s1 = queryMinDistance(h, aMax, v1, v2);
 		double s2 = queryMinDistance(h, aMax, v2, v3);
 		double ds = s - s1 - s2;
-		cout << "分成两部分进行规划" << endl;
-		s1 += ds*1.0;
-		s2 += ds*0.0;
-		cout << "s1 = " << s1 << endl;
-		cout << "s2 = " << s2 << endl;
+		s1 += ds*0.9;
+		s2 += ds*0.1; //防止s2=0的情况发生
 		SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
 		interpolator->addInterpolator(query(start, s1, h, aMax, v1, v2));
 		interpolator->addInterpolator(query(start + s1, s2, h, aMax, v2, v3));
@@ -355,7 +352,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_stop(dou
 
 robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible_stop(double start, double s, double h, double aMax, double v1, double v2, double &realV2) const
 {
-	println("SMPlannerEx: 柔性规划停止段.");
+//	println("SMPlannerEx: 柔性规划停止段.");
 	if (checkDitance_stop(s, h, aMax, v1, v2, realV2));
 	else
 		v2 = realV2;
@@ -375,11 +372,11 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::query_flexible
 		else
 			throw("错误<SMPlannerEx>: 柔性规划: 停止段距离不够!");
 	}
-	cout << "分成两部分进行规划" << endl;
+//	cout << "分成两部分进行规划" << endl;
 	s1 += ds/2.0;
 	s2 += ds/2.0;
-	cout << "s1 = " << s1 << endl;
-	cout << "s2 = " << s2 << endl;
+//	cout << "s1 = " << s1 << endl;
+//	cout << "s2 = " << s2 << endl;
 	SequenceInterpolator<double>::ptr interpolator(new SequenceInterpolator<double>());
 	interpolator->addInterpolator(query(start, s1, h, aMax, v1, v2));
 	interpolator->addInterpolator(query(start + s1, s2, h, aMax, v2, 0));
@@ -448,7 +445,7 @@ double SMPlannerEx::queryMaxSpeed_stop(double s, double h, double aMax, double v
 
 robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotion(double start, double s, double h, double aMax, double v1, double v2) const
 {
-	println("过渡三段规划器");
+//	println("过渡三段规划器");
 
 	int sgn = (v2 > v1)? 1:-1;
 	h = sgn*fabs(h);
@@ -478,7 +475,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotio
 
 robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::fourLineMotion(double start, double s, double h, double aMax, double v1, double v2) const
 {
-	println("过渡四段规划器");
+//	println("过渡四段规划器");
 
 	double dv = v2 - v1;
 	int sgn = (dv > 0)? 1:-1;
@@ -514,7 +511,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::fourLineMotion
 
 robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotion(double start, double s, double h, double aMax, double v1) const
 {
-	println("过渡停止三段规划器");
+//	println("过渡停止三段规划器");
 
 	double v2 = 0;
 
@@ -548,7 +545,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::threeLineMotio
 
 robot::trajectory::SequenceInterpolator<double>::ptr SMPlannerEx::fourLineMotion(double start, double s, double h, double aMax, double v1) const
 {
-	println("过渡停止四段规划器");
+//	println("过渡停止四段规划器");
 
 	double v2 = 0;
 

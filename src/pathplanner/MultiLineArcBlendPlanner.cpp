@@ -180,7 +180,6 @@ MultiLineArcBlendPlanner::MultiLineArcBlendPlanner(Q dqLim, Q ddqLim,
 MLABTrajectory::ptr MultiLineArcBlendPlanner::query()
 {
 	/**> 生成各段的trajectory, 保存统一的位置插补器和统一的姿态插补器(长度为索引) */
-	println("MultiLine: 生成trajectory");
 	vector<Trajectory::ptr> vTrajectory;
 	auto posIpr = std::make_shared<SequenceInterpolator<Vector3D<double> > >();
 	auto rotIpr = std::make_shared<SequenceInterpolator<Rotation3D<double> > >();
@@ -237,11 +236,9 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query()
 	}
 
 	/**> 生成lt */
-	println("MultiLine: 生成lt");
 	vector<SequenceInterpolator<double>::ptr> vlt = getLt(vTrajectory);
 
 	/**> 生成qIpr */
-	println("MultiLine: 生成lt");
 	vector<Interpolator<Q>::ptr> vqIpr;
 	for (int i=0; i<(int)vTrajectory.size(); i++)
 	{
@@ -260,7 +257,6 @@ MLABTrajectory::ptr MultiLineArcBlendPlanner::query()
 	auto qIpr = std::make_shared<SequenceInterpolator<Q> > ();
 	for_each(vqIpr.begin(), vqIpr.end(), [&](Interpolator<Q>::ptr ipr){qIpr->addInterpolator(ipr);});
 
-	println("MultiLine: 生成结果");
 	auto mlabTrajectory = std::make_shared<MLABTrajectory> (vTrajectory, vlt, vqIpr, trajectory, lt, qIpr);
 	_mLABTrajectory = mlabTrajectory;
 	return mlabTrajectory;
@@ -388,28 +384,30 @@ bool MultiLineArcBlendPlanner::stop(double t, Interpolator<Q>::ptr& stopIpr)
 	double aMax = _acceleration[index];
 	Interpolator<double>::ptr stopLt = planner.query_stop(s0, v0, a0, h, aMax); //在圆弧上减速是很危险的
 	/**> 判断剩余距离是否足够停止 */
-	if (stopLt->end() >= remainLength)
+	if ((stopLt->end() - s0) >= remainLength)
 	{
-		cout << "错误<CircularPlanner>: 距离不够, 无法停止!\n";
+		cout << stopLt->end() << " " << remainLength << endl;
+		cout << "错误<MulriLineArcBlendPlanner>: 距离不够, 无法停止!\n";
 		return false;
 	}
 	Trajectory::ptr originalTrajectory = _mLABTrajectory->getTrajectory();
 	stopIpr = std::make_shared<CompositeInterpolator<Q> > (originalTrajectory, stopLt);
-	double s1 = s0 + stopLt->end(); //停止点的距离
+	double s1 = stopLt->end(); //停止点的距离
 	index = _mLABTrajectory->getIndexFromLength(s1); //停止点落在哪条轨迹上
 	_qStop = stopIpr->end(); //记录停止点
-	int couunt = index;
-	while(couunt > 0)
+	int count = index;
+	while(count > 0)
 	{
 		_task.erase(_task.begin());
 		_velocity.erase(_velocity.begin());
 		_acceleration.erase(_acceleration.begin());
 		_jerk.erase(_jerk.begin());
 		_startFromLine = !_startFromLine;
-		couunt -= 1;
+		count -= 1;
 	}
 	if (!_startFromLine)
 	{
+		cout << "暂停到圆弧上\n";
 		double s2 = 0; //求圆弧段终点的距离
 		vector<double> vl = _mLABTrajectory->getLengthVector();
 		for (int i=0; i<index+1; i++)

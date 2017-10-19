@@ -35,7 +35,7 @@ namespace pathplanner {
 /**
  * @brief 连续规划-多直线圆弧混合路径规划器
  */
-class MultiLineArcBlendPlanner : Planner{
+class MultiLineArcBlendPlanner : public Planner{
 public:
 	using ptr = std::shared_ptr<MultiLineArcBlendPlanner>;
 

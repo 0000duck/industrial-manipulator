@@ -90,14 +90,15 @@ bool CircularPlanner::stop(double t, Interpolator<Q>::ptr& stopIpr)
 	SMPlannerEx planner;
 	Interpolator<double>::ptr stopLt = planner.query_stop(s0, v0, a0, _h, _aMax);
 	/**> 判断剩余距离是否足够停止 */
-	if (stopLt->end() >= remainLength)
+	if ((stopLt->end() -s0) >= remainLength)
 	{
 		cout << "错误<CircularPlanner>: 距离不够, 无法停止!\n";
 		return false;
 	}
 	Trajectory::ptr originalTrajectory = _circularTrajectory->getTrajectory();
 	stopIpr = std::make_shared<CompositeInterpolator<Q> > (originalTrajectory, stopLt);
-	double s1 = s0 + stopLt->end();
+	double s1 = stopLt->end();
+	cout << "s1 = " << s1 << " s0 = " << s0 << " S = " << S << endl;
 	_qIntermediate = originalTrajectory->x((s1 + S)/2.0); //重新计算中间点
 	_qStop = stopIpr->end();
 	return true;

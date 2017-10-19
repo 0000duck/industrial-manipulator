@@ -64,7 +64,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::query(
 
 robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::fourLineMotion(double s, double h, double aMax, double vMax, double start) const
 {
-	println("四段规划器");
+//	println("四段规划器");
 	int sign = (s < 0)? -1:1;
 	s = fabs(s);
 	double t1 = aMax/h;
@@ -94,7 +94,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::fourLi
 
 robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::fiveLineMotion(double s, double h, double aMax, double vMax, double start) const
 {
-	println("五段规划器");
+//	println("五段规划器");
 	int sign = (s < 0)? -1:1;
 	s = fabs(s);
 	double t1 = aMax/h;
@@ -127,7 +127,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::fiveLi
 
 robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::sixLineMotion(double s, double h, double aMax, double vMax, double start) const
 {
-	println("六段规划器");
+//	println("六段规划器");
 	int sign = (s < 0)? -1:1;
 	s = fabs(s);
 	double s1 = this->s1(h, vMax, aMax);
@@ -167,7 +167,7 @@ robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::sixLin
 
 robot::trajectory::SequenceInterpolator<double>::ptr SmoothMotionPlanner::sevenLineMotion(double s, double h, double aMax, double vMax, double start) const
 {
-	println("七段规划器");
+//	println("七段规划器");
 	int sign = (s < 0)? -1:1;
 	s = fabs(s);
 	double s1 = this->s1(h, vMax, aMax);

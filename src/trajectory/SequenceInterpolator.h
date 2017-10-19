@@ -44,7 +44,7 @@ public:
 	void addInterpolator(std::shared_ptr<Interpolator<T> > interpolator)
 	{
 		_interpolatorSequence.push_back(interpolator);
-		if (_timeSequence.size() == 0)
+		if (_timeSequence.empty())
 		{
 			_timeSequence.push_back(interpolator->duration());
 		}

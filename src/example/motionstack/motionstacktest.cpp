@@ -10,6 +10,7 @@
 # include "../../ik/SiasunSR4CSolver.h"
 # include "../../pathplanner/LinePlanner.h"
 # include "../../pathplanner/CircularPlanner.h"
+# include "../../pathplanner/MultiLineArcBlendPlanner.h"
 # include "../../common/common.h"
 # include "../../common/fileAdvance.h"
 # include <functional>
@@ -113,8 +114,35 @@ bool addCircle(MotionStack* motionStack, Q start, Q intermediate, Q end, double 
 	return false;
 }
 
+bool addMLAB(MotionStack* motionStack, vector<Q> qPath, vector<double> arcRatio, vector<double> velocity, vector<double> acceleration, vector<double> jerk)
+{
+	try{
+		MultiLineArcBlendPlanner::ptr planner( new MultiLineArcBlendPlanner(dqLim, ddqLim, solver, robotModel, qPath, arcRatio, velocity, acceleration, jerk));
+		planner->query();
+		int result = motionStack->addPlanner(planner);
+		if (result == 0)
+		{
+			return true;
+		}
+		else
+		{
+			cout << "添加直线圆弧planner失败, 错误代码: " << result << endl;
+			return false;
+		}
+	}
+	catch(char const* msg)
+	{
+		cout << msg << endl;
+	}
+	catch(std::string &msg)
+	{
+		cout << msg << endl;
+	}
+	return false;
+}
 void move(MotionStack *motionStack, int *status, State *state)
 {
+	cout << "- 运动开始\n";
 	unsigned long long next = getUTime();
 	const unsigned int dt = 4000;
 	while(*status == StatusNormal || *status == StatusPause)
@@ -127,13 +155,13 @@ void move(MotionStack *motionStack, int *status, State *state)
 		int result = motionStack->state(t, *state);
 		if (result == 0 || result == 1)
 		{
-			cout << "下发命令\n";
+//			cout << "下发命令\n";
 			record(*state); //下发指令
 			vt.push_back((double(t - t0))/1000000);
 			if (result == 1) //任务完成
 			{
 				*status = StatusStop;
-				cout << "任务完成\n";
+				cout << "- 运动结束\n";
 				break;
 			}
 		}
@@ -143,7 +171,6 @@ void move(MotionStack *motionStack, int *status, State *state)
 		}
 		next += dt;
 	}
-	cout << "退出move进程\n";
 }
 
 void motionstacktest()
@@ -152,6 +179,11 @@ void motionstacktest()
 	Q start = Q::zero(6);
 	Q intermediate = Q(0.7, 0, 0, 0, -0.7, 0);
 	Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
+	vector<Q> qPath = {start, intermediate, end};
+	vector<double> arcRatio = {0.5};
+	vector<double> velocity = {vMax, vMax};
+	vector<double> acceleration = {aMax, aMax};
+	vector<double> jerk = {h, h};
 
 	MotionStack motionStack(start);
 	State state;
@@ -159,8 +191,9 @@ void motionstacktest()
 
 	addLine(&motionStack, start, end, 1.0, 1.0);
 	addCircle(&motionStack, end, intermediate, start, 1.0, 1.0);
+	addMLAB(&motionStack, qPath, arcRatio, velocity, acceleration, jerk);
 
-	while (motionStack.getStatus() != 0)
+	while (motionStack.getStatus() != 0) //不为空
 	{
 		if (motionStack.start() == 0)
 			status = StatusNormal;
@@ -171,29 +204,49 @@ void motionstacktest()
 		}
 		std::thread normal_t(move, &motionStack, &status, &state);
 		normal_t.detach();
-		sleep(1); //1秒后停止
-		cout << "停止结果: " << motionStack.pause() << endl;
-		status = StatusPause;
+		usleep(900000); //几秒后暂停
+		cout << "尝试暂停\n";
+		int result = motionStack.pause();
+		if (result != 0)
+			cout << "暂停不成功, 结果: " << result << endl;
+		else
+		{
+			cout << "暂停成功\n";
+			status = StatusPause;
+		}
 		try{
 			while(status != StatusStop)
 			{
 				usleep(4000);
 			}
-			cout << "完成停止\n";
+			cout << "暂停结束, 等待一秒\n";
 			sleep(1);
+			cout << "恢复路径\n";
 			int result = motionStack.resume(*(vxpath.end() - 1));
-			cout << "恢复结果: " << result << "\n";
+			if (result != 0)
+				cout << "恢复不成功, 结果: " << result << "\n";
 			if (result == 0)
 			{
-				cout << "再启动结果: " << motionStack.start() << endl;
-				status = StatusNormal;
-				std::thread normal_t(move, &motionStack, &status, &state);
-				normal_t.detach();
+				int result = motionStack.start();
+				if (result == 0)
+				{
+					cout << "再启动成功\n";
+					status = StatusNormal;
+					std::thread normal_t(move, &motionStack, &status, &state);
+					normal_t.detach();
+				}
+				else
+				{
+					cout << "再启动失败, 清空堆栈\n";
+					motionStack.clear();
+					status = StatusStop;
+				}
 			}
 			while(status != StatusStop)
 			{
 				usleep(4000);
 			}
+			cout << "完成一次运动\n\n";
 		}
 		catch(char const* msg)
 		{

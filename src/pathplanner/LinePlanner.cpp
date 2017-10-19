@@ -188,7 +188,7 @@ bool LinePlanner::stop(double t, Interpolator<Q>::ptr& stopIpr)
 	SMPlannerEx planner;
 	Interpolator<double>::ptr stopLt = planner.query_stop(s0, v0, a0, _h, _aMax);
 	/**> 判断剩余距离是否足够停止 */
-	if (stopLt->x(stopLt->duration()) >= remainLength)
+	if ((stopLt->end() - s0) >= remainLength)
 	{
 		cout << "错误<LinePlanner>: 距离不够, 无法停止!\n";
 		return false;
