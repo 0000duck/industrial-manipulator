@@ -93,6 +93,17 @@ public:
 	Interpolator<Q>::ptr getQTrajectory() const;
 
 	virtual ~LinePlanner();
+
+public:
+	/**
+	 * @brief 纯直线平移查找可到达的最远距离
+	 * @param start
+	 * @param direction
+	 * @param ikSolver
+	 * @return
+	 */
+	static Q findReachableEnd(Q start, Vector3D<double> direction, std::shared_ptr<robot::ik::IKSolver> ikSolver, double dl=0.02);
+
 private:
 	/** @brief 末端预定最大直线速度 */
 	double _vMax;

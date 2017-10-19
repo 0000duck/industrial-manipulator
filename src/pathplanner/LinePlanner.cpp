@@ -222,5 +222,34 @@ Interpolator<Q>::ptr LinePlanner::getQTrajectory() const
 LinePlanner::~LinePlanner() {
 }
 
+Q LinePlanner::findReachableEnd(Q start, Vector3D<double> direction, std::shared_ptr<robot::ik::IKSolver> ikSolver, double dl)
+{
+	Config config = ikSolver->getConfig(start);
+	SerialLink::ptr robot = ikSolver->getRobot();
+	direction.doNormalize();
+	direction = direction*dl;
+	const HTransform3D<double> startTran = robot->getEndTransform(start);
+	const Rotation3D<double> rot = startTran.getRotation();
+	Vector3D<double> pos;
+	pos = startTran.getPosition();
+	Q end = start;
+	do{
+		pos += direction; //下一个位置
+		try{
+			end = ikSolver->solve(HTransform3D<double>(pos, rot), config)[0];
+		}
+		catch(char const*)
+		{
+			break;
+		}
+		catch(std::string &)
+		{
+			break;
+		}
+	}
+	while(true);
+	return end;
+}
+
 } /* namespace pathplanner */
 } /* namespace robot */

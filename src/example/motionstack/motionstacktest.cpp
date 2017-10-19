@@ -11,6 +11,7 @@
 # include "../../pathplanner/LinePlanner.h"
 # include "../../pathplanner/CircularPlanner.h"
 # include "../../pathplanner/MultiLineArcBlendPlanner.h"
+# include "../../pathplanner/JoggingPlanner.h"
 # include "../../common/common.h"
 # include "../../common/fileAdvance.h"
 # include <functional>
@@ -52,6 +53,8 @@ double h = 50;
 
 Q dqLim = Q(3, 3, 3, 3, 5, 5);
 Q ddqLim = Q(20, 20, 20, 20, 20, 20);
+
+JoggingPlanner jogPlanner = JoggingPlanner(solver, vector<double>{0.5, 10, 50, 1, 10, 100}, dqLim, ddqLim);
 
 vector<double> vt;
 vector<Q> vxpath;
@@ -140,6 +143,36 @@ bool addMLAB(MotionStack* motionStack, vector<Q> qPath, vector<double> arcRatio,
 	}
 	return false;
 }
+
+bool addJog(MotionStack *motionStack, Q start, const std::string& type)
+{
+	Q farEnd;
+	Planner::ptr planner;
+	if (type == "x")
+		planner = jogPlanner.jogX(start, farEnd); //默认为底座坐标系
+	else
+	{
+		cout << "尚未识别的jog模式!";
+		return false;
+	}
+	if (start == farEnd)
+	{
+		cout << "无法再运动, 到达边界\n";
+		return false;
+	}
+	int result = motionStack->addPlanner(planner);
+	if (result == 0)
+	{
+		return true;
+	}
+	else
+	{
+		cout << "添加Jog失败, 错误代码: " << result << endl;
+		return false;
+	}
+
+}
+
 void move(MotionStack *motionStack, int *status, State *state)
 {
 	cout << "- 运动开始\n";
@@ -189,9 +222,10 @@ void motionstacktest()
 	State state;
 	int status = StatusStop;
 
-	addLine(&motionStack, start, end, 1.0, 1.0);
-	addCircle(&motionStack, end, intermediate, start, 1.0, 1.0);
-	addMLAB(&motionStack, qPath, arcRatio, velocity, acceleration, jerk);
+	addJog(&motionStack, start, "x");
+//	addLine(&motionStack, start, start, 1.0, 1.0);
+//	addCircle(&motionStack, end, intermediate, start, 1.0, 1.0);
+//	addMLAB(&motionStack, qPath, arcRatio, velocity, acceleration, jerk);
 
 	while (motionStack.getStatus() != 0) //不为空
 	{

@@ -120,6 +120,7 @@ public:
 		_n = var.n;
 		_vel = (duration == 0)? 0 : (_theta/duration);
 		_acc = _vel*_vel;
+		_quartStart.print();
 	}
 
 	virtual ~LinearInterpolator(){}
