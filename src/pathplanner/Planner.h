@@ -27,8 +27,9 @@ public:
 	Planner();
 	virtual ~Planner();
 
+	virtual void doQuery() = 0;
 	virtual bool stop(double t, Interpolator<Q>::ptr& stopIpr) = 0;
-	virtual void resume(const Q qStart) = 0;
+	virtual void resume() = 0;
 	virtual bool isTrajectoryExist() const = 0;
 	virtual Interpolator<Q>::ptr getQTrajectory() const = 0;
 protected:

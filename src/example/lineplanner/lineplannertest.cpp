@@ -62,8 +62,8 @@ LineTrajectory::ptr lineplannerTest()
 		clock_t clockStart = clock();
 		Q start = Q::zero(6);
 		Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
-		LinePlanner planner = LinePlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, solver, robot, end);
-		lineIpr = planner.query(start);
+		LinePlanner planner = LinePlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, solver, start, end);
+		lineIpr = planner.query();
 		clock_t clockEnd = clock();
 		cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 		int step = 300;

@@ -59,7 +59,7 @@ void mlabplannertest()
 
 	vector<double> jerk(2, 50.0);
 
-	MultiLineArcBlendPlanner mlabplanner(dqLim, ddqLim, solver, robot, qPath, arcRatio, velocity, acceleration, jerk);
+	MultiLineArcBlendPlanner mlabplanner(dqLim, ddqLim, solver, qPath, arcRatio, velocity, acceleration, jerk);
 
 	MLABTrajectory::ptr mlabTrajectory;
 

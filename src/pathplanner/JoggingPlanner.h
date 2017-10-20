@@ -20,11 +20,11 @@ class JoggingPlanner {
 public:
 	JoggingPlanner(std::shared_ptr<robot::ik::IKSolver> ikSolver, vector<double> constraints, Q dqLim, Q ddqLim);
 
-	Planner::ptr jogX(Q current, Q &farEnd, Rotation3D<double> rot=Rotation3D<double>());
+	Planner::ptr jogX(Q current, Q &farEnd, bool isPositive, Rotation3D<double> rot=Rotation3D<double>());
 
-	Planner::ptr jogY(Q current);
+	Planner::ptr jogY(Q current, Q &farEnd, bool isPositive, Rotation3D<double> rot=Rotation3D<double>());
 
-	Planner::ptr jogZ(Q current);
+	Planner::ptr jogZ(Q current, Q &farEnd, bool isPositive, Rotation3D<double> rot=Rotation3D<double>());
 
 	Planner::ptr jogRX(Q current);
 
@@ -33,6 +33,9 @@ public:
 	Planner::ptr jogRZ(Q current);
 
 	virtual ~JoggingPlanner();
+
+private:
+	Planner::ptr planLine(Q current, Q &farEnd, Vector3D<double> direction);
 private:
 	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
 

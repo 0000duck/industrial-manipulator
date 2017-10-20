@@ -58,8 +58,8 @@ public:
 	 */
 	LinePlanner(Q dqLim, Q ddqLim,
 			double vMaxLine, double aMaxLine, double hLine,
-			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink,
-			Q qEnd);
+			std::shared_ptr<robot::ik::IKSolver> ikSolver,
+			Q start, Q qEnd);
 
 	/**
 	 * @brief 询问路径(方法1)
@@ -72,7 +72,7 @@ public:
 	 * 不考虑直径的旋转约束, 这样做的好处是可以把位姿以路径长度为索引. 方法2中直线
 	 * 和旋转的速度规划是不统一的, 可能会造成"不同速度配置下, 路径不同"的结果;
 	 */
-	LineTrajectory::ptr query(const Q qStart);
+	LineTrajectory::ptr query();
 
 	/**
 	 * @brief 询问路径(方法2)
@@ -86,9 +86,9 @@ public:
 	 */
 	LineTrajectory::ptr query2(const Q qStart, const Q qEnd) const;
 
-
+	void doQuery();
 	bool stop(double t, Interpolator<Q>::ptr& stopIpr);
-	void resume(const Q qStart); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
+	void resume(); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
 	bool isTrajectoryExist() const;
 	Interpolator<Q>::ptr getQTrajectory() const;
 
@@ -117,6 +117,9 @@ private:
 	/** @brief 逆解器 */
 	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
 
+    /** @brief 机器人的模型 */
+    robot::model::SerialLink::ptr _serialLink;
+
 	/** @brief 关节下限 */
 	Q _qMin;
 
@@ -132,9 +135,6 @@ private:
 	/** @brief 关节个数 */
 	int _size;
 
-    /** @brief 机器人的模型 */
-    robot::model::SerialLink::ptr _serialLink;
-
     Q _qEnd;
 
     /**> 记录的停止点, 用于恢复运动时检查启动点的位置正不正确 */
@@ -143,6 +143,12 @@ private:
     robot::model::Config _config;
 
     LineTrajectory::ptr _lineTrajectory;
+
+	/** @brief 采样精度 */
+	const double _dl = 0.1;
+
+	/** @brief 最少采样点数 */
+	const double _countMin = 8;
 };
 
 /** @} */

@@ -47,7 +47,7 @@ public:
 	 * @param serialLink [in] 机器人模型
 	 */
 	MultiLineArcBlendPlanner(Q dqLim, Q ddqLim,
-			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink,
+			std::shared_ptr<robot::ik::IKSolver> ikSolver,
 			const vector<Q>& path, const vector<double>& arcRatio, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk);
 
 	/**
@@ -63,8 +63,9 @@ public:
 
 	vector<SequenceInterpolator<double>::ptr> getLt(vector<Trajectory::ptr>& trajectoryIpr);
 
+	void doQuery();
 	bool stop(double t, Interpolator<Q>::ptr& stopIpr);
-	void resume(const Q qStart); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
+	void resume(); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
 	bool isTrajectoryExist() const;
 	Interpolator<Q>::ptr getQTrajectory() const;
 
@@ -77,6 +78,9 @@ private:
 	/** @brief 逆解器 */
 	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
 
+    /** @brief 机器人的模型 */
+	SerialLink::ptr _serialLink;
+
 	/** @brief 关节下限 */
 	const Q _qMin;
 
@@ -88,9 +92,6 @@ private:
 
 	/** @brief 关节最大加速度 */
 	const Q _ddqLim;
-
-    /** @brief 机器人的模型 */
-	SerialLink::ptr _serialLink;
 
 	Q _qStop;
 
@@ -107,6 +108,12 @@ private:
 	Config _config;
 
 	MLABTrajectory::ptr _mLABTrajectory;
+
+	/** @brief 采样精度 */
+	const double _dl = 0.1;
+
+	/** @brief 最少采样点数 */
+	const double _countMin = 8;
 };
 
 /**@}*/

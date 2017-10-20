@@ -27,11 +27,11 @@ namespace pathplanner {
 
 CircularPlanner::CircularPlanner(Q dqLim, Q ddqLim,
 		double vMaxLine, double aMaxLine, double hLine,
-		std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink,
-		const Q qIntermediate, const Q qEnd) :
+		std::shared_ptr<robot::ik::IKSolver> ikSolver,
+		const Q qStart, const Q qIntermediate, const Q qEnd) :
 	_vMax(vMaxLine), _aMax(aMaxLine), _h(hLine),
-	_ikSolver(ikSolver), _qMin(serialLink->getJointMin()), _qMax(serialLink->getJointMax()), _dqLim(dqLim), _ddqLim(ddqLim), _serialLink(serialLink),
-	_qIntermediate(qIntermediate), _qEnd(qEnd)
+	_ikSolver(ikSolver), _serialLink(ikSolver->getRobot()), _qMin(_serialLink->getJointMin()), _qMax(_serialLink->getJointMax()), _dqLim(dqLim), _ddqLim(ddqLim),
+	_qStop(qStart), _qIntermediate(qIntermediate), _qEnd(qEnd)
 {
 	_size = _serialLink->getDOF();
 	if (_qMax.size() != _size || _qMax.size() != _size || dqLim.size() != _size || ddqLim.size() != _size || _size != _qIntermediate.size() || _size != _qEnd.size())
@@ -41,15 +41,16 @@ CircularPlanner::CircularPlanner(Q dqLim, Q ddqLim,
 	_config = _ikSolver->getConfig(qIntermediate);
 	if (_config != _ikSolver->getConfig(qEnd))
 		throw ("错误<圆弧规划>: 中间点和结束点的Config不同!");
-}
-
-CircularTrajectory::ptr CircularPlanner::query(const Q qStart)
-{
-	double assignedVelocity = _vMax;
-	double assignedAcceleration = _aMax;
 	/**> 检查dof */
 	if (_size != qStart.size())
 		throw ("错误<圆弧规划>: 查询的关节数值与机器人的自由度不符!");
+}
+
+CircularTrajectory::ptr CircularPlanner::query()
+{
+	Q qStart = _qStop;
+	double assignedVelocity = _vMax;
+	double assignedAcceleration = _aMax;
 	Vector3D<double> startPos = (_serialLink->getEndTransform(qStart)).getPosition();
 	Vector3D<double> intermediatePos = (_serialLink->getEndTransform(_qIntermediate)).getPosition();
 	Vector3D<double> endPos = (_serialLink->getEndTransform(_qEnd)).getPosition();
@@ -61,8 +62,8 @@ CircularTrajectory::ptr CircularPlanner::query(const Q qStart)
 	/**> 生成Trajectory */
 	Trajectory::ptr trajectory(new Trajectory(std::make_pair(posIpr, rotIpr), _ikSolver, _config));
 	/**> 直线平滑插补器_l(t) */
-	double sampledl = 0.01;
-	int count = Length/sampledl + 1;
+	int count = Length/_dl + 1;
+	count = (count < _countMin)? _countMin : count;
 	/** 策略 */
 	double velocity = trajectory->getMaxSpeed(count, _dqLim, _ddqLim, assignedVelocity);
 	double acceleration = assignedAcceleration;
@@ -74,6 +75,11 @@ CircularTrajectory::ptr CircularPlanner::query(const Q qStart)
 	CircularTrajectory::ptr circularTrajectory(new CircularTrajectory(origin, _ikSolver, _config, lt, trajectory));
 	_circularTrajectory = circularTrajectory;
 	return circularTrajectory;
+}
+
+void CircularPlanner::doQuery()
+{
+	query();
 }
 
 bool CircularPlanner::stop(double t, Interpolator<Q>::ptr& stopIpr)
@@ -104,13 +110,9 @@ bool CircularPlanner::stop(double t, Interpolator<Q>::ptr& stopIpr)
 	return true;
 }
 
-void CircularPlanner::resume(const Q qStart)
+void CircularPlanner::resume()
 {
-	Q deltaQ = (qStart - _qStop);
-	deltaQ.abs();
-	if (deltaQ.getMax() > 0.01)
-		cout << "警告<CircularPlanner>: 恢复点与停止点的距离相差过大!\n";
-	query(qStart);
+	query();
 }
 
 bool CircularPlanner::isTrajectoryExist() const

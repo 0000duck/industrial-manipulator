@@ -11,6 +11,8 @@
 # include <queue>
 # include "../pathplanner/Planner.h"
 # include "../common/common.h"
+# include <memory>
+# include <mutex>
 
 using robot::pathplanner::Planner;
 
@@ -27,7 +29,9 @@ typedef enum{
 
 class MotionStack {
 public:
-	MotionStack(Q& initialQ);
+	using ptr = std::shared_ptr<MotionStack>;
+
+	MotionStack(Q& initialQ, std::mutex *mtx);
 	/**
 	 * @brief 向堆栈中添加路径
 	 * @param planner [in] 添加的规划器指针, 规划器应事先规划好一条路径
@@ -84,10 +88,13 @@ public:
 	 * @brief 清空栈
 	 * @retval true 清空成功
 	 * @retval false 运行途中无法清空
+	 * @note id计数会清零
 	 */
 	bool clear();
 
 	inline int getStatus()const {return _status;}
+
+	inline std::mutex* getMutex(){return _mtx;}
 
 	virtual ~MotionStack();
 protected:
@@ -99,6 +106,8 @@ protected:
 
 	std::queue<motionData> _motionQueue;
 private:
+	std::mutex *const _mtx;
+
 	/**> 指向最高的ID号, 清空堆栈时清零 */
 	int _id;
 	/**> 最大栈数 */

@@ -56,14 +56,14 @@ void circularplannerTest()
 	Q intermediate = Q(0.7, 0, 0, 0, -1, 0);
 	Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
 	try{
-		CircularPlanner planner = CircularPlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, solver, robot,
+		CircularPlanner planner = CircularPlanner(dqLim, ddqLim, vMaxLine, aMaxLine, hLine, solver, start,
 				intermediate, end);
 
 	//	robot.setTool(&tool);
 	//	solver->init();
 
 		clock_t clockStart = clock();
-		CircularTrajectory::ptr circularIpr = planner.query(start);
+		CircularTrajectory::ptr circularIpr = planner.query();
 		clock_t clockEnd = clock();
 		cout << "插补器构造用时: " << clockEnd - clockStart << "us" << endl;
 		int step = 1000;

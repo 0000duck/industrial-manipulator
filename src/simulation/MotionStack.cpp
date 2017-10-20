@@ -12,7 +12,8 @@ namespace simulation {
 
 using robot::common::getUTime;
 
-MotionStack::MotionStack(Q& initialQ) : _staticQ(initialQ), _zero(Q::zero(initialQ.size())){
+MotionStack::MotionStack(Q& initialQ, std::mutex *mtx) : _mtx(mtx), _staticQ(initialQ), _zero(Q::zero(initialQ.size()))
+{
 	_id = 0;
 	_status = stackEmpty;
 	_recordTime = 0;
@@ -175,7 +176,7 @@ int MotionStack::resume(Q &current)
 		throw("内部错误, 运动堆栈启动时找到异常状态号\n");
 	}
 	Planner::ptr planner = _motionQueue.front().planner;
-	planner->resume(current);
+	planner->resume();
 	_status = stackWait;
 	return 0;
 }
@@ -199,6 +200,7 @@ bool MotionStack::clear()
 	}
 	_motionQueue = std::queue<motionData>();
 	_status = stackEmpty;
+	_id = 0;
 	return true;
 }
 
