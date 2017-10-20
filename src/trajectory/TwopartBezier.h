@@ -13,12 +13,15 @@
 # include "../common/printAdvance.h"
 # include "../trajectory/BezierInterpolator.h"
 # include "../trajectory/SequenceInterpolator.h"
+# include "../math/Q.h"
 
 namespace robot {
 namespace trajectory {
 
 using robot::math::Vector3D;
 using std::vector;
+using namespace robot::trajectory;
+using namespace robot::math;
 
 class TwopartBezier : public Interpolator<Vector3D<double> >{
 public:
@@ -26,10 +29,15 @@ public:
 	using point = Vector3D<double>;
 	//using namespace robot::trajectory;
 
-	TwopartBezier();
+	TwopartBezier() = default;
 
 	TwopartBezier(const point &p1, const point &p2, const point &p3, double k, double duration);
 
+	robot::math::Vector3D<double> x(double t);
+
+	robot::math::Vector3D<double> dx(double t);
+
+	robot::math::Vector3D<double> ddx(double t);
 	virtual ~TwopartBezier();
 
 private:
