@@ -18,6 +18,10 @@
 namespace robot {
 namespace trajectory {
 
+/**@brief 两段三次bezier曲线连续过度
+ * @file TwopartBezie
+ * @data 2017/10/23
+ */
 using robot::math::Vector3D;
 using std::vector;
 using namespace robot::trajectory;
@@ -27,17 +31,43 @@ class TwopartBezier : public Interpolator<Vector3D<double> >{
 public:
 	using ptr = std::shared_ptr<TwopartBezier>;
 	using point = Vector3D<double>;
-	//using namespace robot::trajectory;
 
+	/**@brief 默认构造函数
+	 *
+	 */
 	TwopartBezier() = default;
 
+	/**@brief 曲线生成函数
+	 *两段Bezier曲线合成一条过度曲线
+	 * @param p1 [in] 点p1
+	 * @param p2 [in] 点p2
+	 * @param p3 [in] 点p3
+	 * @param k [in] 过度大小系数（0～0.5）
+	 * @param duration [in] 时长
+	 */
 	TwopartBezier(const point &p1, const point &p2, const point &p3, double k, double duration);
 
+	/**@brief 位置函数
+	 *
+	 * @param t
+	 * @return t时刻位置
+	 */
 	robot::math::Vector3D<double> x(double t);
 
+	/**@brief 速度函数
+	 *
+	 * @param t
+	 * @return t时刻速度
+	 */
 	robot::math::Vector3D<double> dx(double t);
 
+	/**@brief 加速度函数
+	 *
+	 * @param t
+	 * @return t时刻加速度
+	 */
 	robot::math::Vector3D<double> ddx(double t);
+
 	virtual ~TwopartBezier();
 
 private:
