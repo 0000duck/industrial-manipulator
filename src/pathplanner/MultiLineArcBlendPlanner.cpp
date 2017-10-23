@@ -23,9 +23,9 @@ namespace robot {
 namespace pathplanner {
 
 MultiLineArcBlendPlanner::MultiLineArcBlendPlanner(Q dqLim, Q ddqLim,
-		std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink,
+		std::shared_ptr<robot::ik::IKSolver> ikSolver,
 		const vector<Q>& Qpath, const vector<double>& arcRatio, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk) :
-	_ikSolver(ikSolver), _qMin(serialLink->getJointMin()), _qMax(serialLink->getJointMax()), _dqLim(dqLim), _ddqLim(ddqLim), _serialLink(serialLink)
+	_ikSolver(ikSolver), _serialLink(ikSolver->getRobot()), _qMin(_serialLink->getJointMin()), _qMax(_serialLink->getJointMax()), _dqLim(dqLim), _ddqLim(ddqLim)
 {
 	_startFromLine = true;
 	_size = _serialLink->getDOF();
@@ -301,13 +301,13 @@ vector<SequenceInterpolator<double>::ptr> MultiLineArcBlendPlanner::getLt(vector
 
 	/** 策略2 三速度规划 关节速度与加速度限制的线速度 线加速度不约束**/
 	vector<SequenceInterpolator<double>::ptr> lt;
-	double sampledl = 0.01;
 	SMPlannerEx smPlanner;
 	vector<double> maxSpeed;
 	for (int i=0; i<(int)_task.size(); i++)
 	{
 		double L = trajectoryIpr[i]->duration();
-		int count = L/sampledl + 1;
+		int count = L/_dl + 1;
+		count = (count < _countMin)? _countMin : count;
 		double tempMaxSpeed = trajectoryIpr[i]->getMaxSpeed(count, _dqLim, _ddqLim, _velocity[i]);
 		if (tempMaxSpeed <= 0)
 			throw(string("错误<MulriLineArcBlendPlanner>: 第") + to_string(i + 1) + string("段限制速度为0"));
@@ -367,6 +367,11 @@ vector<SequenceInterpolator<double>::ptr> MultiLineArcBlendPlanner::getLt(vector
 	return lt;
 }
 
+void MultiLineArcBlendPlanner::doQuery()
+{
+	query();
+}
+
 bool MultiLineArcBlendPlanner::stop(double t, Interpolator<Q>::ptr& stopIpr)
 {
 	if (_mLABTrajectory.get() == NULL)
@@ -419,7 +424,7 @@ bool MultiLineArcBlendPlanner::stop(double t, Interpolator<Q>::ptr& stopIpr)
 	return true;
 }
 
-void MultiLineArcBlendPlanner::resume(const Q qStart)
+void MultiLineArcBlendPlanner::resume()
 {
 	query();
 }

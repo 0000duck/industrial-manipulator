@@ -181,10 +181,15 @@ Quaternion::rotVar Quaternion::getRotationVariables() const
 	Quaternion::rotVar var;
 	var.theta = theta;
 	if (fabs(st) > 1e-16)
+	{
 		var.n = Vector3D<double>(_i/st, _j/st, _k/st);
-	else
-		throw("转向有多义性");
-	var.n.doNormalize();
+		var.n.doNormalize();
+	}
+	else //不旋转
+	{
+		theta = 0;
+		var.n = Vector3D<double>(0, 0, 0);
+	}
 	return var;
 }
 

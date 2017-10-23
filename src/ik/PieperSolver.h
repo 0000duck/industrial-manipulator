@@ -88,6 +88,9 @@ public:
      * @retval flase 失败
      */
     bool isValid() const;
+
+    inline robot::model::SerialLink::ptr getRobot(){ return _serialRobot;}
+
 	virtual ~PieperSolver();
 private:
 	/**
@@ -116,6 +119,8 @@ private:
     mutable double alpha3, a3, calpha3, salpha3, d4;
     mutable double alpha4, a4, calpha4, salpha4, d5;
     mutable double alpha5, a5, calpha5, salpha5, d6;
+
+    robot::model::SerialLink::ptr _serialRobot;
 };
 
 /** @} */

@@ -132,6 +132,9 @@ public:
 	 * 对于腕部, 返回的是wpositive或wnegtive
 	 */
 	robot::model::Config getConfig(const robot::math::Q& q) const;
+
+	inline robot::model::SerialLink::ptr getRobot(){ return _serialLink;}
+
 	virtual ~SiasunSR4CSolver();
 private:
     double _alpha1, _a1, _calpha1, _salpha1, _d1;

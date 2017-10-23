@@ -11,6 +11,7 @@
 # include "../math/Q.h"
 # include "../math/HTransform3D.h"
 # include "../model/Config.h"
+# include "../model/SerialLink.h"
 
 using namespace robot::math;
 
@@ -27,9 +28,10 @@ namespace ik {
  */
 class IKSolver {
 public:
-	IKSolver(){}
+	IKSolver() {}
 	virtual std::vector<Q> solve(const HTransform3D<>& baseTend, const model::Config& config) const = 0;
-	virtual robot::model::Config getConfig(const robot::math::Q& q) const {return robot::model::Config();};
+	virtual robot::model::Config getConfig(const robot::math::Q& q) const = 0;
+	virtual robot::model::SerialLink::ptr getRobot() = 0;
 	virtual ~IKSolver();
 };
 

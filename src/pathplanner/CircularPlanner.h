@@ -53,8 +53,8 @@ public:
 	 */
 	CircularPlanner(Q dqLim, Q ddqLim,
 			double vMaxLine, double aMaxLine, double hLine,
-			std::shared_ptr<robot::ik::IKSolver> ikSolver, robot::model::SerialLink::ptr serialLink,
-			const Q qIntermediate, const Q qEnd);
+			std::shared_ptr<robot::ik::IKSolver> ikSolver,
+			const Q qStart, const Q qIntermediate, const Q qEnd);
 
 	/**
 	 * @brief 询问路径
@@ -65,10 +65,11 @@ public:
 	 * @param accRatio [in] 加速度占最大加速度的比例
 	 * @return
 	 */
-	CircularTrajectory::ptr query(const Q qStart);
+	CircularTrajectory::ptr query();
 
+	void doQuery();
 	bool stop(double t, Interpolator<Q>::ptr& stopIpr);
-	void resume(const Q qStart); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
+	void resume(); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
 	bool isTrajectoryExist() const;
 	Interpolator<Q>::ptr getQTrajectory() const;
 
@@ -86,6 +87,9 @@ private:
 	/** @brief 逆解器 */
 	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
 
+    /** @brief 机器人的模型 */
+    robot::model::SerialLink::ptr _serialLink;
+
 	/** @brief 关节下限 */
 	Q _qMin;
 
@@ -101,16 +105,21 @@ private:
 	/** @brief 关节个数 */
 	int _size;
 
-    /** @brief 机器人的模型 */
-    robot::model::SerialLink::ptr _serialLink;
+    Q _qStop;
 
     Q _qIntermediate;
+
     Q _qEnd;
-    Q _qStop;
 
     robot::model::Config _config;
 
     CircularTrajectory::ptr _circularTrajectory;
+
+	/** @brief 采样精度 */
+	const double _dl = 0.1;
+
+	/** @brief 最少采样点数 */
+	const double _countMin = 8;
 };
 
 /** @} */
