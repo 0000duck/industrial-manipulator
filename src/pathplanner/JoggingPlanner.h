@@ -26,16 +26,18 @@ public:
 
 	Planner::ptr jogZ(Q current, Q &farEnd, bool isPositive, Rotation3D<double> rot=Rotation3D<double>());
 
-	Planner::ptr jogRX(Q current);
+	Planner::ptr jogRX(Q current, Q &farEnd, bool isPositive, Rotation3D<double> rot=Rotation3D<double>());
 
-	Planner::ptr jogRY(Q current);
+	Planner::ptr jogRY(Q current, Q &farEnd, bool isPositive, Rotation3D<double> rot=Rotation3D<double>());
 
-	Planner::ptr jogRZ(Q current);
+	Planner::ptr jogRZ(Q current, Q &farEnd, bool isPositive, Rotation3D<double> rot=Rotation3D<double>());
 
 	virtual ~JoggingPlanner();
 
 private:
 	Planner::ptr planLine(Q current, Q &farEnd, Vector3D<double> direction);
+
+	Planner::ptr planRotation(Q current, Q &farEnd, Vector3D<double> direction);
 private:
 	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
 

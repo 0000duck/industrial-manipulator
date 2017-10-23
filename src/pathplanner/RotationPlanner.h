@@ -20,7 +20,7 @@ namespace pathplanner {
 /**
  * @brief 纯旋转运动规划器
  */
-class RotationPlanner {
+class RotationPlanner : public Planner{
 public:
 	RotationPlanner(Q dqLim, Q ddqLim,
 			double vMaxRot, double aMaxRot, double hRot,
