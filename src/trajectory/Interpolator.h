@@ -385,6 +385,8 @@ private:
 template <class T>
 class FixedInterpolator: public Interpolator<T>{
 public:
+	using ptr = std::shared_ptr<FixedInterpolator>;
+
 	/**
 	 * @brief 构造函数
 	 * @param constant [in] 固定返回的常量
