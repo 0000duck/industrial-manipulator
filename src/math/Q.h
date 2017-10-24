@@ -285,6 +285,15 @@ public:
 	 * @return 返回一个长度为size, 数字全为0的数组.
 	 */
 	static Q zero(int size);
+
+	/**
+	 * @brief 返回两个数组的距离(二次范数)
+	 * @param q1 [in] 第一个数组
+	 * @param q2 [in] 第二个数组
+	 * @param size [in] 维数
+	 * @return
+	 */
+	static double distance(const Q& q1, const Q& q2, int size);
 private:
 	/**
 	 * @brief 数组大小

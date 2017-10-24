@@ -205,7 +205,11 @@ void motionstacktest()
     s_in.sin_port = htons(port);//change port to netchar
     l_fd = socket(AF_INET,SOCK_STREAM,0);//socket(int domain, int type, int protocol)
     bind(l_fd,(struct sockaddr *)&s_in,sizeof(s_in));
-    listen(l_fd,10);//lisiening start
+    if (listen(l_fd,10) < 0)//lisiening start
+    {
+    	cout << "建立TCP服务失败, 终止程序\n";
+    	return;
+    }
     cout<<"tcp begin"<<endl;
     if (!realtime)
     	cout << "尝试连接, 请运行Matlab tcpiptest中的第一节程序进行连接" << endl;

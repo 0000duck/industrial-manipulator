@@ -136,6 +136,10 @@ public:
 	inline robot::model::SerialLink::ptr getRobot(){ return _serialLink;}
 
 	virtual ~SiasunSR4CSolver();
+
+public:
+	static Q select(const std::vector<Q>& result, const Q& current);
+
 private:
     double _alpha1, _a1, _calpha1, _salpha1, _d1;
     double _alpha2, _a2, _calpha2, _salpha2, _d2;

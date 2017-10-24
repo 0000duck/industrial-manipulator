@@ -334,5 +334,19 @@ void Q::print() const
 Q::~Q() {
 }
 
+double Q::distance(const Q& q1, const Q& q2, int size)
+{
+	if (size <= 0)
+		throw("错误<Q::distance>: 维数须大于0");
+	if (q1.size() < size)
+		throw("错误<Q::distance>: q1的长度小于维数");
+	if (q2.size() < size)
+		throw("错误<Q::distance>: q2的长度小于维数");
+	double sum = 0;
+	for (int i=0; i<size; i++)
+		sum += pow(q1[i] - q2[i], 2);
+	return sqrt(sum);
+}
+
 } /* namespace math */
 } /* namespace robot */

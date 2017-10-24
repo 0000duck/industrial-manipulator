@@ -407,5 +407,19 @@ SiasunSR4CSolver::~SiasunSR4CSolver() {
 
 }
 
+Q SiasunSR4CSolver::select(const std::vector<Q>& result, const Q& current)
+{
+	if ((int)result.size() <= 0)
+		throw("错误<SiasunSR4CSolver::select>: 没有可选择的解!");
+	int index = 0;
+	double distance = Q::distance(result[0], current, 6);
+	for (int i=1; i<(int)result.size(); i++)
+	{
+		if (Q::distance(result[i], current, 6) < distance)
+			index = i;
+	}
+	return result[index];
+}
+
 } /* namespace ik */
 } /* namespace robot */
