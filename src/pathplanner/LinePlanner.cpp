@@ -139,7 +139,8 @@ Q LinePlanner::findReachableEnd(Q start, Vector3D<double> direction, std::shared
 	do{
 		pos += direction; //下一个位置
 		try{
-			end = ikSolver->solve(HTransform3D<double>(pos, rot), config)[0];
+			vector<Q> result = ikSolver->solve(HTransform3D<double>(pos, rot), config);
+			end = result[0];
 		}
 		catch(char const*)
 		{

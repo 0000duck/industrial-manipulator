@@ -14,7 +14,8 @@ Trajectory::Trajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpol
 		std::shared_ptr<robot::ik::IKSolver> iksolver,
 		robot::model::Config config): ikInterpolator(origin, iksolver, config)
 {
-
+	if (origin.first->duration() <= 0 || origin.second->duration() <= 0)
+		throw("错误<Trajectory>: 构造的插补器周期不能小于0!");
 }
 
 

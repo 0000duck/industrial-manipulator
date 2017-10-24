@@ -19,16 +19,22 @@ RotationInterpolator::RotationInterpolator(Rotation3D<double>& start, Vector3D<d
   _rad(rad)
 {
 	if (n == Vector3D<double>())
-		throw("错误<RotationInterpolator>: 旋转向量不能为0向量!");
+		rad = 0;
 	else
 		_n.doNormalize();
 
 	if (duration == 0)
-		_duration = rad;
+	{
+		if (rad != 0)
+			_duration = rad;
+		else
+			_duration = 0.001;
+	}
 	else if (duration < 0)
 		throw("错误<RotationInterpolator>: 时长不能为负数!");
 	else
 		_duration = duration;
+
 }
 
 Rotation3D<double> RotationInterpolator::x(double t) const

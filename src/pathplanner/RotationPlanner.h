@@ -25,7 +25,7 @@ public:
 	RotationPlanner(Q dqLim, Q ddqLim,
 			double vMaxRot, double aMaxRot, double hRot,
 			std::shared_ptr<robot::ik::IKSolver> ikSolver,
-			Q start, Q qEnd);
+			Q start, Vector3D<double> n, double theta);
 
 	LineTrajectory::ptr query();
 
@@ -36,7 +36,7 @@ public:
 	Interpolator<Q>::ptr getQTrajectory() const;
 	virtual ~RotationPlanner();
 public:
-	static Q findReachableEnd(Q start, Vector3D<double> n, std::shared_ptr<robot::ik::IKSolver> ikSolver, double da=0.1);
+	static double findReachableTheta(Q start, Vector3D<double> n, std::shared_ptr<robot::ik::IKSolver> ikSolver, double da=0.1);
 private:
 	/** @brief 关节最大速度 */
 	Q _dqLim;
@@ -62,8 +62,10 @@ private:
 	/** @brief 关节个数 */
 	int _size;
 
-	/**> 记录的目标终点 */
-    Q _qEnd;
+	Vector3D<double> _n;
+
+	/**> 需要旋转的角度, 暂停后需要重置 */
+	double _theta;
 
     /**> 记录的停止点, 用于恢复运动时检查启动点的位置正不正确 */
     Q _qStop;

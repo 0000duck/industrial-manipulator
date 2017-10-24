@@ -52,7 +52,7 @@ Planner::ptr JoggingPlanner::jogZ(Q current, Q &farEnd, bool isPositive, Rotatio
 	return planLine(current, farEnd, direction);
 }
 
-Planner::ptr JoggingPlanner::jogRX(Q current, Q &farEnd, bool isPositive, Rotation3D<double> rot)
+Planner::ptr JoggingPlanner::jogRX(Q current, Q &farEnd, bool isPositive, Rotation3D<double> rot) //末端的位置由机器人模型指定
 {
 	Vector3D<double> direction(1, 0, 0);
 	if (!isPositive)
@@ -88,10 +88,11 @@ JoggingPlanner::~JoggingPlanner()
 
 Planner::ptr JoggingPlanner::planLine(Q current, Q &farEnd, Vector3D<double> direction)
 {
-	farEnd = LinePlanner::findReachableEnd(current, direction, _ikSolver); //默认采样长度
-	auto planner = std::make_shared<LinePlanner>(_dqLim, _ddqLim, _vLine, _aLine, _jLine, _ikSolver, current, farEnd); //返回的是已近做好规划的规划器, 可以直接添加到运动堆栈里面
+	Q end = LinePlanner::findReachableEnd(current, direction, _ikSolver); //默认采样长度
+	auto planner = std::make_shared<LinePlanner>(_dqLim, _ddqLim, _vLine, _aLine, _jLine, _ikSolver, current, end); //返回的是已近做好规划的规划器, 可以直接添加到运动堆栈里面
 	try{
 		planner->query();
+		farEnd = planner->getQTrajectory()->end();
 	}
 	catch(std::string& msg)
 	{
@@ -102,10 +103,11 @@ Planner::ptr JoggingPlanner::planLine(Q current, Q &farEnd, Vector3D<double> dir
 
 Planner::ptr JoggingPlanner::planRotation(Q current, Q &farEnd, Vector3D<double> direction)
 {
-	farEnd = RotationPlanner::findReachableEnd(current, direction, _ikSolver); //默认采样长度
-	auto planner = std::make_shared<RotationPlanner>(_dqLim, _ddqLim, _vLine, _aLine, _jLine, _ikSolver, current, farEnd); //返回的是已近做好规划的规划器, 可以直接添加到运动堆栈里面
+	double theta = RotationPlanner::findReachableTheta(current, direction, _ikSolver); //默认采样长度
+	auto planner = std::make_shared<RotationPlanner>(_dqLim, _ddqLim, _vAngle, _aAngle, _jAngle, _ikSolver, current, direction, theta); //返回的是已近做好规划的规划器, 可以直接添加到运动堆栈里面
 	try{
 		planner->query();
+		farEnd = planner->getQTrajectory()->end();
 	}
 	catch(std::string& msg)
 	{
