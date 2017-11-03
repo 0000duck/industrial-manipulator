@@ -403,6 +403,27 @@ Config SiasunSR4CSolver::getConfig(const robot::math::Q& q) const
 	return Config(shoulder, elbow, wrist);
 }
 
+int SiasunSR4CSolver::singularJudge(const robot::math::Q& q) const
+{
+	int result = 0;
+	SerialLink::ptr robot = _serialLink;
+	HTransform3D<double> j4Tran = _serialLink->getTransform(0, 5, q);
+    double x = j4Tran.getPosition()(0);
+    double y = j4Tran.getPosition()(1);
+    double r = sqrt(x*x + y*y);
+    if (fabs(r) < 0.1)
+    	result += 4;
+    double j3 = q[2] + atan(_d4/_a4);
+    j3 = common::fixAngle(j3);
+    if (fabs(j3) < 0.1)
+    	result += 2;
+    double j5 = q[4];
+    j5 = common::fixAngle(j5);
+    if (fabs(j5) < 0.1)
+    	result += 1;
+    return result;
+}
+
 SiasunSR4CSolver::~SiasunSR4CSolver() {
 
 }

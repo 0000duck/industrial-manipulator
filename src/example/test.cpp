@@ -57,6 +57,7 @@
 # include "mlabplanner/mlabplannertest.h"
 # include "motionstack/motionstacktest.h"
 # include <functional>
+# include <map>
 
 using namespace robot::math;
 using namespace robot::kinematic;
@@ -180,7 +181,10 @@ int main(){
 
 //	mlabplannertest();
 
-	motionstacktest();
+//	motionstacktest();
+
+	string test = "abcd";
+	cout << test.substr(1, 3);
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

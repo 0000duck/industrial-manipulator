@@ -221,7 +221,7 @@ void motionstacktest()
 
 	t0 = getUTime();
 
-	Q start = Q::zero(6);
+	Q start = Q(0, 0, 0, 0, 0, 0);
 	Q intermediate = Q(0.7, 0, 0, 0, -0.7, 0);
 	Q end =  Q(1.5, 0, 0, 0, -1.5, 0);
 	vector<Q> qPath = {intermediate, end};
@@ -234,15 +234,13 @@ void motionstacktest()
 	State state;
 	int status = StatusStop;
 
-	Q temp;
-//	addJog(motionStack.get(), start, temp, "y");
-//	start = temp;
-//	addJog(motionStack.get(), start, temp, "-y");
+	addJog(motionStack.get(), start, start, "ry");
+	addJog(motionStack.get(), start, start, "-ry");
 
-	addJog(motionStack.get(), start, temp, "-x"); //逆x轴直线示教到最远端
-	TaskStack taskStack(motionStack, temp, dqLim, ddqLim, vMax, aMax, h, solver); //以最远端为初始点建立一个任务栈
-	taskStack.addLine(start, 1.0, 1.0); //添加直线, 运动回初始位置
-	taskStack.addMLAB(qPath, arcRatio, velocity, acceleration, jerk); //添加连续轨迹
+//	addJog(motionStack.get(), start, temp, "-x"); //逆x轴直线示教到最远端
+//	TaskStack taskStack(motionStack, temp, dqLim, ddqLim, vMax, aMax, h, solver); //以最远端为初始点建立一个任务栈
+//	taskStack.addLine(start, 1.0, 1.0); //添加直线, 运动回初始位置
+//	taskStack.addMLAB(qPath, arcRatio, velocity, acceleration, jerk); //添加连续轨迹
 
 	/**
 	 * 以下为运动堆栈发送测试代码;
@@ -319,7 +317,7 @@ void motionstacktest()
 		int datasize = 360;
 		for (int i=0; i<(int)vxpath.size(); i++)
 		{
-			cout << i << "/" << (int)vxpath.size() << endl;
+			cout << i + 1 << "/" << (int)vxpath.size() << endl;
 			Q x = vxpath[i];
 			Q dx = vdxpath[i];
 			Q ddx = vddxpath[i];

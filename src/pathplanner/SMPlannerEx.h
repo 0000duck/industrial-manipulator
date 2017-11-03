@@ -87,6 +87,15 @@ public:
 			double &realV2,
 			double &realV3) const;
 
+	/**
+	 * @brief 暂停规划
+	 * @param s0
+	 * @param v0
+	 * @param a0
+	 * @param h
+	 * @param aMax
+	 * @return
+	 */
 	robot::trajectory::SequenceInterpolator<double>::ptr query_stop(double s0, double v0, double a0, double h, double aMax);
 
 	/**

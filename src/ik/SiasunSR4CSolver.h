@@ -133,7 +133,20 @@ public:
 	 */
 	robot::model::Config getConfig(const robot::math::Q& q) const;
 
+	/**
+	 * @brief 获取机器人模型指针
+	 * @return 机器人模型指针
+	 */
 	inline robot::model::SerialLink::ptr getRobot(){ return _serialLink;}
+
+	/**
+	 * @brief 判断奇异
+	 * @param q [in] 关节角度
+	 * @retval 0 无奇异
+	 * @retval 1~7 有奇异. 返回值用二进制表示, 最高位表示肩部的奇异, 中间为表示肘部的奇异
+	 * 最低位表示腕部的奇异. 例如, 7(111)表示三部位均出现奇异; 4(100)表示只有肩部出现奇异.
+	 */
+	int singularJudge(const robot::math::Q& q) const;
 
 	virtual ~SiasunSR4CSolver();
 
