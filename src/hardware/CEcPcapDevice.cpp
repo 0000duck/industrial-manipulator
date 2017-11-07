@@ -37,7 +37,7 @@ int CEcPcapDevice::Opendev(){
 	    return 1;
 	  }
 	  /* open a device*/
-	  device = pcap_open_live(devStr, 1518, 1, 1, errBuf);//超时时间1ms
+	  device = pcap_open_live(devStr, 1518, 1, 1, errBuf);//最大捕获1518Byte; 捕获所有地址; 超时时间1ms
 
 	  if(!device)
 	  {
@@ -50,12 +50,13 @@ int CEcPcapDevice::Opendev(){
 	  //char filter_app[]="ether src 56:EE:75:42:AE:3F";
 	  char filter_app[]="not ether src 54:EE:75:42:AE:3F and ether proto 0x88a4";
 	 // char filter_app[]="ether proto 0x88a4";
-	  pcap_compile(device, &filter, filter_app, 1, 0);
+	  pcap_compile(device, &filter, filter_app, 1, 0); //;;;optimize;netmask
 	  pcap_setfilter(device, &filter);
 	  return 0;
 }
 
 int CEcPcapDevice::CyclReceiver(int cnt){
+	/** 改为负数? */
 	  int id = 0;
 	  //struct pcap_pkthdr * pkthdr;
 	  //u_char * packet;//=(u_char*)malloc(ETHERNET_MAX_FRAME_LEN);
@@ -82,6 +83,7 @@ int CEcPcapDevice::Receiver(){
 		 /*struct timeval tv;
 		gettimeofday(&tv,NULL);
 		printf("pcaptime1:%u:%u\n",tv.tv_sec,tv.tv_usec);*/
+	  /** 只抓一个数据包 */
 	  int erro=pcap_loop(device, 1,PcapCallBack, (u_char*)this);
 		/*gettimeofday(&tv,NULL);
 		printf("pcaptime2:%u:%u\n",tv.tv_sec,tv.tv_usec);*/

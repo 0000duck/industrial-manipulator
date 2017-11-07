@@ -184,7 +184,7 @@ int main(){
 //	motionstacktest();
 
 	string test = "abcd";
-	cout << test.substr(1, 3);
+	cout << sizeof((short)8);
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

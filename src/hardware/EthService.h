@@ -58,7 +58,7 @@ using namespace std;
 //#include "global.h"
 
 
-#define 	ETHERNET_MAX_FRAME_LEN 1514
+#define 	ETHERNET_MAX_FRAME_LEN 1514 /** 加入FCS后的最大长度是1518 */
 #define 	ETHERNET_FRAME_TYPE_ECAT 0x88A4
 #define 	PDO_CYCL_TIME 2000
 #define 	PDO_CYCL_TIME_NS 2000000
