@@ -86,44 +86,35 @@ public:
 
 	T x(double t) const
 	{
-		int i=0;
-		for (; i<(int)_interpolatorSequence.size(); i++)
-		{
-			if (_timeSequence[i] > t)
-				break;
-		}
-		if (i >= (int)_interpolatorSequence.size())
-			i--;
-		double interpolatorT = t - ((i == 0)? 0:_timeSequence[i - 1]);
-		return _interpolatorSequence[i]->x(interpolatorT);
+		if (_timeSequence.empty())
+			throw("错误<SequenceInterpolator>: 插补器时间序列为空!");
+		auto it = upper_bound(_timeSequence.begin(), _timeSequence.end(), t);
+		if (it == _timeSequence.end()) it--;
+		int idx = it - _timeSequence.begin();
+		return (it == _timeSequence.begin())? _interpolatorSequence[0]->x(t):
+				_interpolatorSequence[idx]->x(t - _timeSequence[idx - 1]);
 	}
 
 	T dx(double t) const
 	{
-		int i=0;
-		for (; i<(int)_interpolatorSequence.size(); i++)
-		{
-			if (_timeSequence[i] > t)
-				break;
-		}
-		if (i >= (int)_interpolatorSequence.size())
-			i--;
-		double interpolatorT = t - ((i == 0)? 0:_timeSequence[i - 1]);
-		return _interpolatorSequence[i]->dx(interpolatorT);
+		if (_timeSequence.empty())
+			throw("错误<SequenceInterpolator>: 插补器时间序列为空!");
+		auto it = upper_bound(_timeSequence.begin(), _timeSequence.end(), t);
+		if (it == _timeSequence.end()) it--;
+		int idx = it - _timeSequence.begin();
+		return (it == _timeSequence.begin())? _interpolatorSequence[0]->dx(t):
+				_interpolatorSequence[idx]->dx(t - _timeSequence[idx - 1]);
 	}
 
 	T ddx(double t) const
 	{
-		int i=0;
-		for (; i<(int)_interpolatorSequence.size(); i++)
-		{
-			if (_timeSequence[i] > t)
-				break;
-		}
-		if (i >= (int)_interpolatorSequence.size())
-			i--;
-		double interpolatorT = t - ((i == 0)? 0:_timeSequence[i - 1]);
-		return _interpolatorSequence[i]->ddx(interpolatorT);
+		if (_timeSequence.empty())
+			throw("错误<SequenceInterpolator>: 插补器时间序列为空!");
+		auto it = upper_bound(_timeSequence.begin(), _timeSequence.end(), t);
+		if (it == _timeSequence.end()) it--;
+		int idx = it - _timeSequence.begin();
+		return (it == _timeSequence.begin())? _interpolatorSequence[0]->ddx(t):
+				_interpolatorSequence[idx]->ddx(t - _timeSequence[idx - 1]);
 	}
 
 	double duration() const
