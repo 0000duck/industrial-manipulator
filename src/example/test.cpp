@@ -181,10 +181,7 @@ int main(){
 
 //	mlabplannertest();
 
-//	motionstacktest();
-
-	string test = "abcd";
-	cout << sizeof((short)8);
+	motionstacktest();
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

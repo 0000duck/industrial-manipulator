@@ -300,8 +300,8 @@ bool SiasunSR4CSolver::isShoulderValid(const robot::math::Q& q, const model::Con
 {
 	if ((int)q.size() < 6)
 		throw("错误<SiasunSR4CSolver::getconfig>: 关节角的长度不够!");
-	double j2 = q[1];
-	double j3 = q[2];
+	double j2 = q[1] + _dHTable[1].theta();
+	double j3 = q[2] + _dHTable[2].theta();
 	double r = _a2 + _a3*cos(j2) + _a4*cos(j2 + j3) - _d4*sin(j2 + j3);
 	return isShoulderValid(r, config);
 }
@@ -333,10 +333,10 @@ bool SiasunSR4CSolver::isElbowValid(const robot::math::Q& q, const model::Config
 {
 	if ((int)q.size() < 6)
 		throw("错误<SiasunSR4CSolver::getconfig>: 关节角的长度不够!");
-	return isElbowValid(q[2], config);
+	return isElbowValid(q[2] + _dHTable[2].theta(), config);
 }
 
-bool SiasunSR4CSolver::isElbowValid(const double j3, const model::Config& config) const
+bool SiasunSR4CSolver::isElbowValid(const double j3, const model::Config& config) const //内部角
 {
 	double fixedJ3 = j3 + atan(_d4/_a4);
 	fixedJ3 = common::fixAngle(fixedJ3);
@@ -364,7 +364,7 @@ bool SiasunSR4CSolver::isWristValid(const robot::math::Q& q, const model::Config
 {
 	if ((int)q.size() < 6)
 		throw("错误<SiasunSR4CSolver::getconfig>: 关节角的长度不够!");
-	return isWristValid(q[4], config);
+	return isWristValid(q[4] + _dHTable[4].theta(), config);
 }
 
 bool SiasunSR4CSolver::isWristValid(const double j5, const model::Config& config) const
@@ -413,11 +413,11 @@ int SiasunSR4CSolver::singularJudge(const robot::math::Q& q) const
     double r = sqrt(x*x + y*y);
     if (fabs(r) < 0.1)
     	result += 4;
-    double j3 = q[2] + atan(_d4/_a4);
+    double j3 = q[2] + _dHTable[2].theta() + atan(_d4/_a4);
     j3 = common::fixAngle(j3);
     if (fabs(j3) < 0.1)
     	result += 2;
-    double j5 = q[4];
+    double j5 = q[4] + _dHTable[4].theta();
     j5 = common::fixAngle(j5);
     if (fabs(j5) < 0.1)
     	result += 1;

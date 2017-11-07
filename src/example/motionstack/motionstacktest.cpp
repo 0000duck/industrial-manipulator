@@ -51,12 +51,6 @@ typedef enum{
 robot::parse::RobotXMLParser modelParser;
 SerialLink::ptr robotModel = modelParser.parse("src/example/modelData/siasun6.xml");
 
-/**> 设置工具(可选) */
-HTransform3D<double> tran = HTransform3D<double>(Vector3D<double>(0, 0, 0.2), Rotation3D<double>());
-Frame tool = Frame(tran);
-//	robot.setTool(&tool);
-//	solver->init();
-
 /**> 逆解器 */
 std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robotModel));
 
@@ -198,6 +192,12 @@ void move(MotionStack *motionStack, int *status, State *state)
 
 void motionstacktest()
 {
+	/**> 设置工具(可选) */
+	HTransform3D<double> tran = HTransform3D<double>(Vector3D<double>(0, 0, 0.5), Rotation3D<double>());
+	Frame tool = Frame(tran);
+	robotModel->setTool(&tool);
+	solver->init();
+
     memset((void *)&s_in,0,sizeof(s_in));
     //bzero((void *)&s_in,sizeof(s_in));
     s_in.sin_family = AF_INET;//IPV4 communication domain
@@ -234,8 +234,8 @@ void motionstacktest()
 	State state;
 	int status = StatusStop;
 
-	addJog(motionStack.get(), start, start, "ry");
-	addJog(motionStack.get(), start, start, "-ry");
+	addJog(motionStack.get(), start, start, "x");
+	addJog(motionStack.get(), start, start, "-x");
 
 //	addJog(motionStack.get(), start, temp, "-x"); //逆x轴直线示教到最远端
 //	TaskStack taskStack(motionStack, temp, dqLim, ddqLim, vMax, aMax, h, solver); //以最远端为初始点建立一个任务栈

@@ -114,12 +114,19 @@ double RotationPlanner::findReachableTheta(Q start, Vector3D<double> n, std::sha
 	const Rotation3D<double> startRot = startTran.getRotation();
 	double theta = 0;
 	const double thetaMax = 2*M_PI; //限制一次最多旋转一圈
+	Q result; //用来保存结果,做奇异点检查
 	do{
-		theta += da; //下一个位置
+		theta += da; //下一个位置 ////////////////////
 		if (theta > thetaMax)
 			break;
 		try{
-			ikSolver->solve(HTransform3D<double>(pos, startRot*(Quaternion(theta, n)).toRotation3D()), config);
+			result = ikSolver->solve(HTransform3D<double>(pos, startRot*(Quaternion(theta, n)).toRotation3D()), config)[0];
+			int singular;
+			if ((singular = ikSolver->singularJudge(result)) != 0)
+			{
+				printf("奇异点: %02X\n", singular);
+				break;
+			}
 		}
 		catch(char const*)
 		{

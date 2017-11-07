@@ -102,7 +102,7 @@ public:
 	 * @param ikSolver
 	 * @return
 	 */
-	static Q findReachableEnd(Q start, Vector3D<double> direction, std::shared_ptr<robot::ik::IKSolver> ikSolver, double dl=0.02);
+	static Q findReachableEnd(Q start, Vector3D<double> direction, std::shared_ptr<robot::ik::IKSolver> ikSolver, double dl=0.01);
 
 private:
 	/** @brief 末端预定最大直线速度 */

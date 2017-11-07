@@ -36,7 +36,7 @@ public:
 	Interpolator<Q>::ptr getQTrajectory() const;
 	virtual ~RotationPlanner();
 public:
-	static double findReachableTheta(Q start, Vector3D<double> n, std::shared_ptr<robot::ik::IKSolver> ikSolver, double da=0.1);
+	static double findReachableTheta(Q start, Vector3D<double> n, std::shared_ptr<robot::ik::IKSolver> ikSolver, double da=0.05);
 private:
 	/** @brief 关节最大速度 */
 	Q _dqLim;

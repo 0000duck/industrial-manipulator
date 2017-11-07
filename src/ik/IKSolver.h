@@ -32,6 +32,7 @@ public:
 	virtual std::vector<Q> solve(const HTransform3D<>& baseTend, const model::Config& config) const = 0;
 	virtual robot::model::Config getConfig(const robot::math::Q& q) const = 0;
 	virtual robot::model::SerialLink::ptr getRobot() = 0;
+	virtual int singularJudge(const robot::math::Q& q) const = 0;
 	virtual ~IKSolver();
 };
 
