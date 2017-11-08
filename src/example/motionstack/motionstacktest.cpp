@@ -57,13 +57,13 @@ std::shared_ptr<SiasunSR4CSolver> solver(new SiasunSR4CSolver(robotModel));
 /**> 参数设定 */
 double vMax = 1.0;
 double aMax = 20.0;
-double h = 50;
+double h = 100;
 
 Q dqLim = Q(3, 3, 3, 3, 5, 5);
 Q ddqLim = Q(20, 20, 20, 20, 20, 20);
 
 /** Jogging 规划器 */
-JoggingPlanner jogPlanner = JoggingPlanner(solver, vector<double>{0.5, 10, 50, 1, 10, 100}, dqLim, ddqLim);
+JoggingPlanner jogPlanner = JoggingPlanner(solver, vector<double>{0.5, 10, 100, 1, 10, 100}, dqLim, ddqLim);
 
 /** 堆栈锁 */
 std::mutex motionStackMutex;
@@ -257,44 +257,44 @@ void motionstacktest()
 		}
 		std::thread normal_t(move, motionStack.get(), &status, &state);
 		normal_t.detach();
-		usleep(900000); //几秒后暂停
-		cout << "尝试暂停\n";
-		int result = motionStack->pause();
-		if (result != 0)
-			cout << "暂停不成功, 结果: " << result << endl;
-		else
-		{
-			cout << "暂停成功\n";
-			status = StatusPause;
-		}
+//		usleep(90000); //几秒后暂停
+//		cout << "尝试暂停\n";
+//		int result = motionStack->pause();
+//		if (result != 0)
+//			cout << "暂停不成功, 结果: " << result << endl;
+//		else
+//		{
+//			cout << "暂停成功\n";
+//			status = StatusPause;
+//		}
 		try{
-			while(status != StatusStop)
-			{
-				usleep(4000);
-			}
-			cout << "暂停结束, 等待一秒\n";
-			sleep(1);
-			cout << "恢复路径\n";
-			int result = motionStack->resume(*(vxpath.end() - 1));
-			if (result != 0)
-				cout << "恢复不成功, 结果: " << result << "\n";
-			if (result == 0)
-			{
-				int result = motionStack->start();
-				if (result == 0)
-				{
-					cout << "再启动成功\n";
-					status = StatusNormal;
-					std::thread normal_t(move, motionStack.get(), &status, &state);
-					normal_t.detach();
-				}
-				else
-				{
-					cout << "再启动失败, 清空堆栈\n";
-					motionStack->clear();
-					status = StatusStop;
-				}
-			}
+//			while(status != StatusStop)
+//			{
+//				usleep(4000);
+//			}
+//			cout << "暂停结束, 等待一秒\n";
+//			sleep(1);
+//			cout << "恢复路径\n";
+//			int result = motionStack->resume(*(vxpath.end() - 1));
+//			if (result != 0)
+//				cout << "恢复不成功, 结果: " << result << "\n";
+//			if (result == 0)
+//			{
+//				int result = motionStack->start();
+//				if (result == 0)
+//				{
+//					cout << "再启动成功\n";
+//					status = StatusNormal;
+//					std::thread normal_t(move, motionStack.get(), &status, &state);
+//					normal_t.detach();
+//				}
+//				else
+//				{
+//					cout << "再启动失败, 清空堆栈\n";
+//					motionStack->clear();
+//					status = StatusStop;
+//				}
+//			}
 			while(status != StatusStop)
 			{
 				usleep(4000);

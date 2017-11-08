@@ -97,7 +97,7 @@ public:
 	double getMaxSpeed(const int count, Q dqMax, double v, double precision=0.00001);
 
 	/**
-	 * @brief dqMax约束下获取沿路径的最大速度
+	 * @brief dqMax和ddqMax约束下获取沿路径的最大速度
 	 * @param count [in] 采样的点数
 	 * @param dqMax [in] 各关节的限制最大速度
 	 * @param ddqMax [in] 各关节的限制最大加速度
@@ -106,6 +106,8 @@ public:
 	 * @return 在dqMax和ddqMax的约束下, 在整条路径上沿着路径允许的最大速度
 	 */
 	double getMaxSpeed(const int count, Q dqMax, Q ddqMax, double v, double precision=0.00001);
+
+	vector<double> sampleMaxSpeed(const int count, Q dqMax, Q ddqMax, double v, double precision=0.00001);
 	virtual ~Trajectory(){}
 protected:
 	const double _samplel = 0.01;

@@ -19,24 +19,48 @@ Trajectory::Trajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpol
 }
 
 
+//Trajectory::qVelAcc Trajectory::sampleVelAcc(const int count, double precision)
+//{
+//	vector<Q> dq;
+//	vector<Q> ddq;
+//	double L = this->duration();
+//	double dl = L/(double)(count - 1);
+//	Q tempQ1 = _ikSolver->solve(HTransform3D<double>(_posInterpolator->x(0), _rotInterpolator->x(0)), _config)[0];
+//	Q tempQ2 = Q::zero(tempQ1.size());
+//	Q tempQ3 = Q::zero(tempQ1.size());
+//	for (double l=0; l<=L; l+=dl)
+//	{
+//		Q tempQ1 = _ikSolver->solve(HTransform3D<double>(_posInterpolator->x(l), _rotInterpolator->x(l)), _config)[0];
+//		Q tempQ2 = _ikSolver->solve(HTransform3D<double>(_posInterpolator->x(l + precision), _rotInterpolator->x(l + precision)), _config)[0];
+//		Q tempQ3 = _ikSolver->solve(HTransform3D<double>(_posInterpolator->x(l + precision*2), _rotInterpolator->x(l + precision*2)), _config)[0];
+//		dq.push_back((tempQ2 - tempQ1)/precision);
+//		ddq.push_back((tempQ3 - tempQ2*2 + tempQ1)/(precision*precision));
+//	}
+//	qVelAcc result;
+//	result.dq = dq;
+//	result.ddq = ddq;
+//	return result;
+//}
+
 Trajectory::qVelAcc Trajectory::sampleVelAcc(const int count, double precision)
 {
+	Q lastQ;
 	vector<Q> dq;
 	vector<Q> ddq;
 	double L = this->duration();
 	double dl = L/(double)(count - 1);
-	Q tempQ1 = _ikSolver->solve(HTransform3D<double>(_posInterpolator->x(0), _rotInterpolator->x(0)), _config)[0];
-	Q tempQ2 = Q::zero(tempQ1.size());
-	Q tempQ3 = Q::zero(tempQ1.size());
-	for (double l=0; l<=L; l+=dl)
+	State state = this->getState(0);
+	lastQ = state.getAngle();
+	dq.push_back(state.getVelocity());
+	ddq.push_back(state.getAcceleration());
+	double l=dl; int i=1;
+	for (; i<count; i++, l+=dl)
 	{
-		Q tempQ1 = _ikSolver->solve(HTransform3D<double>(_posInterpolator->x(l), _rotInterpolator->x(l)), _config)[0];
-		Q tempQ2 = _ikSolver->solve(HTransform3D<double>(_posInterpolator->x(l + precision), _rotInterpolator->x(l + precision)), _config)[0];
-		Q tempQ3 = _ikSolver->solve(HTransform3D<double>(_posInterpolator->x(l + precision*2), _rotInterpolator->x(l + precision*2)), _config)[0];
-		dq.push_back((tempQ2 - tempQ1)/precision);
-		ddq.push_back((tempQ3 - tempQ2*2 + tempQ1)/(precision*precision));
+		state = this->getState(l, precision);
+		ddq.push_back(state.getAcceleration());
+		dq.push_back((state.getAngle() - lastQ)/dl); //用平均速度来代替瞬时速度
 	}
-	qVelAcc result;
+	struct qVelAcc result;
 	result.dq = dq;
 	result.ddq = ddq;
 	return result;
@@ -129,6 +153,34 @@ double Trajectory::getMaxSpeed(const int count, Q dqMax, Q ddqMax, double v, dou
 		maxSpeed = tempSpeed < maxSpeed ? tempSpeed:maxSpeed;
 	}
 	return maxSpeed;
+}
+
+vector<double> Trajectory::sampleMaxSpeed(const int count, Q dqMax, Q ddqMax, double v, double precision)
+{
+	Trajectory::qVelAcc velAcc = sampleVelAcc(count, precision);
+	vector<Q> dq = velAcc.dq;
+	vector<Q> ddq = velAcc.ddq;
+	for_each(dq.begin(), dq.end(), [](Q& q){q.abs();});
+	for_each(ddq.begin(), ddq.end(), [](Q& q){q.abs();});
+	double maxSpeed = v;
+	double tempSpeed = 0;
+	vector<double> result;
+	for (int i=0; i<(int)dq.size(); i++)
+	{
+		dq[i].print();
+		ddq[i].print();
+		tempSpeed = (dqMax/dq[i]).getMin();
+		println(tempSpeed);
+		maxSpeed = tempSpeed < maxSpeed ? tempSpeed:maxSpeed;
+		tempSpeed = sqrt((ddqMax/ddq[i]).getMin());
+		println(tempSpeed);
+		maxSpeed = tempSpeed < maxSpeed ? tempSpeed:maxSpeed;
+		println(maxSpeed);
+		result.push_back(maxSpeed);
+		println();
+		maxSpeed = v;
+	}
+	return result;
 }
 
 } /* namespace trajectory */
