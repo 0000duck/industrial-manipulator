@@ -145,7 +145,7 @@ private:
     LineTrajectory::ptr _lineTrajectory;
 
 	/** @brief 采样精度 */
-	const double _dl = 0.1;
+	const double _dl = 0.05; //设置过小会影响时间最优效率
 
 	/** @brief 最少采样点数 */
 	const double _countMin = 8;

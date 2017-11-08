@@ -22,6 +22,8 @@ public:
 	TimeOptimalPlanner();
 	virtual ~TimeOptimalPlanner();
 public:
+	static void optimizeVelocityRestriction(vector<double>& maxSpeed, double a, double h, double ds);
+
 	/**
 	 * @brief 时间最优s型规划
 	 * @param Vm [in] 获取最大速度限制的函数
@@ -34,6 +36,8 @@ public:
 	 * @return 时间最优的长度-时间插补器, 速度由最大速度限制函数Vm指定
 	 */
 	static SequenceInterpolator<double>::ptr getOptimalLt(std::function<double(double)>& Vm, double s, double ve, double a, double h, double ds);
+
+	static SequenceInterpolator<double>::ptr getOptimalLt(vector<double> optimizedMaxSpeed, double s, double ve, double a, double h, double ds);
 };
 
 } /* namespace pathplanner */

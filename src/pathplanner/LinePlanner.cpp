@@ -67,15 +67,23 @@ LineTrajectory::ptr LinePlanner::query()
 	count = (count < _countMin)? _countMin : count;
 
 	/** 最低速策略 */
-	double velocity = trajectory->getMaxSpeed(count, _dqLim, _ddqLim, assignedVelocity);
-	double acceleration = assignedAcceleration;
-	SmoothMotionPlanner smPlanner;
-	SequenceInterpolator<double>::ptr lt = smPlanner.query(Length, _h, acceleration, velocity, 0);
+//	double velocity = trajectory->getMaxSpeed(count, _dqLim, _ddqLim, assignedVelocity);
+//	double acceleration = assignedAcceleration;
+//	SmoothMotionPlanner smPlanner;
+//	SequenceInterpolator<double>::ptr lt = smPlanner.query(Length, _h, acceleration, velocity, 0);
 
 	/** 时间最优策略 */
-//	vector<double> maxSpeed = trajectory->sampleMaxSpeed(count, _dqLim, _ddqLim, assignedVelocity);
-//	vector<double> vl = robot::trajectory::Sampler<double>::linspace(0, Length, count);
-//	saveDoublePath(to_string(getUTime()).c_str(), maxSpeed, vl);
+	vector<double> maxSpeed = trajectory->sampleMaxSpeed(count, _dqLim, _ddqLim, assignedVelocity);
+//	for (int i=0; i<maxSpeed.size(); i++)
+//	{
+//		maxSpeed[i] -= fRand(0, 0.3);
+//		maxSpeed[i] = (maxSpeed[i] < 0.1)? 0.1:maxSpeed[i];
+//	}
+	vector<double> vl = robot::trajectory::Sampler<double>::linspace(0, Length, count);
+	saveDoublePath(to_string(getUTime()).c_str(), maxSpeed, vl);
+	TimeOptimalPlanner::optimizeVelocityRestriction(maxSpeed, assignedAcceleration, _h, Length/(count - 1));
+	saveDoublePath(to_string(getUTime()).c_str(), maxSpeed, vl);
+
 //	std::function<double(double)> getMaxSpeed = [&](double l){
 //		auto it = std::upper_bound(vl.begin(), vl.end(), l);
 //		if (it == vl.end()) it--;
@@ -84,12 +92,12 @@ LineTrajectory::ptr LinePlanner::query()
 ////		return (maxSpeed[idx] <= maxSpeed[idx - 1])? maxSpeed[idx]:maxSpeed[idx - 1]; //取最小
 //		return (l - vl[idx - 1])/(vl[idx] - vl[idx - 1])*(maxSpeed[idx] - maxSpeed[idx - 1]) + maxSpeed[idx - 1]; //线性
 //	};
-//	SequenceInterpolator<double>::ptr lt;
-//	lt = TimeOptimalPlanner::getOptimalLt(getMaxSpeed, Length, assignedVelocity, assignedAcceleration, _h, Length/(count - 1));
-//	vector<double> vt = robot::trajectory::Sampler<double>::linspace(0, lt->duration(), 100);
-//	vl = robot::trajectory::Sampler<double>::sample(vt, [&](double t){return lt->x(t);});
-//	vector<double> vv = robot::trajectory::Sampler<double>::sample(vt, [&](double t){return lt->dx(t);});
-//	saveDoublePath(to_string(getUTime()).c_str(), vv, vl);
+	SequenceInterpolator<double>::ptr lt;
+	lt = TimeOptimalPlanner::getOptimalLt(maxSpeed, Length, assignedVelocity, assignedAcceleration, _h, Length/(count - 1));
+	vector<double> vt = robot::trajectory::Sampler<double>::linspace(0, lt->duration(), 100);
+	vl = robot::trajectory::Sampler<double>::sample(vt, [&](double t){return lt->x(t);});
+	vector<double> vv = robot::trajectory::Sampler<double>::sample(vt, [&](double t){return lt->dx(t);});
+	saveDoublePath(to_string(getUTime()).c_str(), vv, vl);
 
 	/**> 返回 */
 	auto origin = std::make_pair(CompositeInterpolator<Vector3D<double> >::ptr(new CompositeInterpolator<Vector3D<double> >(posIpr, lt)),

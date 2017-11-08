@@ -313,6 +313,8 @@ double SMPlannerEx::queryMaxSpeed(double s, double h, double aMax, double v1, do
 		throw("错误<SMPlannerEx>: 距离s必须大于0!");
 	if (fixZero(v1) < 0 || fixZero(v2) < 0)
 		throw("错误<SMPlannerEx>: 速度必须为非负数!");
+	if (v1 == v2)
+		return 0;
 	int sgn = (v2 > v1)? 1:-1;
 	h = sgn*fabs(h);
 	aMax = sgn*fabs(aMax);
@@ -323,7 +325,7 @@ double SMPlannerEx::queryMaxSpeed(double s, double h, double aMax, double v1, do
 	double midSpeed = (lowerSpeed + upperSpeed)/2.0;
 	double dv = upperSpeed - lowerSpeed;
 	/**> 二分法查找最接近v2且可以达到的速度, v1是一定能达到的 */
-	while(fabs(dv) >= 0.01)
+	while(fabs(dv) >= 0.01 || lowerSpeed == v1)
 	{
 		if (queryMinDistance(h, aMax, v1, midSpeed) <= s)
 			lowerSpeed = midSpeed;

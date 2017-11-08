@@ -56,9 +56,10 @@ Trajectory::qVelAcc Trajectory::sampleVelAcc(const int count, double precision)
 	double l=dl; int i=1;
 	for (; i<count; i++, l+=dl)
 	{
-		state = this->getState(l, precision);
+		state = this->getState(l);
 		ddq.push_back(state.getAcceleration());
 		dq.push_back((state.getAngle() - lastQ)/dl); //用平均速度来代替瞬时速度
+		lastQ = state.getAngle();
 	}
 	struct qVelAcc result;
 	result.dq = dq;
