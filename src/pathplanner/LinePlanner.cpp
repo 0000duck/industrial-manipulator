@@ -79,7 +79,7 @@ LineTrajectory::ptr LinePlanner::query()
 //		maxSpeed[i] -= fRand(0, 0.3);
 //		maxSpeed[i] = (maxSpeed[i] < 0.1)? 0.1:maxSpeed[i];
 //	}
-	vector<double> vl = robot::trajectory::Sampler<double>::linspace(0, Length, count);
+//	vector<double> vl = robot::trajectory::Sampler<double>::linspace(0, Length, count);
 //	saveDoublePath(to_string(getUTime()).c_str(), maxSpeed, vl);
 	TimeOptimalPlanner::optimizeVelocityRestriction(maxSpeed, assignedAcceleration, _h, Length/(count - 1));
 //	saveDoublePath(to_string(getUTime()).c_str(), maxSpeed, vl);
