@@ -80,24 +80,15 @@ LineTrajectory::ptr LinePlanner::query()
 //		maxSpeed[i] = (maxSpeed[i] < 0.1)? 0.1:maxSpeed[i];
 //	}
 	vector<double> vl = robot::trajectory::Sampler<double>::linspace(0, Length, count);
-	saveDoublePath(to_string(getUTime()).c_str(), maxSpeed, vl);
+//	saveDoublePath(to_string(getUTime()).c_str(), maxSpeed, vl);
 	TimeOptimalPlanner::optimizeVelocityRestriction(maxSpeed, assignedAcceleration, _h, Length/(count - 1));
-	saveDoublePath(to_string(getUTime()).c_str(), maxSpeed, vl);
+//	saveDoublePath(to_string(getUTime()).c_str(), maxSpeed, vl);
 
-//	std::function<double(double)> getMaxSpeed = [&](double l){
-//		auto it = std::upper_bound(vl.begin(), vl.end(), l);
-//		if (it == vl.end()) it--;
-//		int idx = it - vl.begin();
-//		if (0 == idx) idx = 1;
-////		return (maxSpeed[idx] <= maxSpeed[idx - 1])? maxSpeed[idx]:maxSpeed[idx - 1]; //取最小
-//		return (l - vl[idx - 1])/(vl[idx] - vl[idx - 1])*(maxSpeed[idx] - maxSpeed[idx - 1]) + maxSpeed[idx - 1]; //线性
-//	};
-	SequenceInterpolator<double>::ptr lt;
-	lt = TimeOptimalPlanner::getOptimalLt(maxSpeed, Length, assignedVelocity, assignedAcceleration, _h, Length/(count - 1));
-	vector<double> vt = robot::trajectory::Sampler<double>::linspace(0, lt->duration(), 100);
-	vl = robot::trajectory::Sampler<double>::sample(vt, [&](double t){return lt->x(t);});
-	vector<double> vv = robot::trajectory::Sampler<double>::sample(vt, [&](double t){return lt->dx(t);});
-	saveDoublePath(to_string(getUTime()).c_str(), vv, vl);
+	SequenceInterpolator<double>::ptr lt = TimeOptimalPlanner::getOptimalLt(maxSpeed, Length, assignedVelocity, assignedAcceleration, _h, Length/(count - 1));
+//	vector<double> vt = robot::trajectory::Sampler<double>::linspace(0, lt->duration(), 100);
+//	vl = robot::trajectory::Sampler<double>::sample(vt, [&](double t){return lt->x(t);});
+//	vector<double> vv = robot::trajectory::Sampler<double>::sample(vt, [&](double t){return lt->dx(t);});
+//	saveDoublePath(to_string(getUTime()).c_str(), vv, vl);
 
 	/**> 返回 */
 	auto origin = std::make_pair(CompositeInterpolator<Vector3D<double> >::ptr(new CompositeInterpolator<Vector3D<double> >(posIpr, lt)),

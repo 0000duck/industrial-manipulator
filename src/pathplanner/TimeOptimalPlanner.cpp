@@ -37,10 +37,8 @@ void TimeOptimalPlanner::optimizeVelocityRestriction(vector<double>& maxSpeed, d
 		{
 			if (! planner.checkDitance(ds, h, a, maxSpeed[index], maxSpeed[index - 1], trueV)) //index - 1处速度无法达到
 			{
-				cout << ds << " " << h << " " << a << " " << maxSpeed[index] << " " << maxSpeed[index - 1] << " " << trueV << endl;
 				maxSpeed[index - 1] = trueV;
 				checkIndex.push(index - 1);
-				cout << trueV << endl;
 			}
 		}
 		if (index < maxSpeed.size() - 1 && maxSpeed[index] < maxSpeed[index + 1])

@@ -183,8 +183,8 @@ int main(){
 
 //	motionstacktest();
 
-//	SMPlannerEx planner;
-//	cout << planner.queryMaxSpeed(0.01007, 50, 20, 0.3614, 1) << endl;
+	SMPlannerEx planner;
+	cout << planner.queryMaxSpeed(0.01007, 50, 20, 0.3614, 1) << endl;
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

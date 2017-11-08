@@ -168,17 +168,11 @@ vector<double> Trajectory::sampleMaxSpeed(const int count, Q dqMax, Q ddqMax, do
 	vector<double> result;
 	for (int i=0; i<(int)dq.size(); i++)
 	{
-		dq[i].print();
-		ddq[i].print();
 		tempSpeed = (dqMax/dq[i]).getMin();
-		println(tempSpeed);
 		maxSpeed = tempSpeed < maxSpeed ? tempSpeed:maxSpeed;
 		tempSpeed = sqrt((ddqMax/ddq[i]).getMin());
-		println(tempSpeed);
 		maxSpeed = tempSpeed < maxSpeed ? tempSpeed:maxSpeed;
-		println(maxSpeed);
 		result.push_back(maxSpeed);
-		println();
 		maxSpeed = v;
 	}
 	return result;
