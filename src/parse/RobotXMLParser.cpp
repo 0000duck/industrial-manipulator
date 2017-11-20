@@ -42,13 +42,13 @@ SerialLink::ptr RobotXMLParser::parse(const std::string filename)
 		std::regex tagName("(<name>)(.*?)(</name>)(.*)", std::regex::icase);
 		if (regex_match(body, tagName))
 		{
-			cout << "Name:\t" << std::regex_replace(body, tagName, "$2") << endl;
+//			cout << "Name:\t" << std::regex_replace(body, tagName, "$2") << endl;
 		}
 		else
 		{
-			cout << "Name:\t" << endl;
+//			cout << "Name:\t" << endl;
 		}
-		cout << '\n';
+//		cout << '\n';
 		std::regex tagJoint("(<joint>)(.*?)(</joint>)", std::regex::icase);
 		std::regex tagAlpha("(<alpha>)(.*?)(</alpha>)", std::regex::icase);
 		std::regex tagA("(<a>)(.*?)(</a>)", std::regex::icase);
@@ -66,20 +66,20 @@ SerialLink::ptr RobotXMLParser::parse(const std::string filename)
 			string lmax;
 			string name;
 			string jointStr = it->str();
-			cout << "Joint: ";
+//			cout << "Joint: ";
 			if (regex_search(jointStr, tempMatch, tagName))
 			{
 				name = tempMatch.str(2);
-				cout << name <<"\n";
+//				cout << name <<"\n";
 			}
 			else
 			{
-				cout << "\tname:\n";
+//				cout << "\tname:\n";
 			}
 			if (regex_search(jointStr, tempMatch, tagAlpha))
 			{
 				alpha = tempMatch.str(2);
-				cout << " -alpha:" << alpha <<"\n";
+//				cout << " -alpha:" << alpha <<"\n";
 			}
 			else
 			{
@@ -88,7 +88,7 @@ SerialLink::ptr RobotXMLParser::parse(const std::string filename)
 			if (regex_search(jointStr, tempMatch, tagA))
 			{
 				a = tempMatch.str(2);
-				cout << " -a:\t" << a <<"\n";
+//				cout << " -a:\t" << a <<"\n";
 			}
 			else
 			{
@@ -97,7 +97,7 @@ SerialLink::ptr RobotXMLParser::parse(const std::string filename)
 			if (regex_search(jointStr, tempMatch, tagD))
 			{
 				d = tempMatch.str(2);
-				cout << " -d:\t" << d <<"\n";
+//				cout << " -d:\t" << d <<"\n";
 			}
 			else
 			{
@@ -106,7 +106,7 @@ SerialLink::ptr RobotXMLParser::parse(const std::string filename)
 			if (regex_search(jointStr, tempMatch, tagTheta))
 			{
 				theta = tempMatch.str(2);
-				cout << " -theta:" << theta <<"\n";
+//				cout << " -theta:" << theta <<"\n";
 			}
 			else
 			{
@@ -115,7 +115,7 @@ SerialLink::ptr RobotXMLParser::parse(const std::string filename)
 			if (regex_search(jointStr, tempMatch, tagLmin))
 			{
 				lmin = tempMatch.str(2);
-				cout << " -min:" << lmin <<"\n";
+//				cout << " -min:" << lmin <<"\n";
 			}
 			else
 			{
@@ -124,7 +124,7 @@ SerialLink::ptr RobotXMLParser::parse(const std::string filename)
 			if (regex_search(jointStr, tempMatch, tagLmax))
 			{
 				lmax = tempMatch.str(2);
-				cout << " -max:" << lmax <<"\n";
+//				cout << " -max:" << lmax <<"\n";
 			}
 			else
 			{
@@ -146,11 +146,11 @@ SerialLink::ptr RobotXMLParser::parse(const std::string filename)
 			}
 			catch(const char* msg)
 			{
-				cout << "error: " << msg << '\n';
+//				cout << "error: " << msg << '\n';
 				throw( string("XML文件格式错误!") );
 			}
 			linkList.push_back(Link::ptr(new Link(dalpha, da, dd, dtheta, dlmin, dlmax, name)));
-			cout << '\n';
+//			cout << '\n';
 		}
 	}
 	else

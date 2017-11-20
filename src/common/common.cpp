@@ -39,6 +39,10 @@ unsigned long long getUTime()
 	return tv.tv_sec*1000000 + tv.tv_usec;
 }
 
+double min_d(double a, double b) { return ((a < b)? a:b);}
+
+double max_d(double a, double b) { return ((a > b)? a:b);}
+
 }
 }
 

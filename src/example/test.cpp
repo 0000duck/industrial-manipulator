@@ -7,6 +7,7 @@
 
 # include "../math/Rotation3D.h"
 # include "../math/HTransform3D.h"
+# include "../math/LeastSquare.h"
 # include "../kinematics/Trsf.h"
 # include "../kinematics/Frame.h"
 # include "../kinematics/State.h"
@@ -171,7 +172,7 @@ int main(){
 
 //	p2pPlannerSampler();
 
-	lineplannerTest();
+//	lineplannerTest();
 
 //	circularplannerTest();
 
@@ -182,9 +183,6 @@ int main(){
 //	mlabplannertest();
 
 //	motionstacktest();
-
-	SMPlannerEx planner;
-	cout << planner.queryMaxSpeed(0.01007, 50, 20, 0.3614, 1) << endl;
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

@@ -48,7 +48,14 @@ double fixAngle(double angle);
  */
 double fixZero(double num);
 
+/**
+ * @brief 通过gettimeofday获取系统绝对时间(微秒)
+ */
 unsigned long long getUTime();
+
+double min_d(double a, double b);
+
+double max_d(double a, double b);
 
 /** @} */
 }

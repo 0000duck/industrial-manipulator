@@ -88,6 +88,7 @@ private:
 template<>
 class ConvertedInterpolator<std::vector<Interpolator<double>::ptr > , robot::math::Q>: public Interpolator<robot::math::Q> {
 public:
+	using ptr = std::shared_ptr<ConvertedInterpolator<std::vector<Interpolator<double>::ptr > , robot::math::Q> >;
 	/**
 	 * @brief 构造函数
 	 * @param origin [in] 用于构造Q插补器的double插补器集合
