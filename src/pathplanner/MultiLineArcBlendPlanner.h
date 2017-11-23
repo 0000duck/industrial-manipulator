@@ -41,32 +41,31 @@ public:
 
 	/**
 	 * @brief 构造函数
-	 * @param dqLim [in] 关节最大速度
-	 * @param ddqLim [in] 关节最大加速度
+	 * @param dqLim [in] 关节速度限制
+	 * @param ddqLim [in] 关节加速度限制
 	 * @param ikSolver [in] 逆解器
-	 * @param serialLink [in] 机器人模型
+	 * @param path [in] 连续路径点
+	 * @param arcRatio [in] 圆弧开始处到原相交点的距离占两侧最短直线长度的比例
+	 * @param velocity [in] 在各段直线上的期望速度
+	 * @param acceleration [in] 在各段直线上的期望加速度
+	 * @param jerk [in] 在各段直线上的期望加加速度
 	 */
 	MultiLineArcBlendPlanner(Q dqLim, Q ddqLim,
 			std::shared_ptr<robot::ik::IKSolver> ikSolver,
 			const vector<Q>& path, const vector<double>& arcRatio, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk);
 
-	/**
-	 * @brief 询问路径
-	 * @param path [in] 关键点列表
-	 * @param arcRatio [in] 各个交界处圆弧起始点占整条线段的比值(0.1~0.5)
-	 * @param velocity [in] 各个线段上的期望速度
-	 * @param acceleration [in] 各个线段上的期望加速度
-	 * @param jerk [in] 各个线段上的最大加加速度
-	 * @return 直线圆弧连续轨迹插补器的指针
-	 */
 	MLABTrajectory::ptr query();
 
 	vector<SequenceInterpolator<double>::ptr> getLt(vector<Trajectory::ptr>& trajectoryIpr);
 
 	void doQuery();
+
 	bool stop(double t, Interpolator<Q>::ptr& stopIpr);
+
 	void resume(); //qStart为恢复点, 可以改为自动获取, 或留以作为位置误差判断
+
 	bool isTrajectoryExist() const;
+
 	Interpolator<Q>::ptr getQTrajectory() const;
 
 	virtual ~MultiLineArcBlendPlanner();

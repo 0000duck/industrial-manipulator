@@ -57,6 +57,7 @@
 //# include "smplannerex/smplannertest.h"
 # include "mlabplanner/mlabplannertest.h"
 # include "motionstack/motionstacktest.h"
+# include "q2qplanner/q2qplannertest.h"
 # include <functional>
 # include <map>
 
@@ -183,6 +184,14 @@ int main(){
 //	mlabplannertest();
 
 //	motionstacktest();
+
+	try{
+	q2qplannertest();
+	}
+	catch(char const* msg)
+	{
+		cout << msg;
+	}
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);

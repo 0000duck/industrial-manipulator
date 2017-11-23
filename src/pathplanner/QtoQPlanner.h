@@ -24,10 +24,9 @@ public:
 	using ptr = std::shared_ptr<Planner>;
 
 	QtoQPlanner(Q dqLim, Q ddqLim,
-			std::shared_ptr<robot::ik::IKSolver> ikSolver,
 			Q start, Q qEnd);
 
-	void query();
+	Interpolator<Q>::ptr query();
 
 	void doQuery();
 
@@ -43,8 +42,6 @@ public:
 private:
 	Q _dqLim;
 	Q _ddqLim;
-	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
-	SerialLink::ptr  _serialLink;
 	Q _qStop;
 	Q _qEnd;
 	const double _size;

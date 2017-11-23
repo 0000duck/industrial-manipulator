@@ -16,10 +16,8 @@ namespace robot {
 namespace pathplanner {
 
 QtoQPlanner::QtoQPlanner(Q dqLim, Q ddqLim,
-		std::shared_ptr<robot::ik::IKSolver> ikSolver,
 		Q start, Q qEnd)
 : _dqLim(dqLim), _ddqLim(ddqLim),
-  _ikSolver(ikSolver), _serialLink(ikSolver->getRobot()),
   _qStop(start), _qEnd(qEnd), _size(start.size())
 {
 	_v = 10;
@@ -30,7 +28,7 @@ QtoQPlanner::QtoQPlanner(Q dqLim, Q ddqLim,
 	_k = vector<double>(_size, 0);
 }
 
-void QtoQPlanner::query()
+Interpolator<Q>::ptr QtoQPlanner::query()
 {
 	Q distances = _qEnd - _qStop;
 	double L = (fabs(distances.getMin()) > fabs(distances.getMax())) ? fabs(distances.getMin()):fabs(distances.getMax());
@@ -39,8 +37,8 @@ void QtoQPlanner::query()
 		_k[i] = distances[i]/L;
 		if (fabs(_k[i]) < 1e-12)
 			continue;
-		_v = common::min_d(_v, _dqLim[i]/_k[i]);
-		_a = common::min_d(_a, _ddqLim[i]/_k[i]);
+		_v = common::min_d(_v, fabs(_dqLim[i]/_k[i]));
+		_a = common::min_d(_a, fabs(_ddqLim[i]/_k[i]));
 		// h??
 	}
 
@@ -69,6 +67,7 @@ void QtoQPlanner::query()
 		}
 	}
 	_qIpr = std::make_shared<ConvertedInterpolator<std::vector<Interpolator<double>::ptr > , robot::math::Q> >(_ltoqIpr);
+	return _qIpr;
 }
 
 void QtoQPlanner::doQuery()
