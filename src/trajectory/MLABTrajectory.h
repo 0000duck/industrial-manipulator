@@ -37,17 +37,12 @@ public:
 
 	/**
 	 * @brief 构造函数
-	 * @param arcPosIpr [in] 圆弧段位置插补器列表
-	 * @param linePosIpr [in] 直线段位置插补器列表
-	 * @param arcRotIpr [in] 圆弧段姿态插补器列表
-	 * @param lineRotIpr [in] 直线段姿态插补器列表
-	 * @param length [in] 各段长度列表(包括直线段和圆弧段)
-	 * @param qIpr [in] 各段的Q插补器列表(时间为索引, 包括直线段和圆弧段)
-	 * @param trajectoryIpr [in] 各段的Q插补器列表(长度为索引, 包括直线段和圆弧段)
-	 * @param lt [in] 各段的时间规划插补器列表(包括直线段和圆弧段)
-	 * @param origin [in] 整条线段的位置和姿态插补器(时间为索引)
-	 * @param iksolver [in] 用于逆解的逆解器
-	 * @param config [in] 用于逆解的位姿参数
+	 * @param vtrajectory [in] 各段的轨迹(长度为索引)
+	 * @param vlt [in] 各段轨迹的长度-时间函数(速度策略)
+	 * @param vqIpr [in] 各段的轨迹(时间为索引)
+	 * @param trajectory [in] 整段轨迹(长度为索引)
+	 * @param lt [in] 整段轨迹的长度-时间函数(速度策略)
+	 * @param qIpr [in] 整段轨迹(时间为索引)
 	 */
 	MLABTrajectory(
 			vector<Trajectory::ptr> vtrajectory,

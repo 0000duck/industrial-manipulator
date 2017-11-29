@@ -16,6 +16,7 @@ namespace parse {
 
 /**
  * @addtogroup parse
+ * @brief 文件解析器
  * @{
  */
 

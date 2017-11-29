@@ -38,7 +38,7 @@ public:
 	JoggingPlanner(std::shared_ptr<robot::ik::IKSolver> ikSolver, vector<double> constraints, Q dqLim, Q ddqLim);
 
 	/**
-	 * #brief X方向的示教规划
+	 * @brief X方向的示教规划
 	 * @param current [in] 当前的关节角度值
 	 * @param farEnd [out] 规划的最远端点的关节角度值
 	 * @param isPositive [in] 正方向还是负方向
