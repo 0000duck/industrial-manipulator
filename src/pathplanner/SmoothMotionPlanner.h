@@ -17,9 +17,13 @@ namespace pathplanner {
 /** @addtogroup pathplanner
  * @brief 路径规划器
  *
- * 包括的类有(当前关键研发部分):
- * 1. PointToPointPlanner: 点对点路径规划
+ * 主要包括的类有:
+ * 1. QtoQPlanner: MoveJ点对点路径规划
  * 2. SmoothMotionPlanner: 平滑路径规划器
+ * 3. LinePlanner: MoveL直线规划器
+ * 4. CircularPlanner: MoveC圆弧规划器
+ * 5. MultiLineArcBlendPlanner: 直线段圆弧混合规划器
+ * 6. JoggingPlanner:
  * @{
  */
 

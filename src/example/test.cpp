@@ -185,13 +185,7 @@ int main(){
 
 //	motionstacktest();
 
-	try{
 	q2qplannertest();
-	}
-	catch(char const* msg)
-	{
-		cout << msg;
-	}
 
 //	Q pos(0, 0, 0, 0, 0, 0);
 //	Q velocity = Q(2./sqrt(3), 2./sqrt(3), 2./sqrt(3), 0, 0, 0);
@@ -226,20 +220,7 @@ int main(){
 //		Vector3D<double> tempPosition = circle->x(l);
 //		position.push_back(tempPosition);
 //	}
-//
-//	/**> 保存文件 */
-//	const char* filename1 = "src/example/tempx.csv";
-//	std::ofstream out1(filename1);
-//	for (int i=0; i<(int)position.size(); i++)
-//	{
-//		out1 << position[i](0) << "," << position[i](1) << "," << position[i](2) << endl;
-//	}
-//	out1.close();
 
-
-//	std::vector<std::shared_ptr<base> > a;
-//	a.push_back(std::shared_ptr<class1>(new class1) );
-//	a[0]->print();
 	return 0;
 }
 

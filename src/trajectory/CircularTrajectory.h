@@ -66,21 +66,22 @@ public:
 	 * @return t处的路径加速度
 	 */
 	double ddl(double t) const;
+
 	double duration() const;
 
 	/** @brief 返回距离为索引的插补器 */
 	inline Trajectory::ptr getTrajectory(){return _trajectory;}
+
 	virtual ~CircularTrajectory(){}
 protected:
+	/**> 关节路径 - 时间为索引 */
 	ikInterpolator::ptr _qIpr;
 
-	/** @brief 直线距离-时间插补器 */
+	/**> 直线距离-时间插补器 */
 	SequenceInterpolator<double>::ptr _lt;
 
+	/**> 关节路径 - 长度为索引 */
 	Trajectory::ptr _trajectory;
-
-	std::vector<std::pair<double, double> > _lengthPath;
-	const int _pathSize;
 };
 
 /** @} */

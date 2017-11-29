@@ -22,7 +22,7 @@ namespace trajectory {
  *
  * 长度信息在构造的时候采样获得, 采样的点数由_dl和_countMin共同确定.
  * 注意的是, 除非特别要求, 一般仅用于做速度分析的贝塞尔线段的长度信息对精度的要求
- * 不是很高. 采样点数的多少影响查找速度(查找速度关于采样点数是对数复杂度).
+ * 不是很高. 采样点数的多少影响查找速度(使用对分查找, 时间复杂度为logN).
  */
 class BezierPath : public Interpolator<Vector3D<double> >{
 public:

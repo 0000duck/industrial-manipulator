@@ -81,10 +81,10 @@ LineTrajectory::ptr LinePlanner::query()
 //	}
 //	vector<double> vl = robot::trajectory::Sampler<double>::linspace(0, Length, count);
 //	saveDoublePath(to_string(getUTime()).c_str(), maxSpeed, vl);
-	TimeOptimalPlanner::optimizeVelocityRestriction(maxSpeed, assignedAcceleration, _h, Length/(count - 1));
+	TimeOptimalPlanner::optimizeVelocityRestriction(maxSpeed, assignedAcceleration, _h, Length/(count - 1)); //采样速度检测与优化
 //	saveDoublePath(to_string(getUTime()).c_str(), maxSpeed, vl);
 
-	SequenceInterpolator<double>::ptr lt = TimeOptimalPlanner::getOptimalLt(maxSpeed, Length, assignedVelocity, assignedAcceleration, _h, Length/(count - 1));
+	SequenceInterpolator<double>::ptr lt = TimeOptimalPlanner::getOptimalLt(maxSpeed, Length, assignedVelocity, assignedAcceleration, _h, Length/(count - 1)); //获取最优策略
 //	vector<double> vt = robot::trajectory::Sampler<double>::linspace(0, lt->duration(), 100);
 //	vl = robot::trajectory::Sampler<double>::sample(vt, [&](double t){return lt->x(t);});
 //	vector<double> vv = robot::trajectory::Sampler<double>::sample(vt, [&](double t){return lt->dx(t);});

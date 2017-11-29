@@ -1,8 +1,7 @@
-/*
- * TimeOptimalPlanner.h
- *
- *  Created on: Nov 7, 2017
- *      Author: a1994846931931
+/**
+ * @brief TimeOptimalPlanner.h
+ * @date Nov 7, 2017
+ * @author a1994846931931
  */
 
 #ifndef TIMEOPTIMALPLANNER_H_
@@ -17,6 +16,16 @@ using robot::trajectory::SequenceInterpolator;
 namespace robot {
 namespace pathplanner {
 
+/**
+ * @addtogroup pathplanner
+ * @{
+ */
+
+/**
+ * @brief 时间最优规划类
+ *
+ * 根据沿轨迹的速度限制来进行可行的时间最优规划.
+ */
 class TimeOptimalPlanner {
 public:
 	TimeOptimalPlanner();
@@ -50,6 +59,8 @@ public:
 	 */
 	static SequenceInterpolator<double>::ptr getOptimalLt(vector<double> optimizedMaxSpeed, double s, double ve, double a, double h, double ds);
 };
+
+/** @} */
 
 } /* namespace pathplanner */
 } /* namespace robot */

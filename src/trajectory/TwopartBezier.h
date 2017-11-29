@@ -1,8 +1,7 @@
-/*
- * TwopartBezier.h
- *
- *  Created on: Oct 13, 2017
- *      Author: zrf
+/**@brief 两段三次bezier曲线连续过度
+ * @file TwopartBezie
+ * @date 2017/10/23
+ * @author
  */
 
 #ifndef TWOPARTBEZIER_H_
@@ -18,10 +17,6 @@
 namespace robot {
 namespace trajectory {
 
-/**@brief 两段三次bezier曲线连续过度
- * @file TwopartBezie
- * @data 2017/10/23
- */
 using robot::math::Vector3D;
 using std::vector;
 using namespace robot::trajectory;

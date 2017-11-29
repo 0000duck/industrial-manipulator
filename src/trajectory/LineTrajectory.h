@@ -29,12 +29,6 @@ class LineTrajectory : public Interpolator<Q>{
 public:
 	using ptr = std::shared_ptr<LineTrajectory>;
 
-//	LineTrajectory(std::pair<Interpolator<Vector3D<double> >::ptr , Interpolator<Rotation3D<double> >::ptr >  origin,
-//			std::shared_ptr<robot::ik::IKSolver> iksolver,
-//			robot::model::Config config,
-//			LinearCompositeInterpolator<double>::ptr mappedlt,
-//			LinearCompositeInterpolator<double>::ptr mappedtt);
-
 	/**
 	 * @brief 构造函数
 	 * @param origin [in] 位姿插补器, 位置和姿态插补器的pair(时间t为索引)
@@ -81,22 +75,6 @@ public:
 
 	double duration() const;
 
-//	inline const double length(double t) const{ return _lt->x(t);}
-//
-//	inline const double dlength(double t) const{ return _lt->dx(t);}
-//
-//	inline const double ddlength(double t) const{ return _lt->ddx(t);}
-//
-//	inline const double theta(double t) const{ return _tt->x(t);}
-//
-//	inline const double dtheta(double t) const{ return _tt->dx(t);}
-//
-//	inline const double ddtheta(double t) const{ return _tt->ddx(t);}
-
-//	inline const Interpolator<Vector3D<double> >::ptr getPosTIpr() const{ return _posInterpolator;}
-//
-//	inline const Interpolator<Rotation3D<double> >:: ptr getRotTIpr() const{ return _rotInterpolator;}
-
 	/**
 	 * @brief 获取长度l处所对应的插补器时间
 	 * @param length [in] l
@@ -113,6 +91,7 @@ public:
 	void doLengthAnalysis();
 
 	Trajectory::ptr getTrajectory() const;
+
 	virtual ~LineTrajectory(){}
 private:
 	ikInterpolator::ptr _qIpr;
@@ -120,9 +99,6 @@ private:
 
 	/** @brief 直线距离-时间插补器 */
 	SequenceInterpolator<double>::ptr _lt;
-
-//	/** @brief 直线角度-时间插补器 */
-//	Interpolator<double>::ptr _tt;
 
 	/** @brief 路径长度采样
 	 *

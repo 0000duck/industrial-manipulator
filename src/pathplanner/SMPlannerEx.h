@@ -21,6 +21,11 @@ namespace pathplanner {
 
 /**
  * @brief 加强S速度曲线规划器
+ *
+ * 使用时主要关注四个函数:
+ *  - query()
+ *  - query_flexible() (两种)
+ *  - query_stop()
  */
 class SMPlannerEx {
 public:
@@ -52,7 +57,7 @@ public:
 	 * @param v1 [in] 初始速度
 	 * @param v2 [in] 期望到达的末端速度
 	 * @param realV2 [out] 实际到达的末端速度
-	 * @param stop [in] 是否为停止段
+	 * @param stop [in] 是否最后要停下来
 	 * @return 插补器指针
 	 *
 	 * 规划器尝试v1到v2的规划, 如果在有限距离内无法达到速度v2, 不报错而是做尽量到达v2速度
@@ -88,13 +93,15 @@ public:
 			double &realV3) const;
 
 	/**
-	 * @brief 暂停规划
-	 * @param s0
-	 * @param v0
-	 * @param a0
-	 * @param h
-	 * @param aMax
-	 * @return
+	 * @brief 暂停规划 - 从当前速度加速度情况下直接减速到零(唯一可以指定初始加速度的规划)
+	 * @param s0 [in] 初始位置
+	 * @param v0 [in] 初始速度
+	 * @param a0 [in] 初始加速度
+	 * @param h [in] 加加速度限制
+	 * @param aMax [in] 加速度限制
+	 * @return 插补器指针
+	 * @note 不可指定距离, 保证加速度平滑的情况下最快速度停止. 可以指定初始加速度.
+	 * 需要指定距离时调用query或query_flexible并将stop参数设置为true
 	 */
 	robot::trajectory::SequenceInterpolator<double>::ptr query_stop(double s0, double v0, double a0, double h, double aMax);
 
@@ -131,9 +138,13 @@ public:
 	 * @return 距离限制下可达到的最大速度
 	 */
 	double queryMaxSpeed(double s, double h, double aMax, double v1, double v2) const;
+
 	virtual ~SMPlannerEx(){}
 private:
+	/** @brief query() stop=true的实现 */
 	robot::trajectory::SequenceInterpolator<double>::ptr query_stop(double start, double s, double h, double aMax, double v1, double v2) const;
+
+	/** @brief query_flexible() stop=true的实现 */
 	robot::trajectory::SequenceInterpolator<double>::ptr query_flexible_stop(double start, double s, double h, double aMax, double v1, double v2, double &realV2) const;
 
 	/**

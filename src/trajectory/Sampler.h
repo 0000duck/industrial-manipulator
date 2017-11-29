@@ -79,6 +79,13 @@ template< class T=double>
 			return result;
 		}
 
+		/**
+		 * @brief 线性空间采样点生成函数
+		 * @param start [in] 开始数值
+		 * @param end [in] 结束数值
+		 * @param count [in] 计数
+		 * @return 返回大小为count相邻数据间隔相同的数组, 其首位为start, 末位为end
+		 */
 		static vector<T> linspace(T start, T end, int count)
 		{
 			vector<T> vt;
@@ -90,6 +97,7 @@ template< class T=double>
 			vt.push_back(end);
 			return vt;
 		}
+
 		virtual ~Sampler(){}
 	};
 

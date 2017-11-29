@@ -23,13 +23,14 @@ PointToPointPlanner::PointToPointPlanner(Q h, Q aMax, Q vMax)
 
 Interpolator<Q>::ptr PointToPointPlanner::query(Q qStart, Q qEnd)
 {
+	SmoothMotionPlanner planner;
 	Q distance = qEnd - qStart;
 	vector<Interpolator<double>::ptr > seprateInterpolator;
 	vector<Interpolator<double>::ptr > qInterpolators;
 	double tMax = 0;
 	for (int i=0; i<_size; i++)
 	{
-		seprateInterpolator.push_back(_smPlanner.query(distance[i], _h[i], _aMax[i], _vMax[i], qStart[i]));
+		seprateInterpolator.push_back(planner.query(distance[i], _h[i], _aMax[i], _vMax[i], qStart[i]));
 		double duration = (*(seprateInterpolator.end() - 1))->duration();
 		tMax = (tMax > duration) ? tMax:duration;
 	}
@@ -46,10 +47,6 @@ Interpolator<Q>::ptr PointToPointPlanner::query(Q qStart, Q qEnd)
 
 PointToPointPlanner::~PointToPointPlanner()
 {
-//	for (int i=0; i<(int)_interpolatorList.size(); i++)
-//		delete _interpolatorList[i];
-//	for (int i=0; i<(int)_qInterpolatorList.size(); i++)
-//		delete _qInterpolatorList[i];
 }
 
 } /* namespace pathplanner */

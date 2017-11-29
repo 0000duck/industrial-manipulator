@@ -77,6 +77,7 @@ void circularplannerTest()
 		std::vector<double> l;
 		std::vector<double> dl;
 		std::vector<double> ddl;
+		/**> 采样 (可改用trajectory文件夹中的Sampler类来实现) */
 		clockStart = clock();
 		for (double t=0; t<=T; t+=dt)
 		{
@@ -90,7 +91,7 @@ void circularplannerTest()
 		}
 		clockEnd = clock();
 		cout << "每次插补用时: " << (clockEnd - clockStart)/(double)step << "us" << endl;
-		/**> 保存文件 */
+		/**> 保存文件 (可改用common中fileAdvance的函数来实现) */
 		const char* filename1 = "src/example/circularplanner/tempx.txt";
 		std::ofstream out1(filename1);
 		for (int i=0; i<(int)x.size(); i++)

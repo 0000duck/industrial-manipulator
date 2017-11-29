@@ -104,6 +104,7 @@ int MotionStack::state(unsigned long long t, State &state)
 		return 0;
 	}
 	case stackStop://栈不空, 暂停状态
+		state = State(_staticQ, _zero, _zero);
 		return 2;//处于非发送状态
 	default://未识别的标志号
 		throw("内部错误, 运动堆栈启动时找到异常状态号\n");

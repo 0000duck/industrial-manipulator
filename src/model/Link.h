@@ -135,24 +135,24 @@ public:
 
 	/** @brief 返回关节值 */
 	inline double getQ(){return _offset;}
-	virtual ~Link();
 
+	virtual ~Link();
 private:
 	std::string _name;
 	double _theta;
 	double _d;
 	double _a;
 	double _alpha;
-	bool _sigma;
+	bool _sigma; //sigma为连杆类型，当sigma为0：转动副；sigma为1：移动副
 	double _offset;
 	double _lmin;
 	double _lmax;
 	Frame* _frame;
 	DHParameters _dHParam;
-	const double _sa;
-	const double _ca;;
-	const double _st;
-	const double _ct;
+	const double _sa; //sin(_a)
+	const double _ca; //cos(_a)
+	const double _st; //sin(_theta)
+	const double _ct; //cos(_theta)
 };
 
 /** @} */

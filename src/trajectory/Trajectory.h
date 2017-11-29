@@ -24,7 +24,7 @@ namespace trajectory {
 /**
  * @brief 路径类
  *
- * 要求缩索引为长度, 提供一些采样方法.
+ * ikInterpolator的派生类. 约定其索引为沿路经长度. 提供了沿路经采样的一些方法.
  */
 class Trajectory : public ikInterpolator{
 public:
@@ -107,10 +107,18 @@ public:
 	 */
 	double getMaxSpeed(const int count, Q dqMax, Q ddqMax, double v, double precision=0.00001);
 
+	/**
+	 * @brief 沿路经最大速度限制采样(仅考虑各关节的速度,加速度限制)
+	 * @param count [in] 采样点数(包括开始和结束位置)
+	 * @param dqMax [in] 关节速度限制
+	 * @param ddqMax [in] 关节加速度限制
+	 * @param v [in] 指定沿路经速度上限
+	 * @param precision [in] 计算加速度时的精度
+	 * @return count个数, 线性间距, 沿路经速度的采样
+	 */
 	vector<double> sampleMaxSpeed(const int count, Q dqMax, Q ddqMax, double v, double precision=0.00001);
+
 	virtual ~Trajectory(){}
-protected:
-	const double _samplel = 0.01;
 };
 
 /** @} */

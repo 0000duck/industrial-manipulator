@@ -198,9 +198,16 @@ public:
 
 	virtual ~ConvertedInterpolator(){}
 protected:
+	/**> 逆解器 */
 	std::shared_ptr<robot::ik::IKSolver> _ikSolver;
+
+	/**> 位置插补器 */
 	Interpolator<Vector3D<double> >::ptr _posInterpolator;
+
+	/**> 姿态插补器 */
 	Interpolator<Rotation3D<double> >::ptr _rotInterpolator;
+
+	/**> 机器人姿态 - 用于逆解取解 */
 	robot::model::Config _config;
 };
 

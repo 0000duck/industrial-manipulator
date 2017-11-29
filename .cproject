@@ -39,7 +39,7 @@
 									<listOptionValue builtIn="false" value="/usr/local/lib"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.946943115" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs"/>
-								<option id="gnu.cpp.link.option.userobjs.918467098" superClass="gnu.cpp.link.option.userobjs" valueType="userObjs">
+								<option id="gnu.cpp.link.option.userobjs.918467098" name="Other objects" superClass="gnu.cpp.link.option.userobjs" valueType="userObjs">
 									<listOptionValue builtIn="false" value="/usr/local/lib/libnet.so"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib/libpcap.so"/>
 								</option>
@@ -101,7 +101,7 @@
 									<listOptionValue builtIn="false" value="/usr/local/lib"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1204736380" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs"/>
-								<option id="gnu.cpp.link.option.userobjs.347734062" superClass="gnu.cpp.link.option.userobjs" valueType="userObjs">
+								<option id="gnu.cpp.link.option.userobjs.347734062" name="Other objects" superClass="gnu.cpp.link.option.userobjs" valueType="userObjs">
 									<listOptionValue builtIn="false" value="/usr/local/lib/libnet.so"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib/libpcap.so"/>
 								</option>

@@ -10,11 +10,6 @@
 namespace robot {
 namespace pathplanner {
 
-MLBBPlanner::MLBBPlanner() {
-	// TODO Auto-generated constructor stub
-
-}
-
 MLBBPlanner::~MLBBPlanner() {
 	// TODO Auto-generated destructor stub
 }

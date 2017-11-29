@@ -15,9 +15,8 @@ CircularTrajectory::CircularTrajectory(std::pair<Interpolator<Vector3D<double> >
 		robot::model::Config config,
 		SequenceInterpolator<double>::ptr lt,
 		Trajectory::ptr trajectory)
-:_qIpr(new ikInterpolator(origin, iksolver, config)), _lt(lt), _trajectory(trajectory), _pathSize(trajectory->duration()/0.01 + 1)
+:_qIpr(new ikInterpolator(origin, iksolver, config)), _lt(lt), _trajectory(trajectory)
 {
-	_lengthPath.reserve(_pathSize);
 }
 
 Q CircularTrajectory::x(double t) const

@@ -119,6 +119,10 @@ public:
 	 */
 	void setAcceleration(double acceleration, int jointNumber);
 
+	/**
+	 * @brief 赋值函数
+	 * @param state [in] 复制的State
+	 */
 	void operator=(const State &state);
 	~State();
 private:

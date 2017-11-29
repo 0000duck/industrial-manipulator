@@ -16,10 +16,6 @@ namespace common{
  * @addtogroup common
  * @brief 包含常用的函数, 如取随机数, 打印文字等.
  *
- * 包含的主要函数有:
- * 1. fRand: 随机浮点数
- * 2. to_string: 转换成字符串
- * 3. println: 打印一行
  * @{
  */
 
@@ -50,11 +46,26 @@ double fixZero(double num);
 
 /**
  * @brief 通过gettimeofday获取系统绝对时间(微秒)
+ *
+ * 获取的是1970年1月1日至今的精确时间.
+ * @see 系统函数"gettimeofday()"的具体用法
  */
 unsigned long long getUTime();
 
+/**
+ * @brief 获得min
+ * @param a [in] 比较数a
+ * @param b [in] 比较数b
+ * @return a和b当中较小的那个数
+ */
 double min_d(double a, double b);
 
+/**
+ * @brief 获得max
+ * @param a [in] 比较数a
+ * @param b [in] 比较数b
+ * @return a和b当中较大的那个数
+ */
 double max_d(double a, double b);
 
 /** @} */

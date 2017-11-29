@@ -26,7 +26,9 @@ namespace pathplanner {
 /**
  * @brief 点到点平滑路径规划器
  *
- * 用于从一个Q到另一个Q的平滑插补, 初始和结束的速度, 加速度都为0
+ * 用于从一个Q到另一个Q的平滑插补, 初始和结束的速度, 加速度都为0.
+ * @warning 该规划各个关节都单独做S型速度曲线规划, 运行速度的改变可能导致
+ * 规划路径有所变化. 若需要不同速度下路径不变的MoveJ规划, 可使用QtoQPlanner.
  */
 class PointToPointPlanner {
 public:
@@ -45,6 +47,7 @@ public:
 	 * @return
 	 */
 	Interpolator<Q>::ptr query(Q qStart, Q qEnd);
+
 	virtual ~PointToPointPlanner();
 private:
 	/** @brief Q的大小 */
@@ -58,14 +61,6 @@ private:
 
 	/** @brief 记录的最大速度 */
 	Q _vMax;
-
-	/**
-	 * @brief 单关节的平滑插补器
-	 *
-	 * 把它作为成员边变量的原因是, 要保持由它生成的插补器的生命(SmoothMotionPlanner
-	 * 返回的插补器的生命周期与它自身相同)
-	 */
-	SmoothMotionPlanner _smPlanner;
 };
 
 /** @} */

@@ -236,6 +236,7 @@ public:
 	 * @todo 未定义功能
 	 */
 	void print();
+
 	virtual ~SerialLink();
 private:
 	/** @brief 模型名字 */

@@ -54,8 +54,17 @@ public:
 			std::shared_ptr<robot::ik::IKSolver> ikSolver,
 			const vector<Q>& path, const vector<double>& arcRatio, vector<double>& velocity, vector<double>& acceleration, vector<double>& jerk);
 
+	/**
+	 * @brief 询问路径
+	 * @return 直线圆弧插补器
+	 */
 	MLABTrajectory::ptr query();
 
+	/**
+	 * @brief 获取速度策略
+	 * @param trajectoryIpr [in] 以长度为索引的插补器
+	 * @return lt合集
+	 */
 	vector<SequenceInterpolator<double>::ptr> getLt(vector<Trajectory::ptr>& trajectoryIpr);
 
 	void doQuery();

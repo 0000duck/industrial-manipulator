@@ -87,12 +87,30 @@ public:
 	 */
 	double ddl(double t) const;
 
+	/**
+	 * @brief 获取各段的时长
+	 * @return 容器, 包含各段的时长
+	 */
 	vector<double> getTimeVector() const;
 
+	/**
+	 * @brief 获取各段的路径长度
+	 * @return 容器, 包含各段的路径长度
+	 */
 	vector<double> getLengthVector() const;
 
+	/**
+	 * @brief 获取索引
+	 * @param t [in] 时间
+	 * @return 时间t时指向的那一段路径(例如直线为第0段, 圆弧第1段...)
+	 */
 	int getIndexFromTime(double t) const;
 
+	/**
+	 * @brief 获取索引
+	 * @param l [in] 长度
+	 * @return 路径长度l指向的那一段路径(例如直线为第0段, 圆弧第1段...)
+	 */
 	int getIndexFromLength(double l) const;
 
 	inline Trajectory::ptr getTrajectory() const{return _trajectory;}

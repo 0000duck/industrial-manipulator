@@ -1,7 +1,7 @@
 /**
  * @brief PolynomialInterpolator类
  * @date Sep 4, 2017
- * @author a1994846931931
+ * @author zhuruifeng
  */
 
 #ifndef POLYNOMIALINTERPOLATOR_H_
@@ -33,8 +33,8 @@ public:
 
 	/**
 	 * @brief 构造函数
-	 * @param a [in] 参数
-	 * @param b [in] 参数
+	 * @param a [in] 参数a
+	 * @param b [in] 参数b
 	 * @param duration [in] 时长
 	 *
 	 * 构造 @f$ a + bt @f$ 的一次多项式
@@ -80,9 +80,9 @@ public:
 
 	/**
 	 * @brief 构造函数
-	 * @param a [in] 参数
-	 * @param b [in] 参数
-	 * @param c [in] 参数
+	 * @param a [in] 参数a
+	 * @param b [in] 参数b
+	 * @param c [in] 参数c
 	 * @param duration [in] 时长
 	 *
 	 * 构造 @f$ a + bt + ct^2 @f$ 的二次多项式
@@ -111,6 +111,7 @@ public:
 		return _duration;
 	}
 
+	/**> 给出f(x) = y的三组点, 求出并返回该二次多项式插补器 */
 	static PolynomialInterpolator2::ptr make(double x1,double x2,double x3,double y1,double y2,double y3,double duration)
 		{
 			Eigen::MatrixXd j=(3,3);
@@ -144,10 +145,10 @@ public:
 
 	/**
 	 * @brief 构造函数
-	 * @param a [in] 参数
-	 * @param b [in] 参数
-	 * @param c [in] 参数
-	 * @param d [in] 参数
+	 * @param a [in] 参数a
+	 * @param b [in] 参数c
+	 * @param c [in] 参数c
+	 * @param d [in] 参数d
 	 * @param duration [in] 时长
 	 *
 	 * 构造 @f$ a + bt + ct^2 + dt^3 @f$ 的三次多项式
@@ -176,6 +177,8 @@ public:
 	{
 		return _duration;
 	}
+
+	/**> 给出f(x) = y的四组点, 求出并返回该三次多项式插补器 */
 	static PolynomialInterpolator3::ptr make(double x1,double x2,double x3,double x4,double y1,double y2,double y3,double y4,double duration)
 	{
 		Eigen::MatrixXd j=(4,4);
@@ -212,11 +215,11 @@ public:
 
 	/**
 	 * @brief 构造函数
-	 * @param a [in] 参数
-	 * @param b [in] 参数
-	 * @param c [in] 参数
-	 * @param d [in] 参数
-	 * @param e [in] 参数
+	 * @param a [in] 参数a
+	 * @param b [in] 参数b
+	 * @param c [in] 参数c
+	 * @param d [in] 参数d
+	 * @param e [in] 参数e
 	 * @param duration [in] 时长
 	 *
 	 * 构造 @f$ a + bt + ct^2 + dt^3 + et^4 @f$ 的四次多项式
@@ -245,6 +248,7 @@ public:
 		return _duration;
 	}
 
+	/**> 给出f(x) = y的五四组点, 求出并返回该四次多项式插补器 */
 	static PolynomialInterpolator4::ptr make(double x1,double x2,double x3,double x4,double x5,double y1,double y2,double y3,double y4,double y5,double duration)
 		{
 			Eigen::MatrixXd j=(5,5);
@@ -282,12 +286,12 @@ public:
 
 	/**
 	 * @brief 构造函数
-	 * @param a [in] 参数
-	 * @param b [in] 参数
-	 * @param c [in] 参数
-	 * @param d [in] 参数
-	 * @param e [in] 参数
-	 * @param f [in] 参数
+	 * @param a [in] 参数a
+	 * @param b [in] 参数b
+	 * @param c [in] 参数c
+	 * @param d [in] 参数d
+	 * @param e [in] 参数e
+	 * @param f [in] 参数f
 	 * @param duration [in] 时长
 	 *
 	 * 构造 @f$ a + bt + ct^2 + dt^3 + et^4 + ft^5 @f$ 的五次多项式
@@ -316,6 +320,7 @@ public:
 		return _duration;
 	}
 
+	/**> 给出f(x) = y的六组点, 求出并返回该五次多项式插补器 */
 	static PolynomialInterpolator5::ptr make(double x1,double x2,double x3,double x4,double x5,double x6,double y1,double y2,double y3,double y4,double y5,double y6,double duration)
 		{
 			Eigen::MatrixXd j=(6,6);

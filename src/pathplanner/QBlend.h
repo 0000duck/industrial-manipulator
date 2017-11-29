@@ -18,6 +18,7 @@ using namespace robot::trajectory;
 
 namespace robot {
 namespace pathplanner {
+
 /**
  * @addtogroup pathplanner
  * @{
@@ -54,6 +55,7 @@ public:
 	 * @return
 	 */
 	Interpolator<Q>::ptr query(State qStart, State qEnd, double maxDuration);
+
 	virtual ~QBlend();
 private:
 	/** @brief Q的大小 */

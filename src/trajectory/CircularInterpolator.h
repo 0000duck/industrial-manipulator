@@ -40,6 +40,7 @@ template <class T>
 class CircularInterpolator<Vector3D<T> >: public Interpolator<Vector3D<T> > {
 public:
 	using ptr = std::shared_ptr<CircularInterpolator<Vector3D<T> > >;
+
 	/**
 	 * @brief 构造函数
 	 * @param p1 [in] 开始点
@@ -96,6 +97,12 @@ public:
         	throw("错误<CircularInterpolator>: 不正确的初始点位置, 无法规划");
 	}
 
+	/**
+	 * @brief 构造函数 duration等于圆弧长度
+	 * @param p1 [in] 开始点
+	 * @param p2 [in] 中间点
+	 * @param p3 [in] 结束点
+	 */
 	CircularInterpolator(
 			const Vector3D<T>& p1,
 			const Vector3D<T>& p2,

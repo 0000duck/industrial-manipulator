@@ -104,7 +104,7 @@ bool CircularPlanner::stop(double t, Interpolator<Q>::ptr& stopIpr)
 	Trajectory::ptr originalTrajectory = _circularTrajectory->getTrajectory();
 	stopIpr = std::make_shared<CompositeInterpolator<Q> > (originalTrajectory, stopLt);
 	double s1 = stopLt->end();
-	cout << "s1 = " << s1 << " s0 = " << s0 << " S = " << S << endl;
+//	cout << "s1 = " << s1 << " s0 = " << s0 << " S = " << S << endl;
 	_qIntermediate = originalTrajectory->x((s1 + S)/2.0); //重新计算中间点
 	_qStop = stopIpr->end();
 	return true;
