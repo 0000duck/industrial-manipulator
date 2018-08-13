@@ -1,3 +1,5 @@
+﻿`This is a basic controller for a 6R industrial manipulator. I wrote these code when I was working in a siasun, a mechanical company who wanted to develop a manipulator on their own. Unfortunately, I left this company for Huawei, and became a software engineer before the code could be tested on real robot (industrial manipulator). I've only tested the joint trajectory on Matlab. The controller is simple, and still has many problems to be solved. For example, path planning through a singular joint, better time optimization planning, e.g. But I hope this simple example could give some hint on how to develop a basic manipulator controller. Besides, many of the thoughts are taken from another open-source robotic platform, RoboWorks. `
+
 ##文件说明##
 ###src###
 ####common####
