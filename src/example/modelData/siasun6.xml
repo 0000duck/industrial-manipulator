@@ -1,0 +1,57 @@
+<Robot>
+  <Name> Siasun6 </Name>
+  <Joint>
+    <Name> joint1 </Name>
+    <alpha> 0 </alpha>
+    <a> 0 </a>
+    <d> 0.439 </d>
+    <theta> 0 </theta>
+    <min> -180 </min>
+    <max> 180 </max>
+  </Joint>
+  <Joint>
+    <Name> joint2 </Name>
+    <alpha> -90 </alpha>
+    <a> 0.16 </a>
+    <d> 0 </d>
+    <theta> -90 </theta>
+    <min> -130 </min>
+    <max> 80 </max>
+  </Joint>
+  <Joint>
+    <Name> joint3 </Name>
+    <alpha> 0 </alpha>
+    <a> 0.575 </a>
+    <d> 0 </d>
+    <theta> 0 </theta>
+    <min> -70 </min>
+    <max> 160 </max>
+  </Joint>
+  <Joint>
+    <Name> joint4 </Name>
+    <alpha> -90 </alpha>
+    <a> 0.13 </a>
+    <d> 0.644 </d>
+    <theta> 0 </theta>
+    <min> -240 </min>
+    <max> 240 </max>
+  </Joint>
+  <Joint>
+    <Name> joint5 </Name>
+    <alpha> 90 </alpha>
+    <a> 0 </a>
+    <d> 0 </d>
+    <theta> 90 </theta>
+    <min> -200 </min>
+    <max> 30 </max>
+  </Joint>
+  <Joint>
+    <Name> joint6 </Name>
+    <alpha> -90 </alpha>
+    <a> 0 </a>
+    <d> 0.1095 </d>
+    <theta> 0 </theta>
+    <min> -360 </min>
+    <max> 360 </max>
+  </Joint>
+</Robot>
