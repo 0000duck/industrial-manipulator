@@ -1,1 +1,0 @@
-# industrial-manipulator
