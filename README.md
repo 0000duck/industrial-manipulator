@@ -1,36 +1,51 @@
 ﻿`This is a basic controller for a 6R industrial manipulator. I wrote these code when I was working in a siasun, a mechanical company who wanted to develop a manipulator on their own. Unfortunately, I left this company for Huawei, and became a software engineer before the code could be tested on real robot (industrial manipulator). I've only tested the joint trajectory on Matlab. The controller is simple, and still has many problems to be solved. For example, path planning through a singular joint, better time optimization planning, e.g. But I hope this simple example could give some hint on how to develop a basic manipulator controller. Besides, many of the thoughts are taken from another open-source robotic platform, RoboWorks. `
 
-##文件说明##
-###src###
-####common####
+## 文件说明 ##
+
+### src ###
+
+#### common ####
+
 常用函数
 
 - common: 常用函数, 例如最大值最小值
 - fileAdvance: 文件操作, 将采样的数据保存成文件
 - printAdvance: 方便输出
-####example####
+
+#### example ####
+
 各类测试文件
 
 - 其它: 各类测试代码
 - modelData: 模型XML文件
 - test.cpp: *主函数*
-####ext####
+
+#### ext ####
+
 外部文件 - 开源库Eigen
-####hardware####
+
+#### hardware ####
+
 一代控制其中的通信相关的一些代码
-####ik####
+
+#### ik ####
+
 逆向运动学
 
 - IKSolver: 逆解器基类
 - PieperSolver: 符合Pieper准则一类机器人的逆解, 未进行维护
 - SiasunSR4CSolver: 新松机器人通用的逆解器, 是IKSolver的派生类
-####kinematic####
+
+#### kinematic ####
+
 正向运动学
 
 - Frame: 坐标描述
 - State: 机器人关节状态描述
 - Trsf: xyzrxryrz位姿表示方法
-####math####
+
+#### math ####
+
 数学类
 
 - HTransform3D: 4X4变换矩阵
@@ -40,7 +55,9 @@
 - Quaternion: 单位四元数
 - LeastSquare: 最小二乘法
 - Integrator: 路径长度采样计算
-####model####
+
+#### model ####
+
 模型构建
 
 - Config: 机器人姿态配置
@@ -50,12 +67,16 @@
 - Link: 机器人关节
 - SerialLink: 串联机器人
 - Tool: 工具计算(只完成了TCP计算)
-####parse####
+
+#### parse ####
+
 文件解析
 
 - 其它: 来自一代控制器的代码(未使用)
 - RobotXMLParse: 机器人XML文件解析器
-####pathplanner####
+
+#### pathplanner ####
+
 路径规划器
 
 - Planner: *标准规划器基类*, 它的派生类指针可以放置到运动堆栈中, 以下为其派生类
@@ -76,13 +97,13 @@
 - ExcessMotionPlanner: 未实现
 - MLBBPlanner: 未完成
 
-####simulation####
+#### simulation ####
 仿真类
 
 - IterativeSimulation: 积分仿真
 - MotionStack: 运动堆栈
 - TaskStack: 任务堆栈
-####trajectory####
+#### trajectory ####
 轨迹描述类/插补器
 
 - Interpolator: 插补器基类
@@ -102,18 +123,25 @@
 - Trajectory: 以路径长度为索引的ikInterpolator, 提供一些算法. 与上面几个名字中带有Trajectory的没有关系
 - TwopartBezier: 二段贝塞尔
 
-###doc###
-####doxygen####
+### doc ###
+
+#### doxygen ####
+
 doxygen文档的输出文件夹, 具体输出由Doxyfile文件配置
-####img####
+
+#### img ####
+
 用于doxygen文档的一些内嵌图片
-####其它####
+
+#### 其它 ####
+
 - .git: git文件夹, 不用管
 - .gitignore: 配置git忽略文件,包括Debug,Release,doxygen输出文件夹和名字中带有"temp"的所有文件
 - Doxyfile: doxygen的配置文件
 - 其它
 
-##注释文档使用说明##
+## 注释文档使用说明 ##
+
 注释用doxygen格式编写, 安装doxygen, dot和latex的电脑上在robot目录中执行
 `doxygen ./Doxyfile`
 即可输出doxygen文档. 当前的配置是输出Html文件和Latex文件. 打开`doc/doxygen/html`文件夹下的index.html即可浏览网页版说明文档. Latex文件用于pdf输出, 由于文档中包含中文, 需要对文件进行修改后再调用make输出pdf. "资料整理/程序代码"文件夹中的generatePDF脚本可以辅助这一操作. 打开该文件, 修改robot目录和输出目录, 用命令行运行脚本即可.
